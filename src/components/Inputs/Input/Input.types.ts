@@ -11,7 +11,8 @@ export interface InputFieldProps
     | 'search'
     | 'tel'
     | 'text'
-    | 'url';
+    | 'url'
+    | 'date';
   disabled?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   value?: any;
@@ -31,4 +32,5 @@ export interface InputProps extends Omit<InputFieldProps, 'size'> {
   errorMessage?: string;
   label?: string;
   variant?: 'style1' | 'style2';
+  className?: string;
 }
