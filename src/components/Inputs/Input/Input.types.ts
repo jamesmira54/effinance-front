@@ -33,4 +33,5 @@ export interface InputProps extends Omit<InputFieldProps, 'size'> {
   label?: string;
   variant?: 'style1' | 'style2';
   className?: string;
+  onBlur?: () => void;
 }

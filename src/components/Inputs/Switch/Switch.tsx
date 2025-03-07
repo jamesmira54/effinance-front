@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { ForwardedRef, Fragment, useState } from "react";
 import { SwitchProps } from "./Switch.types";
 import React from "react";
 
@@ -11,14 +11,15 @@ const Switch:React.FC<SwitchProps> = React.forwardRef(
       name,
       disabled=false,
       variant='style1',
-      id
-    }
+      id,
+      ...props
+    }, ref?: ForwardedRef<HTMLDivElement>
 ) => {
 
     const [switchOn, setEnabled] = useState<boolean>(enabled);
     
     return (
-      <div x-data="{ switcherToggle: false }">
+      <div ref={ref} x-data="{ switcherToggle: false }">
         <label
           htmlFor={id}
           className="flex cursor-pointer select-none items-center"
@@ -33,6 +34,7 @@ const Switch:React.FC<SwitchProps> = React.forwardRef(
                 setEnabled(!switchOn);
               }}
               name={name}
+              {...props}
             />
             {variant === 'style1' ?
               <Fragment>

@@ -8,7 +8,7 @@ export type SelectOption = {
 export interface SelectProps {
     className?: string;
     name?: string;
-    value?: SelectOption | null;
+    value?: SelectOption | SelectOption[] | null;
     options?: SelectOption[];
     disabled?: boolean;
     style?: CSSProperties;
@@ -24,4 +24,5 @@ export interface SelectProps {
     readOnly?: boolean;
     label?: string;
     placeholder?: string;
+    onBlur?: () => void;
 }

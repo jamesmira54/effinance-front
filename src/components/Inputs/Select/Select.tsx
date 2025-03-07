@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ForwardedRef } from "react";
 import { useState } from "react";
 import { SelectProps, SelectOption } from "./Select.types";
 import { GoSingleSelect } from "react-icons/go";
@@ -23,8 +23,11 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
         label="Select Input",
         placeholder,
         isMultiple=false, 
+        error,
+        errorMessage = '',
+        onBlur,
         ...props
-    }
+    }, ref?: ForwardedRef<HTMLDivElement>
 ) => {
 
         const isDarkMode = typeof window !== "undefined" && document.body.classList.contains("dark");
@@ -77,7 +80,7 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
         };
 
         return (
-            <div>
+            <div ref={ref}>
                 <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
                     {label}
                 </label>
@@ -88,10 +91,12 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
                     options={options}
                     styles={customStyles}
                     onChange={onChange}
+                    onBlur={onBlur}
                     isMulti={isMultiple}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${className}`}
                     {...props}
                 />
+                {error && <p className="text-meta-1">{errorMessage}</p>}
             </div>
         );
     }
