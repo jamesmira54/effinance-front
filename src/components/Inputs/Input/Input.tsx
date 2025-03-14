@@ -23,9 +23,9 @@ const Input: React.FC<InputProps> = React.forwardRef(
         value,
         name = '',
         placeholder = '',
-        max = 0,
-        min = 0,
-        minLength = 0,
+        max,
+        min,
+        minLength,
         readOnly = false,
         required = false,
         label = '',
@@ -82,7 +82,7 @@ const Input: React.FC<InputProps> = React.forwardRef(
                         onBlur={onBlur}
                     />
 
-                    <div className="absolute right-3 top-4">
+                    <div className="absolute right-3 top-2.5">
                         {endIcon && endIcon}
                     </div>
                 </div>

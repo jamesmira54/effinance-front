@@ -1,6 +1,6 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 
-export interface SporsorshipFormProps {
+export interface SponsorshipFormProps {
     financialAssistanceName: string;
     sponsor: string;
     academicYear:  SelectOption | null;

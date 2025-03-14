@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import React from "react";
+import SchoolListing from "@/screens/setup-manager/school/SchoolListing";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Effinance - Schools",
@@ -9,7 +11,8 @@ export const metadata: Metadata = {
 const SchoolPage: React.FC = () => {
     return (
       <DefaultLayout>
-        <p>Schools Page</p>
+        <Breadcrumb pageName="Schools" />
+        <SchoolListing/>
       </DefaultLayout>
     );
   };

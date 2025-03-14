@@ -3,7 +3,7 @@ import Select from "@/components/Inputs/Select/Select";
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { SporsorshipFormProps } from "./Sponsorship.types";
+import { SponsorshipFormProps } from "./Sponsorship.types";
 
 
 const SponsorshipForm: React.FC = () => {
@@ -34,7 +34,7 @@ const SponsorshipForm: React.FC = () => {
     { value: "6", label: "Requirements 6" }
   ];
 
-  const formik = useFormik<SporsorshipFormProps>({
+  const formik = useFormik<SponsorshipFormProps>({
     initialValues: { 
       financialAssistanceName: "", 
       sponsor: "",

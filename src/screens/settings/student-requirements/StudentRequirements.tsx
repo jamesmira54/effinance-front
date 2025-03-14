@@ -8,9 +8,9 @@ import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
-import AcademicSetupForm from "./AcademicSetupForm";
-import Switch from "@/components/Inputs/Switch";
 import { CiEdit } from "react-icons/ci";
+import StudentRequirementsForm from "./StudentRequirementsForm";
+import { IoEyeOutline } from "react-icons/io5";
 
 
 const StyledModal = styled(Modal)`
@@ -21,21 +21,18 @@ const ActionModal = styled(Modal)`
 
 `;
 
-const AcademicSetupListing: React.FC = () => {
+const StudentRequirements: React.FC = () => {
     
 
     const columns = [
-        { name: "Academic Year & Term", selector: (row:any) => row.academicYear, sortable: true },
-        { name: "Date Covered	", selector: (row:any) => row.dateCovered },
-        { name: "Status", cell: (row:any) => (
-            <>
-                <Switch variant="style2"/>
-            </>
-        )},
+        { name: "Requirement", selector: (row:any) => row.requirement, sortable: true },
+        { name: "Filename", selector: (row:any) => row.filename },
+        { name: "File Type", selector: (row:any) => row.fileType },
         { name: "Action", cell: (row:any) => (
             <>
                 <div className="flex items-center space-x-4">
-                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>
+                    <Button variants="text" startIcon={<IoEyeOutline size={21}/>}/>
+                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={21}/>}/>
                     <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
@@ -44,11 +41,10 @@ const AcademicSetupListing: React.FC = () => {
 
 
     const data = [
-        { id: 1, academicYear: "2022-2023 - 2nd Semester", dateCovered: "06-01-2023 - 07-31-2023", status: "Active", action: 'Lock' },
-        { id: 2, academicYear: "2022-2023 - 1st Semester", dateCovered: "04-01-2023 - 05-31-2023", status: "Active", action: 'Lock' },
+        { id: 1, requirement: "GWA Certification", filename: "gwa.jpeg", fileType: "JPEG", action: 'Action' },
+        { id: 2, requirement: "Certificate of Residency", filename: "cert.pdf", fileType: "PDF", action: 'Action' },
     ];
     
-
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
 
@@ -64,8 +60,8 @@ const AcademicSetupListing: React.FC = () => {
               />
               <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
-            <StyledModal isFullscreen={true} title="Academic Setup Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <AcademicSetupForm/>
+            <StyledModal isFullscreen={true} title="Requirement Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
+                <StudentRequirementsForm/>
             </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
@@ -85,4 +81,4 @@ const AcademicSetupListing: React.FC = () => {
     )
 };
 
-export default AcademicSetupListing;
+export default StudentRequirements;

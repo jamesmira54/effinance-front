@@ -8,8 +8,7 @@ import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
-import AcademicSetupForm from "./AcademicSetupForm";
-import Switch from "@/components/Inputs/Switch";
+import UserAccountForm from "./UserAccountForm";
 import { CiEdit } from "react-icons/ci";
 
 
@@ -21,36 +20,36 @@ const ActionModal = styled(Modal)`
 
 `;
 
-const AcademicSetupListing: React.FC = () => {
-    
+const UserAccountListing: React.FC = () => {
+
+    const [openFormModal, setOpenFormModal] = useState<boolean>(false);
+    const [openActionModal, setOpenActionModal] = useState<boolean>(false);
+
 
     const columns = [
-        { name: "Academic Year & Term", selector: (row:any) => row.academicYear, sortable: true },
-        { name: "Date Covered	", selector: (row:any) => row.dateCovered },
-        { name: "Status", cell: (row:any) => (
-            <>
-                <Switch variant="style2"/>
-            </>
-        )},
+        { name: "First Name", selector: (row:any) => row.firstname, sortable: true },
+        { name: "Middle Name	", selector: (row:any) => row.middlename, sortable: true },
+        { name: "Last Name	", selector: (row:any) => row.lastname, sortable: true },
+        { name: "Email", selector: (row:any) => row.email, width: "250px"},
+        { name: "Phone #", selector: (row:any) => row.phoneNumber },
+        { name: "Role", selector: (row:any) => row.role, sortable: true },
         { name: "Action", cell: (row:any) => (
             <>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3.5">
                     <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>
                     <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
         )},
     ];
-
-
+    
+    
     const data = [
-        { id: 1, academicYear: "2022-2023 - 2nd Semester", dateCovered: "06-01-2023 - 07-31-2023", status: "Active", action: 'Lock' },
-        { id: 2, academicYear: "2022-2023 - 1st Semester", dateCovered: "04-01-2023 - 05-31-2023", status: "Active", action: 'Lock' },
+        { id: 1, firstname: "Britanney", middlename: "Morales", lastname: "Mullins", email: "viquma@mailinator.com", phoneNumber: "12345678901", role: "System Admin"},
+        { id: 2, firstname: "Claudia", middlename: "Sosa", lastname: "Johnson", email: "student_claudia@yopmail.com", phoneNumber: "09111111117", role: "Student"},
+        { id: 3, firstname: "Frances", middlename: "Turner", lastname: "Flores", email: "mapecuzy@mailinator.com", phoneNumber: "12345678909", role: "Sponsor"},
     ];
     
-
-    const [openFormModal, setOpenFormModal] = useState<boolean>(false);
-    const [openActionModal, setOpenActionModal] = useState<boolean>(false);
 
     return (
         <Fragment>
@@ -64,8 +63,8 @@ const AcademicSetupListing: React.FC = () => {
               />
               <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
-            <StyledModal isFullscreen={true} title="Academic Setup Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <AcademicSetupForm/>
+            <StyledModal isFullscreen={true} title="Add New User" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
+                <UserAccountForm/>
             </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
@@ -76,8 +75,10 @@ const AcademicSetupListing: React.FC = () => {
                     </p>
 
                     <div className="flex items-center justify-center w-full gap-6 mt-8">
-                        <Button className="bg-primary" onClick={() => setOpenActionModal(false)}> Cancel </Button>
-                        <Button variants="default" className="bg-danger" onClick={() => {}}>Proceed</Button>
+                        <Button className="bg-primary" onClick={() => setOpenActionModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button className="bg-danger" onClick={() => {}}>Proceed</Button>
                     </div>
                 </div>
             </ActionModal>
@@ -85,4 +86,4 @@ const AcademicSetupListing: React.FC = () => {
     )
 };
 
-export default AcademicSetupListing;
+export default UserAccountListing;

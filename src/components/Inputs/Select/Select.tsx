@@ -1,9 +1,6 @@
 import React, { ForwardedRef } from "react";
-import { useState } from "react";
 import { SelectProps, SelectOption } from "./Select.types";
-import { GoSingleSelect } from "react-icons/go";
-import { IoIosArrowDown } from "react-icons/io";
-import Select, { SingleValue, StylesConfig } from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { styled } from "styled-components";
 
 const StyledSelect = styled(Select)<any>`

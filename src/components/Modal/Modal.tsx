@@ -49,7 +49,7 @@ const Modal: React.FC<ModalProps> = ({
     : "relative rounded-3xl bg-white  dark:bg-gray-900";
 
   return (
-    <div className={`fixed inset-0 flex items-center ${isFullscreen ? 'justify-end bg-slate-500 bg-opacity-50' : 'justify-center' }  overflow-y-auto modal z-99999`}>
+    <div className={`fixed inset-0 flex items-center ${isFullscreen ? 'justify-end bg-slate-500 bg-opacity-50' : 'justify-center' } overflow-y-unset modal z-99999`}>
       {!isFullscreen && (
         <div
           className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
@@ -58,9 +58,8 @@ const Modal: React.FC<ModalProps> = ({
       )}
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-black p-8 ${contentClasses} ${isTextCentered && 'text-center'}  ${className}`}
+        className={`bg-white dark:bg-black p-8 overflow-y-auto ${contentClasses} ${isTextCentered && 'text-center'}  ${className}`}
         onClick={(e) => e.stopPropagation()}
-        style={{overflow: 'unset'}}
       >
         <h3 className="text-title-md mb-4.5">{title}</h3>
         {showCloseButton && (

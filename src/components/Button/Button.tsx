@@ -27,7 +27,7 @@ const Button: React.FC<ButtonProps> = ({
     return (
       <StyledButton
         className={`inline-flex items-center justify-center rounded-md text-center font-medium 
-          ${variants === 'default' ? "text-white" : variants === 'outlined' ?  "text-black dark:text-white hover:text-primary"  : "text-black dark:text-white hover:text-primary" }  
+          ${variants === 'default' ? "text-white" : variants === 'outlined' ?  "text-black dark:text-white hover:text-primary border"  : "text-black dark:text-white hover:text-primary" }  
           hover:bg-opacity-90 py-4 lg:px-8 xl:px-10 
           ${className}`}
         $variants={variants}

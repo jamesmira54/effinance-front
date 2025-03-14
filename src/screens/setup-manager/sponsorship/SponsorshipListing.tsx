@@ -1,16 +1,15 @@
 "use client";
 
-import DataTable, { TableStyles } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { IoEyeOutline } from "react-icons/io5";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import SponsorshipForm from "./SponsorshipForm";
+import { CiEdit } from "react-icons/ci";
 
 
 const StyledModal = styled(Modal)`
@@ -38,8 +37,8 @@ const SponsorshipListing: React.FC = () => {
         { name: "Action", cell: (row:any) => (
             <>
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<IoEyeOutline size={21}/>}/>
-                    <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={21}/>}/>
+                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>
+                    <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
         )},
@@ -55,7 +54,6 @@ const SponsorshipListing: React.FC = () => {
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <Breadcrumb pageName="Sponsorships" />
               <DataTable 
                   columns={columns} 
                   data={data} 
