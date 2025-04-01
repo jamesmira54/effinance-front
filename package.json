@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "apexcharts": "^3.45.2",
+    "axios": "^1.8.3",
+    "cookies-next": "^5.1.0",
     "flatpickr": "^4.6.13",
     "formik": "^2.4.6",
     "jsvectormap": "^1.6.0",
-    "next": "^14.2.4",
+    "next": "^15.2.2",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
     "react-data-table-component": "^7.6.2",

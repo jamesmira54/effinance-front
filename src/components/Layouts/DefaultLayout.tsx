@@ -2,13 +2,17 @@
 import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { APIUserProfileResponse } from "@/lib/AuthService/authService.types";
 
 export default function DefaultLayout({
   children,
+  userDetails
 }: {
   children: React.ReactNode;
+  userDetails: APIUserProfileResponse;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
   return (
     <>
       {/* <!-- ===== Page Wrapper Start ===== --> */}
@@ -20,7 +24,7 @@ export default function DefaultLayout({
         {/* <!-- ===== Content Area Start ===== --> */}
         <div className="relative flex flex-1 flex-col lg:ml-72.5">
           {/* <!-- ===== Header Start ===== --> */}
-          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} />
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}

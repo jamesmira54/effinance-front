@@ -1,8 +1,14 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-    compiler: {
-        styledComponents: true, // Enables SSR for styled-components
-    },
+const nextConfig = async (phase) => {
+    return {
+        compiler: {
+            styledComponents: true, // Enables SSR for styled-components
+        },
+        env: {
+            NEXT_PUBLIC_API_URL: "https://efinas.api.aespinance.com/api/v1",
+            NEXT_PUBLIC_FRONT_URL: "http://localhost:3000",
+        }
+    }
 };
 
 export default nextConfig;

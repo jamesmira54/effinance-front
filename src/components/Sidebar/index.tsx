@@ -27,7 +27,7 @@ const menuGroups = [
       {
         icon: ( <RxDashboard size={18}/> ),
         label: "Dashboard",
-        route: "/"
+        route: "/dashboard"
       },
       // {
       //   icon: (
