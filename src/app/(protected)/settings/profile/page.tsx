@@ -1,20 +1,41 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import Image from "next/image";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import Link from "next/link";
 import { MainProfile, MetaProfile, StudentProfile } from "@/screens/settings";
+import { AuthAPIService, UserAPIService } from "@/api";
 
 export const metadata: Metadata = {
   title: "Effinance - Profile",
 };
 
-const Profile = () => {
+
+const authAPI = new AuthAPIService();
+const userAPI = new UserAPIService();
+
+const fetchUserSession = async () => {
+  return await authAPI.me();
+}
+
+const fetchProfile = async (userId: string) => {
+  return await userAPI.profile(userId);
+}
+
+const Profile = async() => {
+
+  let accessToken = '';
+  const getUserSession = await fetchUserSession();
+  if(getUserSession) {
+    accessToken = getUserSession.userId
+  }
+  
+  const userDetails = await fetchProfile(accessToken);
+  const studentDetails = await fetchProfile(accessToken);
+
+  
+  
   return (
     <>
       <Breadcrumb pageName="Profile" />
       <div className="flex gap-6 flex-col">
-        <MetaProfile/>
         <MainProfile/>
         <StudentProfile/>
       </div>

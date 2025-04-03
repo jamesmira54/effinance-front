@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
 import { useRouter } from "next/navigation";
-import { signup } from "@/lib/AuthService/authService";
+import { AuthAPIService } from "@/api";
 
 
 const SignUp: React.FC = () => {
@@ -18,15 +18,16 @@ const SignUp: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const authAPI = new AuthAPIService();
 
   const SignUpHandler = async(values: SignUpFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
     try {
       setSubmitting(true);
-      await signup(values)
+      await authAPI.signUp(values);
       router.push("/dashboard");
     } catch (err: any) {
       setError(true);
-      setErrorMessage(err.message || "Something went wrong, please try again later.")
+      setErrorMessage(err.response?.data.errorDetails || "Something went wrong, please try again later.")
     } finally {
       setLoading(false);
       setSubmitting(false);
@@ -59,8 +60,8 @@ const SignUp: React.FC = () => {
   });
 
   return (
-    <div className="h-fit rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="h-fit flex flex-wrap items-center justify-center">
+    <div className="h-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="h-full flex flex-wrap items-center justify-center">
         <div className="w-full max-w-[760px] border-stroke dark:border-strokedark xl:w-1/2 xl:border-r xl:border-l">
           <div className="w-full p-4 sm:p-12.5 xl:p-10.5">
             <div className="text-center">

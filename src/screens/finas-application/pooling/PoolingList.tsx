@@ -24,7 +24,7 @@ const PoolingList: React.FC = () => {
         { name: "Finas Applied", selector: (row:any) => row.finasApplied, sortable: true },
         { name: "Date of Application", selector: (row:any) => row.dateOfApplication, sortable: true },
         { name: "Attachments", selector: (row:any) => row.attachments, sortable: true },
-        { name: "Action", cell: (row:any) => (
+        { name: "Action", cell: () => (
             <>
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>

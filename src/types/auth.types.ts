@@ -1,3 +1,18 @@
+export interface LoginFieldProps {
+    username: string, 
+    password: string
+}
+
+export interface SignUpFormProps {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    mobileNumber: string;
+    password: string;
+    repassword: string;
+}
+
 export interface APIModuleProps {
     moduleId: string;
     moduleName: string;
@@ -7,11 +22,6 @@ export interface APIModuleProps {
     delete: boolean;
 }
 
-export interface APILoginForm {
-    username: string;
-    password: string;
-}
-  
 export interface APILoginResponse {
     user: string;
     userId: string;
@@ -28,6 +38,7 @@ export interface APISignUpResponse {
     token: string;
     permissions: APIModuleProps
 }
+
 
 export interface APIUserProfileResponse {
     username: string;

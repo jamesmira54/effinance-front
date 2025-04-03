@@ -3,13 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import Input from "@/components/Inputs/Input";
 import { CiLock, CiMail } from "react-icons/ci";
-import { login } from "@/lib/AuthService/authService";
+// import { login } from "@/lib/AuthService/authService";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { LoginFormProps } from "./Auth.types";
 import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
+import { AuthAPIService } from "@/api";
 
 
 const SignIn: React.FC = () => {
@@ -18,15 +19,16 @@ const SignIn: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const authAPI = new AuthAPIService();
 
   const LoginHandler = async(values: LoginFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
     try {
       setSubmitting(true);
-      await login(values);
+      await authAPI.login(values);
       router.push("/dashboard");
     } catch (err: any) {
       setError(true);
-      setErrorMessage(err.message || "Invalid credentials")
+      setErrorMessage(err.response?.data.errorDetails || "Invalid credentials")
     } finally {
       setLoading(false);
       setSubmitting(false);
