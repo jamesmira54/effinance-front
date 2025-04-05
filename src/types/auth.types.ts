@@ -51,3 +51,9 @@ export interface APIUserProfileResponse {
     userTypeId: string;
     userType: string;
 }
+
+export interface APIUserRoles {
+    id: string
+    name: string;
+    description: string;
+}

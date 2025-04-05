@@ -4,8 +4,8 @@ export interface MainProfileFormProps {
     firstName: string;
     lastName: string;
     middleName?: string;
-    emailAddress: string;
-    phone?: string;
+    email: string;
+    mobileNumber?: string;
     role?: SelectOption | null;
     facebookUrl?: string | null;
     instagramUrl?: string | null;

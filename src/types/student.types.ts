@@ -59,5 +59,17 @@ export interface APIStudentProfileResponse {
     guardianOccupation: string | null;
     guardianMobileNumber: string | null;
     numberOfSiblings: number | null;
-    siblings: Array<string> | null;
+    siblings: SiblingRequest[];
+    gwa?: number;
+}
+
+
+export interface SiblingRequest {
+    name?: string;
+    birthdate?: string;
+    age?: number;
+    status?: string;
+    remarks?: string;
+    livingWithParents?: boolean;
+    ownHouse?: boolean;
 }

@@ -4,24 +4,28 @@ import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { MainProfileFormProps } from "./MainProfile.types";
+import { APIUserRoles } from "@/types";
 
 
-const MainProfileForm: React.FC = () => {
+const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUserRoles[]}> = ({
+  userDetails,
+  roles
+}) => {
 
-
-  const sampleData: SelectOption[] = [
-    { value: "1", label: "Data 1" },
-    { value: "2", label: "Data 2" }
-  ];
+  const rolesData: SelectOption[] = roles.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
 
   const formik = useFormik<MainProfileFormProps>({
     initialValues: { 
-        firstName: "", 
-        lastName: "",
-        middleName: "",
-        emailAddress: "",
-        phone: ""
+        firstName: userDetails.firstName, 
+        lastName: userDetails.lastName,
+        middleName: userDetails.middleName,
+        email: userDetails.email,
+        mobileNumber: userDetails.mobileNumber,
+        role: userDetails.role,
     },
     validateOnBlur: true,
     validateOnChange: true,
@@ -85,30 +89,30 @@ const MainProfileForm: React.FC = () => {
         <div className="flex flex-col mb-4 gap-6 xl:flex-row">
           <div className="w-full xl:w-1/2">
             <Input 
-              id="emailAddress"
+              id="email"
               label="Email Address" 
               type="email" 
               placeholder="Email Address" 
-              name="emailAddress"
-              value={formik.values.emailAddress}
+              name="email"
+              value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={() => formik.handleBlur}
-              error={formik.touched.emailAddress && formik.errors.emailAddress ? true : false}
-              errorMessage={formik.errors.emailAddress}
+              error={formik.touched.email && formik.errors.email ? true : false}
+              errorMessage={formik.errors.email}
               />
           </div>
           <div className="w-full xl:w-1/2">
             <Input 
-              id="phone"
-              label="Phone" 
+              id="mobileNumber"
+              label="Mobile Number" 
               type="text" 
-              placeholder="Phone" 
-              name="phone"
-              value={formik.values.phone}
+              placeholder="Mobile Number" 
+              name="mobileNumber"
+              value={formik.values.mobileNumber}
               onChange={formik.handleChange}
               onBlur={() => formik.handleBlur}
-              error={formik.touched.phone && formik.errors.phone ? true : false}
-              errorMessage={formik.errors.phone}
+              error={formik.touched.mobileNumber && formik.errors.mobileNumber ? true : false}
+              errorMessage={formik.errors.mobileNumber}
               />
           </div>
         </div>
@@ -120,7 +124,7 @@ const MainProfileForm: React.FC = () => {
               id="role"
               name="role"
               label="Role" 
-              options={sampleData} 
+              options={rolesData} 
               isMultiple={false} 
               value={formik.values.role}
               onChange={(option) => formik.setFieldValue("role", option)}
@@ -130,7 +134,7 @@ const MainProfileForm: React.FC = () => {
           </div>
         </div>
 
-        <h3 className="text-md mt-6 mb-2">Social Media Links:</h3>
+        {/* <h3 className="text-md mt-6 mb-2">Social Media Links:</h3>
         <div className="flex flex-col mb-4 gap-6 xl:flex-row">
             <div className="w-full xl:w-1/2">
               <Input 
@@ -191,7 +195,7 @@ const MainProfileForm: React.FC = () => {
                   errorMessage={formik.errors.twitterUrl}
                 />
             </div>
-        </div>
+        </div> */}
 
         <div className="flex justify-end mt-5">
           <input

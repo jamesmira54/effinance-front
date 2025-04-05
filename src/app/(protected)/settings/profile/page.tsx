@@ -1,7 +1,8 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
-import { MainProfile, MetaProfile, StudentProfile } from "@/screens/settings";
-import { AuthAPIService, UserAPIService } from "@/api";
+import { MainProfile, StudentProfile } from "@/screens/settings";
+import { AuthAPIService, RolesAPIService, StudentAPIService, UserAPIService } from "@/api";
+import { APIUserRoles } from "@/types";
 
 export const metadata: Metadata = {
   title: "Effinance - Profile",
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 
 const authAPI = new AuthAPIService();
 const userAPI = new UserAPIService();
+const studentAPI = new StudentAPIService();
+const rolesAPI = new RolesAPIService();
 
 const fetchUserSession = async () => {
   return await authAPI.me();
@@ -19,25 +22,51 @@ const fetchProfile = async (userId: string) => {
   return await userAPI.profile(userId);
 }
 
+const fetchStudentProfile = async (userId: string) => {
+  return await studentAPI.getStudentProfile(userId);
+}
+
+
+const fetchRoles = async () => {
+  return await rolesAPI.roles();
+}
+
+
 const Profile = async() => {
 
-  let accessToken = '';
+  let userId = '';
   const getUserSession = await fetchUserSession();
   if(getUserSession) {
-    accessToken = getUserSession.userId
+    userId = getUserSession.userId;
   }
   
-  const userDetails = await fetchProfile(accessToken);
-  const studentDetails = await fetchProfile(accessToken);
-
+  let userType = '';
+  let studentDetails = null;
+  const userDetails = await fetchProfile(userId);
+  if(userDetails) {
+    userType = userDetails.userType;
+  }
   
+  let studentId = '';
+  if(userType === 'Student' && getUserSession.studentId !== null) {
+    studentId = getUserSession.studentId;
+    studentDetails = await fetchStudentProfile(studentId);
+  }
+
+
+  let roles: APIUserRoles[] = [];
+  if(userType === 'System Admin') {
+    roles = await fetchRoles();
+  }
   
   return (
     <>
       <Breadcrumb pageName="Profile" />
       <div className="flex gap-6 flex-col">
-        <MainProfile/>
-        <StudentProfile/>
+        <MainProfile userDetails={userDetails} roles={roles}/>
+        {userType === 'Student' &&
+          <StudentProfile studentDetails={studentDetails}/>
+      }
       </div>
     </>
   );

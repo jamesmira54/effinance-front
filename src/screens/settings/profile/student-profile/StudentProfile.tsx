@@ -1,181 +1,388 @@
 "use client";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import Modal from "@/components/Modal";
 import { CiEdit } from "react-icons/ci";
 import Button from "@/components/Button";
 import StudentProfileForm from "./StudentProfileForm";
 import Tabs from "@/components/Tabs";
+import { APIStudentProfileResponse, SiblingRequest } from "@/types";
+import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
+import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
+import CheckBox from "@/components/Checkboxes";
 
 
-export default function UserInfoCard() {
+
+const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
+    studentDetails
+  }) => {
   const [isOpen, setOpenModal] = useState<boolean>(false);
 
+
+  const PersonalInfo = () => {
+    return (
+      <Fragment>
+        <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">
+                Personal Information
+              </h4>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.firstName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Middle Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.middleName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.lastName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email Address</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.email}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Mobile Number</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.mobileNumber}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Age</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.age}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Gender</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.sex}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birthdate</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.birthdate}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birth Place</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.placeOfBirth}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Solo Parent</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.isSoloParent ? 'YES' : 'NO'}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Child of Solo Parent</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.isChildOfSoloParent ? 'YES' : 'NO'}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Member of Indigenous People</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.isIndigenousPeople ? 'YES' : 'NO'}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">SPED</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.isSped ? 'YES' : 'NO'}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">PWD</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.isPwd ? 'YES' : 'NO'}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Emergency Contact Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.emergencyContactName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Emergency Contact #</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.emergencyContactNumber}</p>
+                </div>  
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">2nd Emergency Contact Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.emergencyContactName2}</p>
+                </div> 
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">2nd Emergency Contact #</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.emergencyContactNumber2}</p>
+                </div> 
+              </div>
+            </div>
+          </div>
+        </div>  
+      </Fragment>
+    );
+  };
+
+  const AddressInfo = () => {
+    return (
+      <Fragment>
+        <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">
+                Permanent Address
+              </h4>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Country</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentCountry}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Region</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentRegionId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Province</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentProvinceId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Zip Code</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentZipCode}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/Municipility</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentCitymunId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Barangay</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentBrgyId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Street</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentStreet}</p>
+                </div>
+              </div>
+
+              <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6 mt-3">
+                Current Address
+              </h4>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Country</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentCountry}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Region</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentRegionId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Province</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentProvinceId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Zip Code</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentZipCode}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/Municipility</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentCitymunId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Barangay</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentBrgyId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Street</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentStreet}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>  
+      </Fragment>
+    );
+  };
+
+  const EducationalBg = () => {
+    return (
+      <Fragment>
+        <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">
+                Highschool/Seniorhigh School Information
+              </h4>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Academic Strand Grade 12</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12AcademicStrand}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Program Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12ProgramName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Award/Honor</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12AwardHonor}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Organization</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12Organization}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12SchoolId}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Year of Graduation</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12YearOfGraduation}</p>
+                </div>
+              </div>
+
+
+              <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6 mt-3">
+                College School Information
+              </h4>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Program Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeProgramName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Year Level</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeYearLevel}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Award/Honor</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeAwardHonor}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Organization</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeOrganization}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeSchoolId}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>  
+      </Fragment>
+    );
+  }
+
+  const FamilyBg = () => {
+    return (
+      <Fragment>
+        <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+
+              <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
+                Father's Information:
+              </h4>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.fatherFirstName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.fatherLastName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Occupation</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.fatherOccupation}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Mobile Number</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.fatherMobileNumber}</p>
+                </div>
+              </div>
+
+              <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 lg:mb-6 mt-3">
+                Mother's Information:
+              </h4>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.motherMaidenFirstName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.motherMaidenLastName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Occupation</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.motherOccupation}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Mobile Number</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.motherMobileNumber}</p>
+                </div>
+              </div>
+
+              <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
+                Guardian's Information:
+              </h4>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.guardianFirstName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.guardianLastName}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Occupation</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.guardianOccupation}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Mobile Number</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.guardianMobileNumber}</p>
+                </div>
+              </div>
+
+              <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
+              Other Information:
+              </h4>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Number of Siblings</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.numberOfSiblings}</p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Siblings</p>
+                  {studentDetails.siblings?.map((sibling: SiblingRequest, index) => (
+                    <p key={index} className="text-sm font-medium text-form-strokedark dark:text-white/90">{sibling.name}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Fragment>
+    );
+  }
+
   const tabData = [
-    { label: "Home", content: <p>Welcome to the Home tab!</p> },
-    { label: "Profile", content: <p>View your profile here.</p> },
-    { label: "Settings", content: <p>Adjust your settings here.</p> },
+    { label: "Personal Information", content: <PersonalInfo/> },
+    { label: "Address", content: <AddressInfo/> },
+    { label: "Educational Background", content: <EducationalBg/> },
+    { label: "Family Background", content: <FamilyBg/> },
   ];
   
   return (
     <>
-      <div className="w-[80%]">
+      <div className="w-full">
         <div className="flex flex-col items-start">
           <Tabs tabs={tabData} />
         </div>
       </div>
-      <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">
-              Student Personal & Family Background Information
-            </h4>
-
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Age</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">21 </p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Gender</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90"> Male </p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birthdate</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">06/01/1999</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Primary Address</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Secondary Address</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Test School</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Year</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">3rd</p>
-              </div>
-            </div>
-
-            <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
-              Father's Information:
-            </h4>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">First Name </p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Middle Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Middle Name</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Last Name</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Age</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">55</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birthdate</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">09/20/1987</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Occupation</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Occupation Test</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Income</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Income Test</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Address</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Phone Number</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">0934284527494</p>
-              </div>
-            </div>
-
-            <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
-              Mother's Information:
-            </h4>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">First Name </p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Middle Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Middle Name</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Last Name</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Age</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">55</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birthdate</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">09/20/1987</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Occupation</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Occupation Test</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Income</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Income Test</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Address</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Phone Number</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">0934284527494</p>
-              </div>
-            </div>
-
-            <h4 className="text-md font-semibold text-form-strokedark dark:text-white/90 mt-3 lg:mb-6">
-            Other Information:
-            </h4>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Number of Siblings</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">4</p>
-              </div>
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Siblings</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Sibling 1</p>
-                <p className="text-sm font-medium text-form-strokedark dark:text-white/90">Sibling 2</p>
-              </div>
-            </div>
-
-
-          </div>
-
-          <Button variants="text" onClick={() => setOpenModal(true)} startIcon={<CiEdit size={18}/>}>Edit</Button>
-        </div>
-
-          <Modal   
-            isFullscreen={true} 
-            title="Edit Personal & Family Background Information" 
-            className="max-w-230" 
-            isOpen={isOpen} 
-            onClose={() => setOpenModal(false)}
-          >
-            <StudentProfileForm/>
-          </Modal>
-      </div>
+      <Modal   
+        isFullscreen={true} 
+        title="Edit Personal & Family Background Information" 
+        className="max-w-230" 
+        isOpen={isOpen} 
+        onClose={() => setOpenModal(false)}
+      >
+        <StudentProfileForm/>
+      </Modal>
     </>
   );
-}
+};
+
+export default StudentProfile;

@@ -1,7 +1,7 @@
 import { APILoginResponse, APISignUpResponse, APIUserProfileResponse, LoginFieldProps, SignUpFormProps } from "@/types";
 import AxiosAPI from "./axios-api";
 import { AxiosResponse } from "axios";
-import { setCookie } from "cookies-next";
+import { deleteCookie, setCookie } from "cookies-next";
 
 
 interface AuthAPI {
@@ -70,6 +70,11 @@ export default class AuthAPIService extends AxiosAPI implements AuthAPI {
             console.error("Failed to fetch user session", error);
             throw error;
         }
+    }
+
+    async logout() {
+      deleteCookie("token");
+      window.location.href = "/login";
     }
 
 }
