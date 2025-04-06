@@ -1,8 +1,9 @@
-import { APIUserProfileResponse } from "@/types";
+import { APIUserProfileResponse, APIUserUpdateResponse, MainProfileFormPayload } from "@/types";
 import AxiosAPI from "./axios-api";
 
 interface userAPI {
     profile: (userId: string) => Promise<APIUserProfileResponse>;
+    updateProfile: (userId: string, data: MainProfileFormPayload) => Promise<APIUserUpdateResponse>;
 }
 
 
@@ -25,6 +26,16 @@ export default class UserAPIService extends AxiosAPI implements userAPI {
             console.error("Failed to fetch user profile", error);
             throw error;
         }  
+    }
+
+    async updateProfile(userId: string, data: MainProfileFormPayload) {
+        try {
+            const response: APIUserUpdateResponse = await this.put({path: `/${userId}`, body: data});
+            return response;
+        } catch (error) {
+            console.error("Failed to update user profile", error);
+            throw error;
+        }
     }
 
 }

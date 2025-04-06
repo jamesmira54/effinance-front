@@ -16,12 +16,14 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
   const [isOpen, setOpenModal] = useState<boolean>(false);
 
   const formData:MainProfileFormProps = {
+    userId: userDetails.userId,
+    username: userDetails.username,
     firstName: userDetails.firstName,
     lastName: userDetails.lastName,
     middleName: userDetails.middleName || undefined,
     email: userDetails.email,
     mobileNumber: userDetails.mobileNumber || undefined,
-    role: userDetails.userType ? { label: userDetails.userType, value: userDetails.userTypeId } : null,
+    roleId: userDetails.userType ? { label: userDetails.userType, value: userDetails.userTypeId } : null,
   };
   
   return (

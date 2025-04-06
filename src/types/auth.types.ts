@@ -39,21 +39,3 @@ export interface APISignUpResponse {
     permissions: APIModuleProps
 }
 
-
-export interface APIUserProfileResponse {
-    username: string;
-    firstName: string;
-    middleName: string | null;
-    lastName: string;
-    mobileNumber: string | null;
-    userId: string;
-    email: string;
-    userTypeId: string;
-    userType: string;
-}
-
-export interface APIUserRoles {
-    id: string
-    name: string;
-    description: string;
-}

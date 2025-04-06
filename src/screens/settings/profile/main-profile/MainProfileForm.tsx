@@ -4,13 +4,22 @@ import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { MainProfileFormProps } from "./MainProfile.types";
-import { APIUserRoles } from "@/types";
+import { APIUserRoles, MainProfileFormPayload } from "@/types";
+import { UserAPIService } from "@/api";
+import { useState } from "react";
+import Throbber from "@/components/common/Throbber";
+import Alert from "@/components/Alert";
 
 
 const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUserRoles[]}> = ({
   userDetails,
   roles
 }) => {
+
+  const userAPI = new UserAPIService();
+  const [isError, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const rolesData: SelectOption[] = roles.map((item) => ({
     label: item.name,
@@ -20,22 +29,51 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
 
   const formik = useFormik<MainProfileFormProps>({
     initialValues: { 
+        userId: userDetails.userId,
+        username: userDetails.username,
         firstName: userDetails.firstName, 
         lastName: userDetails.lastName,
         middleName: userDetails.middleName,
         email: userDetails.email,
         mobileNumber: userDetails.mobileNumber,
-        role: userDetails.role,
+        roleId: userDetails.roleId,
     },
     validateOnBlur: true,
     validateOnChange: true,
     validationSchema: Yup.object({
-        firstName: Yup.string().required("Required Field!"),
-        lastName: Yup.string().required("Required Field!"),
-        emailAddress: Yup.string().email("Invalid email format").required("Required Field!"),
+      username: Yup.string().required("Required Field!"),
+      firstName: Yup.string().required("Required Field!"),
+      lastName: Yup.string().required("Required Field!"),
+      email: Yup.string().email("Invalid email format").required("Required Field!"),
     }),
-    onSubmit: (values) => console.log(values),
+    onSubmit: (values, { setSubmitting }) => {
+      submitHandler(values, setSubmitting);
+      setSubmitting(true);
+      setShowAlert(false);
+    }
   });
+
+  const submitHandler = async (values: MainProfileFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
+    try {
+      const payload:MainProfileFormPayload = {
+        ...values,
+        roleId: values.roleId?.value || ''
+      }
+      const response = await userAPI.updateProfile(values.userId, payload);
+      if(response){
+        setError(false);
+        setErrorMessage('');
+        
+      }
+    } catch (err: any) {
+      setError(true);
+      setShowAlert(true);
+      setErrorMessage(err.response?.data?.errorDetails?.errors[0].msg || "An error occurred while updating the profile.");
+    } finally {
+      setSubmitting(false);
+      setShowAlert(true);
+    }
+  }
 
 
   return(
@@ -87,7 +125,21 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
         </div>
 
         <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-          <div className="w-full xl:w-1/2">
+          <div className="w-full xl:w-1/3">
+            <Input 
+              id="username"
+              label="Username" 
+              type="text" 
+              placeholder="Username" 
+              name="username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={() => formik.handleBlur}
+              error={formik.touched.username && formik.errors.username ? true : false}
+              errorMessage={formik.errors.username}
+              />
+          </div>
+          <div className="w-full xl:w-1/3">
             <Input 
               id="email"
               label="Email Address" 
@@ -101,7 +153,7 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
               errorMessage={formik.errors.email}
               />
           </div>
-          <div className="w-full xl:w-1/2">
+          <div className="w-full xl:w-1/3">
             <Input 
               id="mobileNumber"
               label="Mobile Number" 
@@ -121,15 +173,15 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
           <div className="w-full xl:w-1/2">
             <Select 
               className="z-999"
-              id="role"
-              name="role"
+              id="roleId"
+              name="roleId"
               label="Role" 
               options={rolesData} 
               isMultiple={false} 
-              value={formik.values.role}
-              onChange={(option) => formik.setFieldValue("role", option)}
-              error={formik.touched.role && formik.errors.role ? true : false}
-              errorMessage={formik.errors.role}
+              value={formik.values.roleId}
+              onChange={(option) => formik.setFieldValue("roleId", option)}
+              error={formik.touched.roleId && formik.errors.roleId ? true : false}
+              errorMessage={formik.errors.roleId}
             />
           </div>
         </div>
@@ -198,12 +250,26 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
         </div> */}
 
         <div className="flex justify-end mt-5">
-          <input
-            type="submit"
-            value="Save"
-            className="w-50 cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-          />
+          {formik.isSubmitting ? 
+              <Throbber/>
+            :
+            <input
+              type="submit"
+              value="Save"
+              className="w-50 cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+            />
+          } 
         </div>
+        {showAlert &&
+          <div className="mt-5">
+            <Alert 
+              variant={isError ? 'error' : 'success'}
+              title={isError ? 'Error' : "Success!"}
+              message={isError ? errorMessage : "Profile updated successfully!"}
+              showLink={false} 
+            />
+          </div>
+        }
       </form>
     </>
   );
