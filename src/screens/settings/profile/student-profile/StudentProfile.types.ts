@@ -1,12 +1,12 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 
 export interface StudentProfileFormProps {
-    userId: string;
+  userId: string;
   firstName: string;
   middleName?: string;
   lastName?: string;
   extensionName?: string;
-  sex?: string;
+  sex?: SelectOption;
   placeOfBirth?: string;
   birthdate?: string;
   height?: number;

@@ -1,11 +1,12 @@
 export interface CheckBoxProps {
-    id?: string;
+    // id?: string;
+    name?: string;
+    value?: string;
     label?: string;
-    isChecked: boolean;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    checked?: boolean;
+    onChange: (checked: boolean) => void;
     onBlur?: () => void;
     className?: string;
     disabled?: boolean;
-    isIndeterminate?: boolean;
-    style?: 'default' | 'rounded' | 'circle' | 'square';
+    style?: 'default' | 'square' | 'x-sign' | 'inner-circle' | 'outer-circle';
 }

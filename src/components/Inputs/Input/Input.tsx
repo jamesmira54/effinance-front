@@ -61,7 +61,7 @@ const Input: React.FC<InputProps> = React.forwardRef(
                         type={type}
                         placeholder={placeholder}
                         className={`
-                            w-full rounded-lg border border-stroke bg-transparent py-2 
+                            w-full rounded-lg border border-stroke bg-white dark:bg-transparent py-2 
                             ${variant === 'style1' ? 'pl-4 pr-10' : 'pl-10 pr-4'} 
                             pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary 
                             ${type === 'date' && 'form-datepicker'} 

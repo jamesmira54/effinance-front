@@ -9,6 +9,7 @@ import { UserAPIService } from "@/api";
 import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
 import Alert from "@/components/Alert";
+import { useRouter } from "next/navigation";
 
 
 const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUserRoles[]}> = ({
@@ -20,6 +21,7 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const router = useRouter();
 
   const rolesData: SelectOption[] = roles.map((item) => ({
     label: item.name,
@@ -63,7 +65,7 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
       if(response){
         setError(false);
         setErrorMessage('');
-        
+        router.refresh();
       }
     } catch (err: any) {
       setError(true);

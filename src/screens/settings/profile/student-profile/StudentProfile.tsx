@@ -5,14 +5,11 @@ import { CiEdit } from "react-icons/ci";
 import Button from "@/components/Button";
 import StudentProfileForm from "./StudentProfileForm";
 import Tabs from "@/components/Tabs";
-import { APIStudentProfileResponse, SiblingRequest } from "@/types";
-import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
-import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
-import CheckBox from "@/components/Checkboxes";
+import { APIStudentListResponse, SiblingRequest } from "@/types";
 
 
 
-const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
+const StudentProfile: React.FC<{studentDetails: APIStudentListResponse}> = ({
     studentDetails
   }) => {
   const [isOpen, setOpenModal] = useState<boolean>(false);
@@ -48,10 +45,6 @@ const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Mobile Number</p>
                   <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.mobileNumber}</p>
-                </div>
-                <div>
-                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Age</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.age}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Gender</p>
@@ -254,6 +247,10 @@ const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Name</p>
                   <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeSchoolId}</p>
                 </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">GWA</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.gwa}</p>
+                </div>
               </div>
 
             </div>
@@ -369,10 +366,11 @@ const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
     <>
       <div className="w-full">
         <div className="flex flex-col items-start">
+          <Button className="self-end bg-primary" variants="default" onClick={() => setOpenModal(true)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
           <Tabs tabs={tabData} />
         </div>
       </div>
-      <Modal   
+      {/* <Modal   
         isFullscreen={true} 
         title="Edit Personal & Family Background Information" 
         className="max-w-230" 
@@ -380,7 +378,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentProfileResponse}> = ({
         onClose={() => setOpenModal(false)}
       >
         <StudentProfileForm/>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
