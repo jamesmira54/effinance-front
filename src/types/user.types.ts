@@ -10,6 +10,11 @@ export interface APIUserProfileResponse {
     userType: string;
 }
 
+export interface APIUserListResponse {
+    count: number;
+    users: APIUserProfileResponse[];
+}
+
 export interface APIUserRoles {
     id: string
     name: string;
@@ -30,6 +35,17 @@ export interface MainProfileFormPayload {
     linkedInUrl?: string | null;
     twitterUrl?: string | null;
     profileImageLink?:  string | null;
+}
+
+export interface APINewUserPayload {
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    repassword: string;
+    mobileNumber?: string;
+    roleId?: string
 }
 
 export interface APIUserUpdateResponse {

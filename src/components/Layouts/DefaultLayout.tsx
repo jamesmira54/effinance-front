@@ -2,7 +2,8 @@
 import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import { APIUserProfileResponse } from "@/lib/AuthService/authService.types";
+import { APIUserProfileResponse } from "@/types";
+
 
 export default function DefaultLayout({
   children,

@@ -20,7 +20,7 @@ interface SiblingRepeaterProps {
 
 
 const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSiblingsInit }) => {
-    const [siblings, setSiblings] = useState<SiblingRequest[]>([emptySibling]);
+    const [siblings, setSiblings] = useState<SiblingRequest[]>([]);
     const initialized = useRef(false);
 
     // Initialize from props
@@ -114,7 +114,7 @@ const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSibli
             </div>
   
             <div className="text-right">
-              {siblings.length > 1 && (
+              {siblings.length > 0 && (
                 <button
                   onClick={() => removeSibling(index)}
                   className="text-red-500 hover:underline text-sm"

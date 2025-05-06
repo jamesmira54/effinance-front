@@ -5,6 +5,12 @@ export type SelectOption = {
     label: string;
 };
 
+export type SelectOption2 = {
+    value: string;
+    label: string;
+};
+
+
 export interface SelectProps {
     className?: string;
     name?: string;

@@ -6,7 +6,7 @@ export interface StudentProfileFormProps {
   middleName?: string;
   lastName?: string;
   extensionName?: string;
-  sex?: SelectOption;
+  sex?: string;
   placeOfBirth?: string;
   birthdate?: string;
   height?: number;

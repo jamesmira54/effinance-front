@@ -7,13 +7,19 @@ import { CiEdit } from "react-icons/ci";
 import Image from "next/image";
 import { APIUserProfileResponse, APIUserRoles } from "@/types";
 import { MainProfileFormProps } from "./MainProfile.types";
+import { useRouter } from "next/navigation";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 
-const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUserRoles[]}> = ({
+const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUserRoles[], allowRouterBack: boolean}> = ({
     userDetails,
-    roles
+    roles,
+    allowRouterBack
   }) => {
+
+  
   const [isOpen, setOpenModal] = useState<boolean>(false);
+  const router = useRouter();
 
   const formData:MainProfileFormProps = {
     userId: userDetails.userId,
@@ -25,10 +31,20 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
     mobileNumber: userDetails.mobileNumber || undefined,
     roleId: userDetails.userType ? { label: userDetails.userType, value: userDetails.userTypeId } : null,
   };
+
+  const handleBack = () => {
+    if (allowRouterBack) {
+      router.back();
+    } else {
+      console.log("Back navigation is not allowed.");
+    }
+  };
+
   
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
+        {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Back</Button> }
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="w-[80%]">
             <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">

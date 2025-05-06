@@ -1,4 +1,4 @@
-import { APIUserProfileResponse, APIUserUpdateResponse, MainProfileFormPayload } from "@/types";
+import { APIUserListResponse, APIUserProfileResponse, APIUserUpdateResponse, MainProfileFormPayload } from "@/types";
 import AxiosAPI from "./axios-api";
 
 interface userAPI {
@@ -16,6 +16,16 @@ export default class UserAPIService extends AxiosAPI implements userAPI {
             return UserAPIService._instance;
         }
         UserAPIService._instance = this;
+    }
+
+    async getAllUsers() {
+        try {
+            const response: APIUserListResponse = await this.get({path: '/'});
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch all users", error);
+            throw error;
+        }
     }
 
     async profile(userId: string) {

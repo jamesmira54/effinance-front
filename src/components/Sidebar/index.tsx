@@ -114,6 +114,10 @@ const menuGroups = [
           {
             label: 'User Accounts',
             route: '/settings/user-accounts'
+          },
+          {
+            label: 'Student Accounts',
+            route: '/settings/student-accounts'
           }
         ]
       },

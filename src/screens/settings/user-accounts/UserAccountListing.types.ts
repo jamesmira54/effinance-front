@@ -1,12 +1,12 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 
 export interface UserAccountListingFormProps {
-    firstname: string;
-    middlename?: string | undefined;
-    lastname:  string;
+    firstName: string;
+    lastName:  string;
+    username: string;
     email: string;
-    phoneNumber?: string;
+    mobileNumber?: string;
     password: string;
-    confirmPassword: string;
-    role:  SelectOption | null;
+    repassword: string;
+    roleId:  SelectOption | null;
 }

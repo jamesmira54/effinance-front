@@ -63,9 +63,9 @@ const Profile = async() => {
     <>
       <Breadcrumb pageName="Profile" />
       <div className="flex gap-6 flex-col">
-        <MainProfile userDetails={userDetails} roles={roles}/>
+        <MainProfile userDetails={userDetails} roles={roles} allowRouterBack={false}/>
         {userType === 'Student' &&
-          <StudentProfile studentDetails={studentDetails}/>
+          <StudentProfile studentDetails={studentDetails} allowRouterBack={false}/>
       }
       </div>
     </>

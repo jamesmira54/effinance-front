@@ -6,13 +6,25 @@ import Button from "@/components/Button";
 import StudentProfileForm from "./StudentProfileForm";
 import Tabs from "@/components/Tabs";
 import { APIStudentListResponse, SiblingRequest } from "@/types";
+import { useRouter } from "next/navigation";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 
 
-const StudentProfile: React.FC<{studentDetails: APIStudentListResponse}> = ({
-    studentDetails
+const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRouterBack: boolean}> = ({
+    studentDetails,
+    allowRouterBack
   }) => {
-  const [isOpen, setOpenModal] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    if (allowRouterBack) {
+      router.back();
+    } else {
+      console.log("Back navigation is not allowed.");
+    }
+  };
 
 
   const PersonalInfo = () => {
@@ -366,7 +378,8 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse}> = ({
     <>
       <div className="w-full">
         <div className="flex flex-col items-start">
-          <Button className="self-end bg-primary" variants="default" onClick={() => setOpenModal(true)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
+          {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Back</Button> }
+          <Button className="self-end bg-primary" variants="default" onClick={() => router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
           <Tabs tabs={tabData} />
         </div>
       </div>

@@ -4,62 +4,48 @@ import DataTable from "react-data-table-component";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { CiSquarePlus } from "react-icons/ci";
 import { FaRegEye } from "react-icons/fa";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
-import UserAccountForm from "./UserAccountForm";
-import { APIUserListResponse, APIUserProfileResponse, APIUserRoles } from "@/types";
+import { APIStudentListResponse } from "@/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-
-const StyledModal = styled(Modal)`
-    overflow: auto;
-`;
+import { FaEdit } from "react-icons/fa";
 
 const ActionModal = styled(Modal)`
 
 `;
 
-const UserAccountListing: React.FC<{userAccounts: APIUserListResponse, roles: APIUserRoles[]}> = ({
-    userAccounts,
-    roles
+const StudentAccountListing: React.FC<{studentAccounts: APIStudentListResponse[]}> = ({
+    studentAccounts
 }) => {
 
-    const [data, setData] = useState<APIUserProfileResponse[]>(userAccounts?.users || []);
+    const [data, setData] = useState<APIStudentListResponse[]>(studentAccounts || []);
 
-    useEffect(() => {
-        setData(userAccounts?.users || []);
-    }, [userAccounts.users]);
-
-    const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
     const router = useRouter();
 
 
     const columns = [
         { 
-            name: "Username", 
-            selector: (row:any) => row.username, 
+            name: "Full Name", 
+            selector: (row:any) => row.lastName, 
             sortable: true,  
             cell: (row: any) => (
-                <Link href={`/settings/user-accounts/${row.userId}`} className="text-primary hover:underline">
-                    {row.username}
+                <Link href={`/settings/student-accounts/view/${row.studentId}`} className="text-primary hover:underline">
+                    {row.firstName}  {row.lastName}
                 </Link>
             ),
         },
-        { name: "First Name", selector: (row:any) => row.firstName, sortable: true },
-        { name: "Middle Name	", selector: (row:any) => row.middleName, sortable: true },
-        { name: "Last Name	", selector: (row:any) => row.lastName, sortable: true },
         { name: "Email", selector: (row:any) => row.email, width: "250px"},
+        { name: "Gender", selector: (row:any) => row.sex},
         { name: "Phone #", selector: (row:any) => row.mobileNumber },
-        { name: "Role", selector: (row:any) => row.userType, sortable: true },
         { name: "Action", cell: (row:any) => (
             <>
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => router.push(`/settings/user-accounts/${row.userId}`) } variants="text" startIcon={<FaRegEye size={22}/>}/>
+                    <Button onClick={() => router.push(`/settings/student-accounts/view/${row.studentId}`) } variants="text" startIcon={<FaRegEye size={22}/>}/>
+                    <Button onClick={() => router.push(`/settings/student-accounts/edit/${row.studentId}`) } variants="text" startIcon={<FaEdit size={22}/>}/>
                     <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
@@ -77,11 +63,7 @@ const UserAccountListing: React.FC<{userAccounts: APIUserListResponse, roles: AP
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '20px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
-            <StyledModal isFullscreen={true} title="Add New User" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <UserAccountForm onClose={() => setOpenFormModal(false)} roles={roles}/>
-            </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
                 <div className="text-center">
@@ -102,4 +84,4 @@ const UserAccountListing: React.FC<{userAccounts: APIUserListResponse, roles: AP
     )
 };
 
-export default UserAccountListing;
+export default StudentAccountListing;

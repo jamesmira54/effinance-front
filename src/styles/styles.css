@@ -17,7 +17,7 @@
 }
 
 .rdt_TableCell{
-    @apply border-b text-black dark:text-white border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-1 dark:bg-meta-4;
+    @apply border-b text-black dark:text-white border-[#eee] px-4 py-3 pl-9 dark:border-strokedark xl:pl-1 dark:bg-meta-4;
 }
 
 .rdt_Pagination {

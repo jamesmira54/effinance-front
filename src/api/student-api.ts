@@ -1,3 +1,4 @@
+import { APIStudentListResponse } from "@/types";
 import AxiosAPI from "./axios-api";
 
 interface StudentAPI {
@@ -15,12 +16,32 @@ export default class StudentAPIService extends AxiosAPI implements StudentAPI {
         StudentAPIService._instance = this;
     }
 
+    async getAllStudents() {
+        try {
+            const response: APIStudentListResponse[] = await this.get({path: '/'});
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch all users", error);
+            throw error;
+        }
+    }
+
     async getStudentProfile(studentId: string) {
         try {
             const response = await this.get({ path: `/${studentId}` });
             return response;
         } catch (error) {
             console.error("Failed to fetch student profile", error);
+            throw error;
+        }
+    }
+
+    async updateStudentProfile(studentId: string, data: any) {
+        try {
+            const response = await this.put({ path: `/${studentId}`, body: data });
+            return response;
+        } catch (error) {
+            console.error("Failed to update student profile", error);
             throw error;
         }
     }
