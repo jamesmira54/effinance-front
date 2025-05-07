@@ -6,44 +6,97 @@ import * as Yup from "yup";
 import { StudentRequirementsProps } from "./StudentRequirements.types";
 import { useDropzone } from "react-dropzone";
 import { useState } from "react";
+import { APIFileUploadPayload, APIFileTypesProps } from "@/types";
+import { useRouter } from "next/navigation";
+import { UploadAPIService } from "@/api";
+import Throbber from "@/components/common/Throbber";
+import Alert from "@/components/Alert";
 
 
-const AcademicSetupForm: React.FC = () => {
+const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId: string}> = ({
+  requirements,
+  studentId
+}) => {
 
+  const uploadAPI = new UploadAPIService();
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [isError, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const router = useRouter();
 
-  const schoolTermOptions: SelectOption[] = [
-    { value: "1", label: "Requirement 1" },
-    { value: "2", label: "Requirement 2" },
-    { value: "3", label: "Requirement 3" },
-    { value: "4", label: "Requirement 4" }
-  ];
+  const schoolTermOptions: SelectOption[] = requirements.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
-  const statusOptions: SelectOption[] = [
-    { value: "1", label: "Active" },
-    { value: "0", label: "Lock" }
-  ];
 
   const formik = useFormik<StudentRequirementsProps>({
     initialValues: { 
         requirment: schoolTermOptions[0],
-        filename: "",
-        file: null
+        file: null,
     },
     validateOnBlur: true,
     validateOnChange: true,
     validationSchema: Yup.object({
-        requirment: Yup.object()
-            .shape({
-            value: Yup.string().required(),
-            label: Yup.string().required(),
-            })
-        .required("Required Field!"),
-        filename: Yup.string().required("Required Field!"),
-
+      file: Yup.mixed()
+        .required("Required Field!")
+        .test("fileSize", "File too large", (value) => {
+            if (value) {
+                return value instanceof File && value.size <= 5 * 1024 * 1024; // 5MB limit
+            }
+            return true;
+        })
+        .test("fileType", "Unsupported File Format", (value) => {
+            if (value) {
+                const supportedFormats = ["image/png", "image/jpeg", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+                return supportedFormats.includes((value as File).type);
+            }
+            return true;
+        }),
+      requirment: Yup.object()
+          .shape({
+          value: Yup.string().required(),
+          label: Yup.string().required(),
+          })
+      .required("Required Field!"),
     }),
-    onSubmit: (values) => console.log(values),
+    onSubmit: (values, { setSubmitting, resetForm }) => {
+      submitHandler(values, setSubmitting, resetForm);
+      setSubmitting(true);
+      setShowAlert(false);
+    }
   });
+
+  const submitHandler = async (
+    values: StudentRequirementsProps, 
+    setSubmitting: (isSubmitting: boolean) => void, 
+    resetForm: () => void
+  ) => {
+    
+    const payload:APIFileUploadPayload = {
+      applicationForm: values.file as File,
+      fileTypeId: values.requirment?.value || '',
+      studentId: studentId
+    }
+
+    try {
+      const response = await uploadAPI.uploadFile(payload);
+      if (response) {
+        setError(false);
+        setErrorMessage('');
+        resetForm();
+        router.refresh();
+      }
+    } catch (err: any) {
+      setError(true);
+      setShowAlert(true);
+      setErrorMessage(err.response?.data?.errorDetails?.errors[0].msg || "An error occurred.");
+    } finally {
+      setSubmitting(false);
+      setShowAlert(true);
+    }
+  }
 
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -82,34 +135,18 @@ const AcademicSetupForm: React.FC = () => {
   return(
     <>
       <form onSubmit={formik.handleSubmit}>
-        <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-          <div className="w-full xl:w-1/2">
-            <Select 
-              id="requirment"
-              name="requirment"
-              label="Requirment" 
-              options={schoolTermOptions} 
-              isMultiple={false} 
-              value={formik.values.requirment}
-              onChange={(option) => formik.setFieldValue("requirment", option)}
-              error={formik.touched.requirment && formik.errors.requirment ? true : false}
-              errorMessage={formik.errors.requirment}
-            />
-          </div>
-          <div className="w-full xl:w-1/2">
-            <Input  
-              id="filename"
-              label="Filename" 
-              type="text" 
-              placeholder="Filename" 
-              name="filename"
-              value={formik.values.filename}
-              onChange={formik.handleChange}
-              onBlur={() => formik.handleBlur}
-              error={formik.touched.filename && formik.errors.filename ? true : false}
-              errorMessage={formik.errors.filename}
-            />
-          </div>
+        <div className="flex flex-col mb-4">
+          <Select 
+            id="requirment"
+            name="requirment"
+            label="Requirment" 
+            options={schoolTermOptions} 
+            isMultiple={false} 
+            value={formik.values.requirment}
+            onChange={(option) => formik.setFieldValue("requirment", option)}
+            error={formik.touched.requirment && formik.errors.requirment ? true : false}
+            errorMessage={formik.errors.requirment}
+          />
         </div>
 
         <div className="flex flex-col mb-4">
@@ -119,7 +156,21 @@ const AcademicSetupForm: React.FC = () => {
               isDragActive ? "border-blue-500" : "border-gray-300"
             }`}
           >
-            <input {...getInputProps()} />
+            <Input
+              id="file" 
+              {...getInputProps()} 
+              name="file"
+              onChange={(e) => {
+                const file = e.currentTarget.files?.[0];
+                if (file) {
+                  formik.setFieldValue("file", file);
+                  setFilePreview(URL.createObjectURL(file));
+                }
+              }}
+              onBlur={() => formik.handleBlur}
+              error={formik.touched.file && formik.errors.file ? true : false}
+              errorMessage={formik.errors.file}
+            />
             {isDragActive ? (
               <p className="text-blue-500">Drop the file here...</p>
             ) : (
@@ -140,12 +191,28 @@ const AcademicSetupForm: React.FC = () => {
         </div>
 
         <div className="flex justify-end mt-5">
-          <input
-            type="submit"
-            value="Submit"
-            className="w-50 cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-          />
+          {formik.isSubmitting ? 
+              <Throbber/>
+            :
+              <input
+                type="submit"
+                value="Upload"
+                className="w-50 cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+              />
+          } 
         </div>
+
+        {showAlert &&
+          <div className="mt-5">
+            <Alert 
+              variant={isError ? 'error' : 'success'}
+              title={isError ? 'Error' : "Success!"}
+              message={isError ? errorMessage : "File Uploaded Successfully!"}
+              showLink={false} 
+            />
+          </div>
+        }
+
       </form>
     </>
   );

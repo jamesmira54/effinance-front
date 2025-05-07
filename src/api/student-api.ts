@@ -1,8 +1,9 @@
-import { APIStudentListResponse } from "@/types";
+import { APIStudentFilesRes, APIStudentListResponse } from "@/types";
 import AxiosAPI from "./axios-api";
 
 interface StudentAPI {
     getStudentProfile: (studentId: string) => Promise<any>;
+    getStudentFiles: (studentId: string) => Promise<APIStudentFilesRes[]>;
 }
 
 export default class StudentAPIService extends AxiosAPI implements StudentAPI {
@@ -45,5 +46,16 @@ export default class StudentAPIService extends AxiosAPI implements StudentAPI {
             throw error;
         }
     }
+
+    async getStudentFiles(studentId: string) {
+        try {
+            const response = await this.get({ path: `/files/${studentId}` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch student files", error);
+            throw error;
+        }
+    }
+
     
 }

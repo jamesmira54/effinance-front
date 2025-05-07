@@ -103,3 +103,27 @@ export interface SiblingRequest {
     livingWithParents?: boolean;
     ownHouse?: boolean;
 }
+
+export interface APIStudentFilesRes {
+    id: string;
+    filename: string;
+    fileType: string;
+}
+
+
+export interface APIFileTypesProps {
+    id: string;
+    name: string;
+}
+
+
+export interface APIFileTypesRes {
+    count: number;
+    fileTypes: APIFileTypesProps[];
+}
+
+export interface APIFileUploadPayload {
+    applicationForm: File;
+    fileTypeId: string;
+    studentId: string;
+} 
