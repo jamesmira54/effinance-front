@@ -5,12 +5,16 @@ import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import AcademicSetupForm from "./AcademicSetupForm";
 import Switch from "@/components/Inputs/Switch";
 import { CiEdit } from "react-icons/ci";
+import { APIAcademicYearProps } from "@/types";
+import { useRouter } from "next/navigation";
+import { AcademicAPIService } from "@/api";
+
 
 
 const StyledModal = styled(Modal)`
@@ -21,36 +25,96 @@ const ActionModal = styled(Modal)`
 
 `;
 
-const AcademicSetupListing: React.FC = () => {
+const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
+    academics
+}) => {
+
+
+    const AcademicAPI = new AcademicAPIService();
+    const [data, setData] = useState<APIAcademicYearProps[]>(academics || []);
+    const [selectedItem, setSelectedItem] = useState<APIAcademicYearProps>({} as APIAcademicYearProps);
+    const router = useRouter();
+    const [pendingDelId, setPendingDelId] = useState<string | null>(null);
+
+    const FormattedDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+
+        // customize locale & options as you like
+        const formatted = date.toLocaleDateString('en-US', {
+            year:  'numeric',
+            month: 'long',
+            day:   'numeric',
+        });
+
+        return formatted;    
+    }
     
 
     const columns = [
-        { name: "Academic Year & Term", selector: (row:any) => row.academicYear, sortable: true },
-        { name: "Date Covered	", selector: (row:any) => row.dateCovered },
-        { name: "Status", cell: (row:any) => (
-            <>
-                <Switch variant="style2"/>
-            </>
-        )},
+        { name: "Year Start", selector: (row:any) => row.academicYearStart},
+        { name: "Year End", selector: (row:any) => row.academicYearEnd},
+        { name: "School Term", selector: (row:any) => row.schoolTerm},
+        { name: "Date From	", selector: (row:any) => FormattedDate(row.dateFrom), sortable: true },
+        { name: "Date To	", selector: (row:any) => FormattedDate(row.dateTo), sortable: true },
         { name: "Action", cell: (row:any) => (
             <>
                 <div className="flex items-center space-x-4">
-                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>
-                    <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
+                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
+                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
         )},
     ];
 
 
-    const data = [
-        { id: 1, academicYear: "2022-2023 - 2nd Semester", dateCovered: "06-01-2023 - 07-31-2023", status: "Active", action: 'Lock' },
-        { id: 2, academicYear: "2022-2023 - 1st Semester", dateCovered: "04-01-2023 - 05-31-2023", status: "Active", action: 'Lock' },
-    ];
+    useEffect(() => {
+        setData(academics || []);
+    }, [academics]);
+
+    const handleEdit = (item: APIAcademicYearProps) => {    
+        setSelectedItem(item);
+        setOpenFormModal(true);
+    }
+
+    const handAddNew = () => {
+        setSelectedItem({} as APIAcademicYearProps);
+        setOpenFormModal(true);
+    }
     
 
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
+
+    const handleSuccess = (updateItem: APIAcademicYearProps) => {
+        setSelectedItem(updateItem)
+        router.refresh();
+    };
+
+
+    
+    const onDeleteWaring = async (fileId: string) => {
+        setOpenActionModal(true);
+        setPendingDelId(fileId);
+    }
+
+    const onConfirmDelete = async () => {
+        if (pendingDelId) {
+            
+            setOpenActionModal(false);
+
+            const response = await AcademicAPI.deleteAcademicYear(pendingDelId);
+            if (response) {
+                setData((prevData) => prevData.filter((item) => item.id !== pendingDelId));
+                setPendingDelId(null);
+            }
+        }
+    }
+
+    const cancelDelete = () => {
+        setOpenActionModal(false);
+        setPendingDelId(null);
+    };
+
 
     return (
         <Fragment>
@@ -62,22 +126,21 @@ const AcademicSetupListing: React.FC = () => {
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+              <Button onClick={() => handAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
             <StyledModal isFullscreen={true} title="Academic Setup Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <AcademicSetupForm/>
+                <AcademicSetupForm initialData={selectedItem}  onSuccess={(item: APIAcademicYearProps) => handleSuccess(item)}/>
             </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
                 <div className="text-center">
                     <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque euismod est quis mauris lacinia pharetra.
+                    You will never revert this delete!
                     </p>
 
                     <div className="flex items-center justify-center w-full gap-6 mt-8">
-                        <Button className="bg-primary" onClick={() => setOpenActionModal(false)}> Cancel </Button>
-                        <Button variants="default" className="bg-danger" onClick={() => {}}>Proceed</Button>
+                        <Button className="bg-primary" onClick={() => cancelDelete()}> Cancel </Button>
+                        <Button onClickCapture={() => onConfirmDelete()} variants="default" className="bg-danger" onClick={() => {}}>Proceed</Button>
                     </div>
                 </div>
             </ActionModal>

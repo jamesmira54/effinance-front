@@ -83,7 +83,7 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
     const cancelDelete = () => {
         setOpenActionModal(false);
         setPendingId(null);
-      };
+    };
     
 
     return (

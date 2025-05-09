@@ -1,10 +1,11 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 
 export interface AcademicSetupFormProps {
-    academicYear: string;
+    academicYearStart: number;
+    academicYearEnd: number;
     schoolTerm: SelectOption | null;
-    dateCovered: string;
-    status:  SelectOption | null;
+    dateFrom: string;
+    dateTo:  string;
 }
 
 
