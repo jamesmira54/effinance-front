@@ -6,7 +6,7 @@ export type SelectOption = {
 };
 
 export type SelectOption2 = {
-    value: string;
+    value: any;
     label: string;
 };
 
@@ -14,8 +14,8 @@ export type SelectOption2 = {
 export interface SelectProps {
     className?: string;
     name?: string;
-    value?: SelectOption | SelectOption[] | null;
-    options?: SelectOption[];
+    value?: SelectOption | SelectOption[] | SelectOption2 | null;
+    options?: SelectOption[] | SelectOption2;
     disabled?: boolean;
     style?: CSSProperties;
     startIcon?: ReactNode;
@@ -25,10 +25,11 @@ export interface SelectProps {
     errorMessage?: string;
     noOptionsMessage?: ReactNode | string;
     isMultiple?: boolean;
-    onChange: (selectedOption: SelectOption | null) => void;
+    onChange: (selectedOption: SelectOption | SelectOption2 | null) => void;
     maxSelect?: number;
     readOnly?: boolean;
     label?: string;
     placeholder?: string;
+    isLoading?: boolean;
     onBlur?: () => void;
 }

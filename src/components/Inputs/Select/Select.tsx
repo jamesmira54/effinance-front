@@ -23,6 +23,7 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
         error,
         errorMessage = '',
         onBlur,
+        isLoading=false,
         ...props
     }, ref?: ForwardedRef<HTMLDivElement>
 ) => {
@@ -92,6 +93,7 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
                     isMulti={isMultiple}
                     className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${className}`}
                     {...props}
+                    isLoading={isLoading}
                 />
                 {error && <p className="text-meta-1">{errorMessage}</p>}
             </div>

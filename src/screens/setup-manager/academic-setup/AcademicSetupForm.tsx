@@ -198,7 +198,7 @@ const AcademicSetupForm: React.FC<{initialData?: APIAcademicYearProps, onSuccess
             :
             <input
               type="submit"
-              value="Add Academic Year"
+             value={initialData?.id ? 'Update Academic' : 'Add Academic'}
               className="w-50 cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
             />
           } 
@@ -209,7 +209,7 @@ const AcademicSetupForm: React.FC<{initialData?: APIAcademicYearProps, onSuccess
             <Alert 
               variant={isError ? 'error' : 'success'}
               title={isError ? 'Error' : "Success!"}
-              message={isError ? errorMessage : initialData?.id ? "Academic Updated Successfully!" : "Academic Created Successfully!"}
+              message={isError ? errorMessage : "Academic Added/Updated Successfully!"}
               showLink={false} 
             />
           </div>

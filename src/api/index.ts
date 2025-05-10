@@ -4,3 +4,5 @@ export { default as StudentAPIService } from './student-api';
 export { default as RolesAPIService } from './roles-api';
 export { default as UploadAPIService } from './upload-api';
 export { default as AcademicAPIService } from './academics-api';
+export { default as SchoolAPIService } from './schools-api';
+export { default as AddressAPIService } from './address-api';
