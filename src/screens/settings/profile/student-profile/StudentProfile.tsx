@@ -8,6 +8,7 @@ import Tabs from "@/components/Tabs";
 import { APIStudentListResponse, SiblingRequest } from "@/types";
 import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { FormattedDate } from "@/utils/helpers";
 
 
 
@@ -64,7 +65,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birthdate</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.birthdate}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{FormattedDate(studentDetails.birthdate)}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Birth Place</p>
@@ -131,11 +132,11 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Region</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentRegionId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentRegionName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Province</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentProvinceId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentProvinceName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Zip Code</p>
@@ -143,11 +144,11 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/Municipility</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentCitymunId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentCitymunName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Barangay</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentBrgyId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.permanentBrgyName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Street</p>
@@ -166,11 +167,11 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Region</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentRegionId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentRegionName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Province</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentProvinceId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentProvinceName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Zip Code</p>
@@ -178,11 +179,11 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/Municipility</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentCitymunId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentCitymunName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Barangay</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentBrgyId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.currentBrgyName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Street</p>
@@ -225,7 +226,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Name</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12SchoolId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.g12SchoolName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Year of Graduation</p>
@@ -257,7 +258,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">School Name</p>
-                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeSchoolId}</p>
+                  <p className="text-sm font-medium text-form-strokedark dark:text-white/90">{studentDetails.collegeSchoolName}</p>
                 </div>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">GWA</p>

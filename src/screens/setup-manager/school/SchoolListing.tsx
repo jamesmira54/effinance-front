@@ -77,7 +77,7 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
         }
     }
 
-    const handAddNew = () => {
+    const handleAddNew = () => {
         setSelectedItem({} as SchoolDataProps);
         setOpenFormModal(true);
     }
@@ -128,7 +128,7 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => handAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+              <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
             <StyledModal 
                 isFullscreen={true} 

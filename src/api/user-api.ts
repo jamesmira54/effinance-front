@@ -18,9 +18,10 @@ export default class UserAPIService extends AxiosAPI implements userAPI {
         UserAPIService._instance = this;
     }
 
-    async getAllUsers() {
+    async getAllUsers(sponsor?: boolean) {
         try {
-            const response: APIUserListResponse = await this.get({path: '/'});
+            const query = sponsor ? `?sponsor=${sponsor}` : "";
+            const response: APIUserListResponse = await this.get({path: `/${query}`});
             return response;
         } catch (error) {
             console.error("Failed to fetch all users", error);

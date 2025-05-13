@@ -5,11 +5,18 @@ import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import SponsorshipForm from "./SponsorshipForm";
 import { CiEdit } from "react-icons/ci";
+import { APIAcademicYearProps, APIFileTypesProps, APIUserProfileResponse } from "@/types";
+import { SchoolListProps } from "@/types/shools.types";
+import { APISponsorshipListResponse, SponsorshipRequirements, SponsorshipSchoolProps } from "@/types/sponsorship.types";
+import { formatCurrency, FormattedDate } from "@/utils/helpers";
+import { FaRegEye } from "react-icons/fa6";
+import { SponsorshipAPIService } from "@/api";
+import { useRouter } from "next/navigation";
 
 
 const StyledModal = styled(Modal)`
@@ -20,35 +27,140 @@ const ActionModal = styled(Modal)`
 
 `;
 
-const SponsorshipListing: React.FC = () => {
+interface serverDataProps {
+    coordinators: APIUserProfileResponse[];
+    schools: SchoolListProps[];
+    requirements: APIFileTypesProps[];
+    academicYears: APIAcademicYearProps[];
+    sponsorships: APISponsorshipListResponse[]
+}
 
+const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
+    serverData
+}) => {
+
+    const sponsorshipAPI = new SponsorshipAPIService();
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
+    const [openReqModal, setOpenReqModal] = useState<boolean>(false);
+    const [openSchoolsModal, setOpenSchoolsModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
+    const [data, setData] = useState<APISponsorshipListResponse[]>(serverData.sponsorships || []);
+    const [selectedReqs, setSelectedReqs] = useState<SponsorshipRequirements[]>([]);
+    const [selectedSchools, setSelectedSchools] = useState<SponsorshipSchoolProps[]>([]);
+    const [selectedItem, setSelectedItem] = useState<APISponsorshipListResponse>({} as APISponsorshipListResponse);
+    const [pendingDelId, setPendingDelId] = useState<string | null>(null);
+    const router = useRouter();
+
+
+    const { coordinators, schools, requirements, academicYears } = serverData || {};
+
+
+    useEffect(() => {
+        setData(serverData.sponsorships || []);
+    }, [serverData.sponsorships]);
+
+    const selectOptionsData = useMemo(() => ({
+        coordinators: coordinators.map(({ firstName, lastName, userId }) => ({
+            label: `${firstName} ${lastName}`,
+            value: userId,
+        })),
+        schools: schools.map(({ name, id }) => ({
+            label: name,
+            value: id,
+        })),
+        requirements: requirements.map(({ name, id }) => ({
+            label: name,
+            value: id,
+        })),
+        academicYears: academicYears.map(({ academicYearStart, academicYearEnd, id }) => ({
+            label: `${academicYearStart} - ${academicYearEnd}`,
+            value: id,
+        })),
+    }), [coordinators, schools, requirements, academicYears]);
+
+    // console.log("selectOptionsData", selectOptionsData);
 
 
     const columns = [
-        { name: "Financial Assistance Name", selector: (row:any) => row.FCName, sortable: true },
-        { name: "Sponsor	", selector: (row:any) => row.sponsor },
-        { name: "Duration", selector: (row:any) => row.duration },
-        { name: "Fund Allocation", selector: (row:any) => row.fundAllocation },
-        { name: "Status", selector: (row:any) => row.status },
-        { name: "Requirements", selector: (row:any) => row.requirements },
-        { name: "Schools", selector: (row:any) => row.schools },
-        { name: "Action", cell: (row:any) => (
+        { name: "Financial Assistance Name", selector: (row:APISponsorshipListResponse) => row.name, sortable: true },
+        { name: "Sponsor", selector: (row:APISponsorshipListResponse) => row.sponsorName },
+        { name: "Duration", minWidth: '250px', selector: (row:APISponsorshipListResponse) => (
+            `${FormattedDate(row.durationFrom)} - ${FormattedDate(row.durationTo)}`
+        )},
+        { name: "Fund Allocation", selector: (row:APISponsorshipListResponse) => formatCurrency(row.fundAllocation) },
+        { name: "Status", selector: (row:APISponsorshipListResponse) => row.status.toUpperCase() },
+        { name: "Req's", center: true, cell: (row:APISponsorshipListResponse) => (
+            <>
+                <Button onClick={() => ShowRequirements(row.sponsorshipRequirements) } variants="text" startIcon={<FaRegEye size={20}/>}/>
+            </>
+        )},
+        { name: "Schools", center: true, cell: (row:APISponsorshipListResponse) => (
+            <>
+                <Button onClick={() => ShowSchools(row.sponsorshipSchool) } variants="text" startIcon={<FaRegEye size={20}/>}/>
+            </>
+        )},
+        { name: "Action", cell: (row:APISponsorshipListResponse) => (
             <>
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => setOpenFormModal(true)} variants="text" startIcon={<CiEdit size={22}/>}/>
-                    <Button onClick={() => setOpenActionModal(true)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
+                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
+                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>
         )},
     ];
+
+    const ShowRequirements = (reqs: SponsorshipRequirements[]) => {
+        setOpenReqModal(true);
+        setSelectedReqs(reqs);
+    };
+
+    const ShowSchools = (schools: SponsorshipSchoolProps[]) => {
+        setOpenSchoolsModal(true);
+        setSelectedSchools(schools);
+    }
+
+    const handleAddNew = () => {
+        setSelectedItem({} as APISponsorshipListResponse);
+        setOpenFormModal(true);
+    }
+
+
+    const handleEdit = (item: APISponsorshipListResponse) => {    
+        setSelectedItem(item);
+        setOpenFormModal(true);
+    }
+
+    const onDeleteWaring = async (fileId: string) => {
+        setOpenActionModal(true);
+        setPendingDelId(fileId);
+    }
+
+
+    const onConfirmDelete = async () => {
+        if (pendingDelId) {
+            
+            setOpenActionModal(false);
+
+            const response = await sponsorshipAPI.deleteSponsorship(pendingDelId);
+            if (response) {
+                setData((prevData) => prevData.filter((item) => item.id !== pendingDelId));
+                setPendingDelId(null);
+            }
+        }
+    }
+
+
+     const cancelDelete = () => {
+        setOpenActionModal(false);
+        setPendingDelId(null);
+    };
     
-    
-    const data = [
-        { id: 1, FCName: "New Sponsor", sponsor: "Alyssa1 Doe Rice", duration: "January 01 - April 27, 2024	", fundAllocation: "2000", status: "Active", requirements: "", schools: "", action: 'Lock' },
-        { id: 2, FCName: "New Sponsor 2", sponsor: "Alyssa1 Doe Rice 2", duration: "January 01 - April 27, 2024	", fundAllocation: "2000", status: "Active", requirements: "", schools: "", action: 'Lock' },
-    ];
+
+    const handleSuccess = (updateItem: APISponsorshipListResponse) => {
+        setSelectedItem(updateItem)
+        router.refresh();
+    };
+
     
 
     return (
@@ -61,24 +173,48 @@ const SponsorshipListing: React.FC = () => {
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+              <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
             <StyledModal isFullscreen={true} title="Sponsorship Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <SponsorshipForm/>
+                <SponsorshipForm 
+                    initialData={selectedItem} 
+                    selectOptionsData={selectOptionsData}
+                    onSuccess={(item: APISponsorshipListResponse) => handleSuccess(item)}
+                />
+            </StyledModal>
+
+            <StyledModal isFullscreen={false} title="Requirements List" className="min-w-125" isOpen={openReqModal} onClose={() => setOpenReqModal(false)}>
+                <ul className="flex flex-col gap-4">
+                    {selectedReqs.map((item: any, index) => (
+                        <li key={index} className="flex items-center justify-between">
+                            <span>{index + 1}. {item.fileName}</span>
+                        </li>
+                    ))}
+                </ul>
+            </StyledModal>
+
+
+             <StyledModal isFullscreen={false} title="Schools List" className="min-w-125" isOpen={openSchoolsModal} onClose={() => setOpenSchoolsModal(false)}>
+                <ul className="flex flex-col gap-4">
+                    {selectedSchools.map((item: any, index) => (
+                        <li key={index} className="flex items-center justify-between">
+                            <span>{index + 1}. {item.schoolName}</span>
+                        </li>
+                    ))}
+                </ul>
             </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
                 <div className="text-center">
                     <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque euismod est quis mauris lacinia pharetra.
+                       You will never revert this delete!
                     </p>
 
                     <div className="flex items-center justify-center w-full gap-6 mt-8">
-                        <Button className="bg-primary" onClick={() => setOpenActionModal(false)}>
+                        <Button className="bg-primary" onClick={() => cancelDelete()}>
                             Cancel
                         </Button>
-                        <Button className="bg-danger" onClick={() => {}}>Proceed</Button>
+                        <Button className="bg-danger" onClick={() => onConfirmDelete()}>Proceed</Button>
                     </div>
                 </div>
             </ActionModal>

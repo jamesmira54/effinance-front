@@ -14,6 +14,7 @@ import { CiEdit } from "react-icons/ci";
 import { APIAcademicYearProps } from "@/types";
 import { useRouter } from "next/navigation";
 import { AcademicAPIService } from "@/api";
+import { FormattedDate } from "@/utils/helpers";
 
 
 
@@ -35,19 +36,6 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     const [selectedItem, setSelectedItem] = useState<APIAcademicYearProps>({} as APIAcademicYearProps);
     const router = useRouter();
     const [pendingDelId, setPendingDelId] = useState<string | null>(null);
-
-    const FormattedDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-
-        // customize locale & options as you like
-        const formatted = date.toLocaleDateString('en-US', {
-            year:  'numeric',
-            month: 'long',
-            day:   'numeric',
-        });
-
-        return formatted;    
-    }
     
 
     const columns = [
@@ -129,7 +117,11 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
               <Button onClick={() => handAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
             <StyledModal isFullscreen={true} title="Academic Setup Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <AcademicSetupForm initialData={selectedItem}  onSuccess={(item: APIAcademicYearProps) => handleSuccess(item)}/>
+                <AcademicSetupForm 
+                    initialData={selectedItem}  
+                    onSuccess={(item: APIAcademicYearProps) => 
+                    handleSuccess(item)}
+                />
             </StyledModal>
 
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>

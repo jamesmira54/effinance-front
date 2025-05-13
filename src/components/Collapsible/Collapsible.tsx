@@ -27,7 +27,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ title, children, isOpen }) =>
                 </svg>
             </button>
         <div
-            className={`overflow-auto transition-all duration-300 ease-in-out ${
+            className={`transition-all duration-300 ease-in-out ${
                 isOpenS ? "max-h-100 opacity-100" : "max-h-0 opacity-0"
             }`}
         >

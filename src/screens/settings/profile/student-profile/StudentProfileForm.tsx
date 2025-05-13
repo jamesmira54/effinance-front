@@ -2,7 +2,7 @@
 
 import Input from "@/components/Inputs/Input";
 import Select from "@/components/Inputs/Select/Select";
-import { SelectOption } from "@/components/Inputs/Select/Select.types";
+import { SelectOption, SelectOption2 } from "@/components/Inputs/Select/Select.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { StudentProfileFormProps } from "./StudentProfile.types";
@@ -11,28 +11,60 @@ import CheckBox from "@/components/Checkboxes";
 import Collapsible from "@/components/Collapsible";
 import SiblingRepeater from "./SiblingRepeater";
 import { useState } from "react";
-import { StudentAPIService } from "@/api";
+import { AddressAPIService, StudentAPIService } from "@/api";
 import { useRouter } from "next/navigation";
 import Throbber from "@/components/common/Throbber";
 import Alert from "@/components/Alert";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Button from "@/components/Button";
+import { BrgyProps, CityMunProps, ProvinceProps, RegionProps, SchoolDataProps } from "@/screens/setup-manager/school/School.types";
 
-const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = ({
-    studentDetails
+const StudentProfileForm: React.FC<
+    {
+        studentDetails: APIStudentListResponse, 
+        provinces: ProvinceProps[], 
+        regions: RegionProps[],
+        schools: SchoolDataProps[]
+    }> = ({
+    studentDetails,
+    provinces,
+    regions,
+    schools
 }) => {
 
     const studentAPI = new StudentAPIService();
+    const addressesAPI = new AddressAPIService();
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [isError, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const router = useRouter();
+    const [permanentCityMunOptions, setPermanentCityMunOptions] = useState<SelectOption2[]>([]);
+    const [permanentBrgyOptions, setPermanentBrgyOptions] = useState<SelectOption2[]>([]);
+    const [currentCityMunOptions, setCurrentCityMunOptions] = useState<SelectOption2[]>([]);
+    const [currentBrgyOptions, setCurrentBrgyOptions] = useState<SelectOption2[]>([]);
 
 
-    // const GenderData: SelectOption[] = [
-    //     { value: "Male", label: "Male" },
-    //     { value: "Female", label: "Female" }
-    // ];
+    const provinceData: SelectOption2[] = provinces.map((province) => ({
+        label: province.provDesc,
+        value: {
+            id: province.id,
+            provCode: province.provCode,
+        }
+    }));
+
+
+    const regionData: SelectOption2[] = regions.map((region) => ({
+        label: region.regDesc,
+        value: {
+            id: region.id,
+            regCode: region.regCode,
+        }
+    }));
+
+    const schoolData: SelectOption[] = schools.map((school) => ({
+        label: school.name,
+        value: school.id,
+    }));
 
 
     const formik = useFormik<StudentProfileFormProps>({
@@ -44,7 +76,7 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
             extensionName: studentDetails.extensionName,
             sex: studentDetails.sex,
             placeOfBirth: studentDetails.placeOfBirth ,
-            birthdate: studentDetails.birthdate,
+            birthdate: studentDetails?.birthdate?.split('T')[0] ?? new Date().toISOString().split('T')[0],
             height: studentDetails.height,
             weight: studentDetails.weight,
             permanentStreet: studentDetails.permanentStreet,
@@ -125,7 +157,6 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
 
     const submitHandler = async (payload: StudentProfileFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
         try {
-            console.log(payload);
             const response = await studentAPI.updateStudentProfile(studentDetails.studentId, payload);
             if(response){
                 setError(false);
@@ -141,6 +172,67 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
             setShowAlert(true);
         }
     }
+
+
+    const handlePermanetProvinceChange = async (option: SelectOption2 | null) => {
+        if (option) {
+          const cityMunData = await addressesAPI.getAllCities(option.value.provCode);
+    
+          setPermanentCityMunOptions(cityMunData.map((city: CityMunProps) => ({
+            label: city.citymunDesc,
+            value: {
+              id: city.id,
+              citymunCode: city.citymunCode,
+            }
+          })));
+        }
+      };
+    
+      const handlePermanentCityMunChange = async (option: SelectOption2 | null) => {
+        if (option) {
+          const brgyData = await addressesAPI.getAllBarangays(option.value.citymunCode);
+    
+          setPermanentBrgyOptions(brgyData.map((brgy: BrgyProps) => ({
+            label: brgy.brgyDesc,
+            value: {
+              id: brgy.id,
+              brgyCode: brgy.brgyCode,
+            }
+          })));
+        }
+      };
+
+
+       const handleCurrentProvinceChange = async (option: SelectOption2 | null) => {
+        if (option) {
+          const cityMunData = await addressesAPI.getAllCities(option.value.provCode);
+    
+          setCurrentCityMunOptions(cityMunData.map((city: CityMunProps) => ({
+            label: city.citymunDesc,
+            value: {
+              id: city.id,
+              citymunCode: city.citymunCode,
+            }
+          })));
+        }
+      };
+    
+      const handleCurrentCityMunChange = async (option: SelectOption2 | null) => {
+        if (option) {
+          const brgyData = await addressesAPI.getAllBarangays(option.value.citymunCode);
+    
+          setCurrentBrgyOptions(brgyData.map((brgy: BrgyProps) => ({
+            label: brgy.brgyDesc,
+            value: {
+              id: brgy.id,
+              brgyCode: brgy.brgyCode,
+            }
+          })));
+        }
+      };
+
+
+
 
 
 
@@ -341,8 +433,259 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
                         </div>
                 </Collapsible>
 
+                <Collapsible title="Academic Information (Grade 12)">
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="g12AcademicStrand"
+                                label="Academic Strand" 
+                                type="text" 
+                                placeholder="Academic Stran" 
+                                name="g12AcademicStrand"
+                                value={formik.values.g12AcademicStrand}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.g12AcademicStrand && formik.errors.g12AcademicStrand ? true : false}
+                                errorMessage={formik.errors.g12AcademicStrand}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="g12ProgramName"
+                                label="Program Name" 
+                                type="text" 
+                                placeholder="Program Name" 
+                                name="g12ProgramName"
+                                value={formik.values.g12ProgramName}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.g12ProgramName && formik.errors.g12ProgramName ? true : false}
+                                errorMessage={formik.errors.g12ProgramName}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="g12AwardHonor"
+                                label="Award/Honor" 
+                                type="text" 
+                                placeholder="Award/Honor" 
+                                name="g12AwardHonor"
+                                value={formik.values.g12AwardHonor}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.g12AwardHonor && formik.errors.g12AwardHonor ? true : false}
+                                errorMessage={formik.errors.g12AwardHonor}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="g12Organization"
+                                label="Organization" 
+                                type="text" 
+                                placeholder="Organization" 
+                                name="g12Organization"
+                                value={formik.values.g12Organization}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.g12Organization && formik.errors.g12Organization ? true : false}
+                                errorMessage={formik.errors.g12Organization}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="g12YearOfGraduation"
+                                label="Year Of Graduation" 
+                                type="text" 
+                                placeholder="Year Of Graduation" 
+                                name="g12YearOfGraduation"
+                                value={formik.values.g12YearOfGraduation}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.g12YearOfGraduation && formik.errors.g12YearOfGraduation ? true : false}
+                                errorMessage={formik.errors.g12YearOfGraduation}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
+                                id="g12SchoolId"
+                                name="g12SchoolId"
+                                label="School" 
+                                options={schoolData} 
+                                isMultiple={false} 
+                                value={schoolData.find(opt => opt.value === formik.values.g12SchoolId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                        formik.setFieldValue("g12SchoolId", option.value);
+                                    } else {
+                                        formik.setFieldValue("g12SchoolId", null);
+                                    }
+                                }}
+                                error={formik.touched.g12SchoolId && formik.errors.g12SchoolId ? true : false}
+                                errorMessage={formik.errors.g12SchoolId}
+                            />
+                        </div>
+                    </div>
+                </Collapsible>
+
+                <Collapsible title="Academic Information (College)">
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="collegeProgramName"
+                                label="Program Name" 
+                                type="text" 
+                                placeholder="Program Name" 
+                                name="collegeProgramName"
+                                value={formik.values.collegeProgramName}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.collegeProgramName && formik.errors.collegeProgramName ? true : false}
+                                errorMessage={formik.errors.collegeProgramName}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="collegeYearLevel"
+                                label="Year Level" 
+                                type="text" 
+                                placeholder="Year Level" 
+                                name="collegeYearLevel"
+                                value={formik.values.collegeYearLevel}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.collegeYearLevel && formik.errors.collegeYearLevel ? true : false}
+                                errorMessage={formik.errors.collegeYearLevel}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="collegeAwardHonor"
+                                label="Award/Honor" 
+                                type="text" 
+                                placeholder="Award/Honor" 
+                                name="collegeAwardHonor"
+                                value={formik.values.collegeAwardHonor}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.collegeAwardHonor && formik.errors.collegeAwardHonor ? true : false}
+                                errorMessage={formik.errors.collegeAwardHonor}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="collegeOrganization"
+                                label="Organization" 
+                                type="text" 
+                                placeholder="Organization" 
+                                name="collegeOrganization"
+                                value={formik.values.collegeOrganization}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.collegeOrganization && formik.errors.collegeOrganization ? true : false}
+                                errorMessage={formik.errors.collegeOrganization}
+                            />
+                        </div>
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
+                                id="collegeSchoolId"
+                                name="collegeSchoolId"
+                                label="School" 
+                                options={schoolData} 
+                                isMultiple={false} 
+                                value={schoolData.find(opt => opt.value === formik.values.collegeSchoolId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                        formik.setFieldValue("collegeSchoolId", option.value);
+                                    } else {
+                                        formik.setFieldValue("collegeSchoolId", null);
+                                    }
+                                }}
+                                error={formik.touched.collegeSchoolId && formik.errors.collegeSchoolId ? true : false}
+                                errorMessage={formik.errors.collegeSchoolId}
+                            />
+                        </div>
+                    </div>
+                </Collapsible>
+
                 <Collapsible title="Permanent Address:">
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
+                                id="permanentProvinceId"
+                                name="permanentProvinceId"
+                                label="Permanent Province" 
+                                options={provinceData} 
+                                isMultiple={false} 
+                                value={provinceData.find(opt => opt.value.id === formik.values.permanentProvinceId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                    formik.setFieldValue("permanentProvinceId", option.value.id);
+                                    setPermanentCityMunOptions([]);
+                                    setPermanentBrgyOptions([]);
+                                    handlePermanetProvinceChange(option);
+                                    } else {
+                                    formik.setFieldValue("permanentProvinceId", null);
+                                    }
+                                }}
+                                error={formik.touched.permanentProvinceId && formik.errors.permanentProvinceId ? true : false}
+                                errorMessage={formik.errors.permanentProvinceId}
+                                // isLoading={isLoading}
+                            />
+                        </div>
+
+                         <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-999"
+                                id="permanentCitymunId"
+                                name="permanentCitymunId"
+                                label="Permanent City/Muni." 
+                                options={permanentCityMunOptions} 
+                                isMultiple={false} 
+                                value={permanentCityMunOptions.find(opt => opt.value.id === formik.values.permanentCitymunId) || null}
+                                onChange={(option) => {
+                                if (option) {
+                                    formik.setFieldValue("permanentCitymunId", option.value.id);
+                                    setPermanentBrgyOptions([]);
+                                    handlePermanentCityMunChange(option);
+                                } else {
+                                    formik.setFieldValue("permanentCitymunId", null);
+                                }
+                                }}
+                                error={formik.touched.permanentCitymunId && formik.errors.permanentCitymunId ? true : false}
+                                errorMessage={formik.errors.permanentCitymunId}
+                            />
+                        </div>
+                        
+
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                id="permanentBrgId"
+                                name="permanentBrgId"
+                                label="Permanent Brgy." 
+                                options={permanentBrgyOptions} 
+                                isMultiple={false} 
+                                value={permanentBrgyOptions.find(opt => opt.value.id === formik.values.permanentBrgId) || null}
+                                onChange={(option) => {
+                                if (option) {
+                                    formik.setFieldValue("permanentBrgId", option.value.id);
+                                } else {
+                                    formik.setFieldValue("permanentBrgId", null);
+                                }
+                                }}
+                                error={formik.touched.permanentBrgId && formik.errors.permanentBrgId ? true : false}
+                                errorMessage={formik.errors.permanentBrgId}
+                            />
+                        </div>
+
                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Input 
                                 id="permanentStreet"
@@ -358,62 +701,27 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
                             />
                         </div>
 
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="permanentBrgId"
-                                label="Permanent Brgy." 
-                                type="text" 
-                                placeholder="Permanent Brgy."
-                                name="permanentBrgId"
-                                value={formik.values.permanentBrgId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.permanentBrgId && formik.errors.permanentBrgId ? true : false}
-                                errorMessage={formik.errors.permanentBrgId}
-                            />
-                        </div>
-
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="permanentCitymunId"
-                                label="Permanent City/Muni." 
-                                type="text" 
-                                placeholder="Permanent City/Muni."
-                                name="permanentCitymunId"
-                                value={formik.values.permanentCitymunId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.permanentCitymunId && formik.errors.permanentCitymunId ? true : false}
-                                errorMessage={formik.errors.permanentCitymunId}
-                            />
-                        </div>
-
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="permanentProvinceId"
-                                label="Permanent Province" 
-                                type="text" 
-                                placeholder="Permanent Province"
-                                name="permanentProvinceId"
-                                value={formik.values.permanentProvinceId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.permanentProvinceId && formik.errors.permanentProvinceId ? true : false}
-                                errorMessage={formik.errors.permanentProvinceId}
-                            />
-                        </div>
                     </div>
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
+                            <Select 
+                                className="z-99"
                                 id="permanentRegionId"
-                                label="Permanent Region" 
-                                type="text" 
-                                placeholder="Permanent Region" 
                                 name="permanentRegionId"
-                                value={formik.values.permanentRegionId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
+                                label="Permanent Region" 
+                                options={regionData} 
+                                isMultiple={false} 
+                                value={regionData.find(opt => opt.value.id === formik.values.permanentRegionId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                    formik.setFieldValue("permanentRegionId", option.value.id);
+                                    setPermanentCityMunOptions([]);
+                                    setPermanentBrgyOptions([]);
+                                    handlePermanetProvinceChange(option);
+                                    } else {
+                                    formik.setFieldValue("permanentRegionId", null);
+                                    }
+                                }}
                                 error={formik.touched.permanentRegionId && formik.errors.permanentRegionId ? true : false}
                                 errorMessage={formik.errors.permanentRegionId}
                             />
@@ -454,6 +762,77 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
                 <Collapsible title="Current Address:">
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
+                                id="currentProvinceId"
+                                name="currentProvinceId"
+                                label="Current Province" 
+                                options={provinceData} 
+                                isMultiple={false} 
+                                value={provinceData.find(opt => opt.value.id === formik.values.currentProvinceId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                    formik.setFieldValue("currentProvinceId", option.value.id);
+                                    setCurrentCityMunOptions([]);
+                                    setCurrentBrgyOptions([]);
+                                    handleCurrentProvinceChange(option);
+                                    } else {
+                                    formik.setFieldValue("currentProvinceId", null);
+                                    }
+                                }}
+                                error={formik.touched.currentProvinceId && formik.errors.currentProvinceId ? true : false}
+                                errorMessage={formik.errors.currentProvinceId}
+                                // isLoading={isLoading}
+                            />
+                        </div>
+                        
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-999"
+                                id="currentCitymunId"
+                                name="currentCitymunId"
+                                label="Current City/Muni." 
+                                options={currentCityMunOptions} 
+                                isMultiple={false} 
+                                value={currentCityMunOptions.find(opt => opt.value.id === formik.values.currentCitymunId) || null}
+                                onChange={(option) => {
+                                if (option) {
+                                    formik.setFieldValue("currentCitymunId", option.value.id);
+                                    setCurrentBrgyOptions([]);
+                                    handleCurrentCityMunChange(option);
+                                } else {
+                                    formik.setFieldValue("currentCitymunId", null);
+                                }
+                                }}
+                                error={formik.touched.currentCitymunId && formik.errors.currentCitymunId ? true : false}
+                                errorMessage={formik.errors.currentCitymunId}
+                            />
+                        </div>
+
+
+
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                id="currentBrgId"
+                                name="currentBrgId"
+                                label="Current Brgy." 
+                                options={currentBrgyOptions} 
+                                isMultiple={false} 
+                                value={currentBrgyOptions.find(opt => opt.value.id === formik.values.currentBrgId) || null}
+                                onChange={(option) => {
+                                if (option) {
+                                    formik.setFieldValue("currentBrgId", option.value.id);
+                                } else {
+                                    formik.setFieldValue("currentBrgId", null);
+                                }
+                                }}
+                                error={formik.touched.currentBrgId && formik.errors.currentBrgId ? true : false}
+                                errorMessage={formik.errors.currentBrgId}
+                            />
+                        </div>
+
+
+                        <div className="w-full md:w-[48%] xl:w-1/3">
                             <Input 
                                 id="currentStreet"
                                 label="Current Street" 
@@ -466,65 +845,31 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
                                 error={formik.touched.currentStreet && formik.errors.currentStreet ? true : false}
                                 errorMessage={formik.errors.currentStreet}
                             />
+                            
                         </div>
 
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="currentBrgId"
-                                label="Current Brgy." 
-                                type="text" 
-                                placeholder="Current Brgy."
-                                name="currentBrgId"
-                                value={formik.values.currentBrgId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.currentBrgId && formik.errors.currentBrgId ? true : false}
-                                errorMessage={formik.errors.currentBrgId}
-                            />
-                        </div>
-
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="currentCitymunId"
-                                label="Current City/Muni." 
-                                type="text" 
-                                placeholder="Current City/Muni."
-                                name="currentCitymunId"
-                                value={formik.values.currentCitymunId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.currentCitymunId && formik.errors.currentCitymunId ? true : false}
-                                errorMessage={formik.errors.currentCitymunId}
-                            />
-                        </div>
-
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="currentProvinceId"
-                                label="Current Province" 
-                                type="text" 
-                                placeholder="Current Province"
-                                name="currentProvinceId"
-                                value={formik.values.currentProvinceId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.currentProvinceId && formik.errors.currentProvinceId ? true : false}
-                                errorMessage={formik.errors.currentProvinceId}
-                            />
-                        </div>
                     </div>
 
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
+                            <Select 
+                                className="z-99"
                                 id="currentRegionId"
-                                label="Current Region" 
-                                type="text" 
-                                placeholder="Current Region" 
                                 name="currentRegionId"
-                                value={formik.values.currentRegionId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
+                                label="Current Region" 
+                                options={regionData} 
+                                isMultiple={false} 
+                                value={regionData.find(opt => opt.value.id === formik.values.currentRegionId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                    formik.setFieldValue("currentRegionId", option.value.id);
+                                    setPermanentCityMunOptions([]);
+                                    setPermanentBrgyOptions([]);
+                                    handlePermanetProvinceChange(option);
+                                    } else {
+                                    formik.setFieldValue("currentRegionId", null);
+                                    }
+                                }}
                                 error={formik.touched.currentRegionId && formik.errors.currentRegionId ? true : false}
                                 errorMessage={formik.errors.currentRegionId}
                             />
@@ -689,176 +1034,6 @@ const StudentProfileForm: React.FC<{studentDetails: APIStudentListResponse}> = (
                                 onBlur={() => formik.handleBlur}
                                 error={formik.touched.emergencyContactNumber2 && formik.errors.emergencyContactNumber2 ? true : false}
                                 errorMessage={formik.errors.emergencyContactNumber2}
-                            />
-                        </div>
-                    </div>
-                </Collapsible>
-                
-                <Collapsible title="Academic Information (Grade 12)">
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12AcademicStrand"
-                                label="Academic Strand" 
-                                type="text" 
-                                placeholder="Academic Stran" 
-                                name="g12AcademicStrand"
-                                value={formik.values.g12AcademicStrand}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12AcademicStrand && formik.errors.g12AcademicStrand ? true : false}
-                                errorMessage={formik.errors.g12AcademicStrand}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12ProgramName"
-                                label="Program Name" 
-                                type="text" 
-                                placeholder="Program Name" 
-                                name="g12ProgramName"
-                                value={formik.values.g12ProgramName}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12ProgramName && formik.errors.g12ProgramName ? true : false}
-                                errorMessage={formik.errors.g12ProgramName}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12AwardHonor"
-                                label="Award/Honor" 
-                                type="text" 
-                                placeholder="Award/Honor" 
-                                name="g12AwardHonor"
-                                value={formik.values.g12AwardHonor}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12AwardHonor && formik.errors.g12AwardHonor ? true : false}
-                                errorMessage={formik.errors.g12AwardHonor}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12Organization"
-                                label="Organization" 
-                                type="text" 
-                                placeholder="Organization" 
-                                name="g12Organization"
-                                value={formik.values.g12Organization}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12Organization && formik.errors.g12Organization ? true : false}
-                                errorMessage={formik.errors.g12Organization}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12YearOfGraduation"
-                                label="Year Of Graduation" 
-                                type="text" 
-                                placeholder="Year Of Graduation" 
-                                name="g12YearOfGraduation"
-                                value={formik.values.g12YearOfGraduation}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12YearOfGraduation && formik.errors.g12YearOfGraduation ? true : false}
-                                errorMessage={formik.errors.g12YearOfGraduation}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="g12SchoolId"
-                                label="School" 
-                                type="text" 
-                                placeholder="School" 
-                                name="g12SchoolId"
-                                value={formik.values.g12SchoolId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.g12SchoolId && formik.errors.g12SchoolId ? true : false}
-                                errorMessage={formik.errors.g12SchoolId}
-                            />
-                        </div>
-                    </div>
-                </Collapsible>
-
-                <Collapsible title="Academic Information (College)">
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="collegeProgramName"
-                                label="Program Name" 
-                                type="text" 
-                                placeholder="Program Name" 
-                                name="collegeProgramName"
-                                value={formik.values.collegeProgramName}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.collegeProgramName && formik.errors.collegeProgramName ? true : false}
-                                errorMessage={formik.errors.collegeProgramName}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="collegeYearLevel"
-                                label="Year Level" 
-                                type="text" 
-                                placeholder="Year Level" 
-                                name="collegeYearLevel"
-                                value={formik.values.collegeYearLevel}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.collegeYearLevel && formik.errors.collegeYearLevel ? true : false}
-                                errorMessage={formik.errors.collegeYearLevel}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="collegeAwardHonor"
-                                label="Award/Honor" 
-                                type="text" 
-                                placeholder="Award/Honor" 
-                                name="collegeAwardHonor"
-                                value={formik.values.collegeAwardHonor}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.collegeAwardHonor && formik.errors.collegeAwardHonor ? true : false}
-                                errorMessage={formik.errors.collegeAwardHonor}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="collegeOrganization"
-                                label="Organization" 
-                                type="text" 
-                                placeholder="Organization" 
-                                name="collegeOrganization"
-                                value={formik.values.collegeOrganization}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.collegeOrganization && formik.errors.collegeOrganization ? true : false}
-                                errorMessage={formik.errors.collegeOrganization}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="collegeSchoolId"
-                                label="School" 
-                                type="text" 
-                                placeholder="School" 
-                                name="collegeSchoolId"
-                                value={formik.values.collegeSchoolId}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.collegeSchoolId && formik.errors.collegeSchoolId ? true : false}
-                                errorMessage={formik.errors.collegeSchoolId}
                             />
                         </div>
                     </div>
