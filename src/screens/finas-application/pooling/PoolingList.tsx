@@ -5,25 +5,53 @@ import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import { CiEdit } from "react-icons/ci";
+import { SponsorshipApplicationResponse, SponsorshipRequirements, SponsorshipSchoolProps } from "@/types/sponsorship.types";
+import { FormattedDate } from "@/utils/helpers";
+import { FaRegEye } from "react-icons/fa6";
 
 const ActionModal = styled(Modal)`
 
 `;
 
-const PoolingList: React.FC = () => {
+const StyledModal = styled(Modal)`
+    overflow: auto;
+`;
+
+
+interface serverDataProps {
+    applications: SponsorshipApplicationResponse[];
+    totalCount: number;
+}
+
+const PoolingList: React.FC<{serverData: serverDataProps}> = ({
+    serverData
+}) => {
     
+    const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
+
+    useEffect(() => {
+        setData(serverData.applications || []);
+    }, [serverData.applications]);
 
     const columns = [
-        { name: "Application Number", selector: (row:any) => row.applicationNumber, sortable: true },
-        { name: "Application Name", selector: (row:any) => row.applicationName, sortable: true },
-        { name: "School", selector: (row:any) => row.school, sortable: true },
-        { name: "Finas Applied", selector: (row:any) => row.finasApplied, sortable: true },
-        { name: "Date of Application", selector: (row:any) => row.dateOfApplication, sortable: true },
-        { name: "Attachments", selector: (row:any) => row.attachments, sortable: true },
+        { name: "Application Number", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
+        { name: "Applicants Name", selector: (row:SponsorshipApplicationResponse) => row.applicantName, sortable: true },
+        { name: "Schools", center: true, cell: (row:any) => (
+            <>
+                <Button onClick={() => getSchools('srte') } variants="text" startIcon={<FaRegEye size={20}/>}/>
+            </>
+        )},
+        { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
+        { name: "Date of Application", selector: (row:SponsorshipApplicationResponse) => FormattedDate(row.dateOfApp), sortable: true },
+        { name: "Attachments", center: true, cell: (row:any) => (
+            <>
+                <Button onClick={() => getAttachments('srte') } variants="text" startIcon={<FaRegEye size={20}/>}/>
+            </>
+        )},
         { name: "Action", cell: () => (
             <>
                 <div className="flex items-center space-x-4">
@@ -32,18 +60,31 @@ const PoolingList: React.FC = () => {
                 </div>
             </>
         )},
-        { name: "Accepted", selector: (row:any) => row.accepted, sortable: true },
     ];
-
-
-    const data = [
-        { id: 1, schoolName: "Camiguin HS", schoolType: "Public School", province: "CAMIGUIN", city: "EL SALVADOR", municipality: "GUINSILIBAN", barangay:  "Cabuan", action: 'Action' },
-        { id: 2, schoolName: "TESTs", schoolType: "Private School", province: "BUKIDNON", city: "EL SALVADOR", municipality: "ALUBIJID", barangay:  "Benigwayan", action: 'Action' },
-    ];
-    
 
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
+    const [openReqModal, setOpenReqModal] = useState<boolean>(false);
+    const [selectedSchools, setSelectedSchools] = useState<SponsorshipSchoolProps[]>([]);
+    const [selectedReqs, setSelectedReqs] = useState<SponsorshipRequirements[]>([]);
+    const [openSchoolsModal, setOpenSchoolsModal] = useState<boolean>(false);
+
+    const getSchools = async(sponsorshipId: string) => {
+        const schoolData = await [ { schoolId: "1", schoolName: "School A" }, { schoolId: "2", schoolName: "School B" } ];
+        if(schoolData) {
+            setSelectedSchools(schoolData);
+            setOpenSchoolsModal(true);
+        }
+    };
+
+
+    const getAttachments = async(studentId: string) => {
+        const reqData = await [ { fileId: "1", fileName: "School A" }, { fileId: "2", fileName: "School B" } ];
+        if(reqData) {
+            setSelectedReqs(reqData);
+            setOpenReqModal(true);
+        }
+    };
 
     return (
         <Fragment>
@@ -57,6 +98,28 @@ const PoolingList: React.FC = () => {
               />
               <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
+
+
+            <StyledModal isFullscreen={false} title="Attachments" className="min-w-125" isOpen={openReqModal} onClose={() => setOpenReqModal(false)}>
+                <ul className="flex flex-col gap-4">
+                    {selectedReqs.map((item: SponsorshipRequirements, index) => (
+                        <li key={index} className="flex items-center justify-between">
+                            <span>{index + 1}. {item.fileName}</span>
+                        </li>
+                    ))}
+                </ul>
+            </StyledModal>
+
+
+            <StyledModal isFullscreen={false} title="Schools" className="min-w-125" isOpen={openSchoolsModal} onClose={() => setOpenSchoolsModal(false)}>
+                <ul className="flex flex-col gap-4">
+                    {selectedSchools.map((item: SponsorshipSchoolProps, index) => (
+                        <li key={index} className="flex items-center justify-between">
+                            <span>{index + 1}. {item.schoolName}</span>
+                        </li>
+                    ))}
+                </ul>
+            </StyledModal>
 
             <ActionModal 
                 isTextCentered={true} 

@@ -65,4 +65,14 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
             throw error;
         }
     }
+
+    async getAllApplications(applicationStage: string) {
+        try{
+            const response = this.get({ path: `/applicants/by-stage?applicationStage=${applicationStage}` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch all applications", error);
+            throw error;
+        }
+    }
 }

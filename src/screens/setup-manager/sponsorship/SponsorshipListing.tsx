@@ -17,6 +17,8 @@ import { formatCurrency, FormattedDate } from "@/utils/helpers";
 import { FaRegEye } from "react-icons/fa6";
 import { SponsorshipAPIService } from "@/api";
 import { useRouter } from "next/navigation";
+import { BsClipboard2DataFill } from "react-icons/bs";
+
 
 
 const StyledModal = styled(Modal)`
@@ -103,6 +105,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
             <>
                 <div className="flex items-center space-x-3.5">
                     <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
+                    <Button onClick={() => {}} variants="text" startIcon={<BsClipboard2DataFill size={20}/>}/>
                     <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
                 </div>
             </>

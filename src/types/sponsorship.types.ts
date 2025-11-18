@@ -45,3 +45,19 @@ export interface SponsorshipRequirements {
     fileId: string;
     fileName: string;
 }
+
+export interface SponsorshipApplicationResponse {
+    id: string;
+    appNumber: string;
+    studentId: string;
+    sponsorshipId: string;
+    appStatus: string;
+    appStage: string;
+    applicantName: string;
+    sex: string;
+    program: string;
+    yearLevel: string;
+    municipality: string; 
+    finAssname: string;
+    dateOfApp: string;
+}

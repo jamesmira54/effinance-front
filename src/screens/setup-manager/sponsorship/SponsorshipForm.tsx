@@ -125,8 +125,20 @@ const SponsorshipForm: React.FC<
       if(response) {
         setError(false);
         setErrorMessage('');
-        resetForm();
-        onSuccess({ ...payload, id: initialData?.id || response?.id });
+        setShowAlert(true);
+        onSuccess(
+          {
+            ...response,
+            sponsorshipRequirements: response.sponsorshipRequirements.map((item: any) => ({
+              fileId: item.fileId,
+              fileName: item.fileName,
+            })),
+            sponsorshipSchool: response.sponsorshipSchool.map((item: any) => ({
+              schoolId: item.schoolId,
+              schoolName: item.schoolName,
+            })),
+          } as APISponsorshipListResponse
+        )
       }
 
     }  catch (err: any) {
@@ -142,6 +154,16 @@ const SponsorshipForm: React.FC<
   return(
     <>  
       <form onSubmit={formik.handleSubmit}>
+        {showAlert &&
+          <div className="mt-5">
+            <Alert 
+              variant={isError ? 'error' : 'success'}
+              title={isError ? 'Error' : "Success!"}
+              message={isError ? errorMessage : "Sponsorship Added/Updated Successfully!"}
+              showLink={false} 
+            />
+          </div>
+        }
         <div className="flex flex-col mb-4 gap-6 xl:flex-row">
           <div className="w-full xl:w-1/2">
             <Input  
@@ -331,16 +353,6 @@ const SponsorshipForm: React.FC<
           } 
         </div>
 
-        {showAlert &&
-          <div className="mt-5">
-            <Alert 
-              variant={isError ? 'error' : 'success'}
-              title={isError ? 'Error' : "Success!"}
-              message={isError ? errorMessage : "Sponsorship Added/Updated Successfully!"}
-              showLink={false} 
-            />
-          </div>
-        }
       </form>
     </>
   );
