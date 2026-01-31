@@ -4,9 +4,7 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { Fragment} from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { cookies } from "next/headers";
 import { AuthAPIService, UserAPIService } from "@/api";
-import { profile } from "console";
 
 
 const authAPI = new AuthAPIService();
@@ -20,20 +18,19 @@ const fetchProfile = async (userId: string) => {
   return await userAPI.profile(userId);
 }
 
-
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   
-  let accessToken = '';
+  let userId = '';
   const getUserSession = await fetchUserSession();
   if(getUserSession) {
-    accessToken = getUserSession.userId
+    userId = getUserSession.userId;
   }
   
-  const userDetails = await fetchProfile(accessToken);
+  const userDetails = await fetchProfile(userId);
 
   return (
     <Fragment>

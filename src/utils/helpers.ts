@@ -1,3 +1,4 @@
+import { MenuItem, UserRole } from '@/lib/menu';
 import { getCookie } from 'cookies-next';
 
 export const getAuthToken = async () => {
@@ -31,7 +32,19 @@ export const formatCurrency = (amount: number) => {
     style: 'currency',
     currency: 'PHP',
   }).format(amount || 0);
-
+  
 
   return formatted;
+}
+
+
+export const filterMenuByRole = (menu: MenuItem[], role: UserRole): MenuItem[] => {
+  return menu
+    .filter(item => Array.isArray(item.roles) && item.roles.includes(role))
+    .map(item => ({
+      ...item,
+      children: item.children
+        ? filterMenuByRole(item.children, role)
+        : undefined,
+    }))
 }

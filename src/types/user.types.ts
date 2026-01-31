@@ -59,3 +59,9 @@ export interface APIUserUpdateResponse {
     userTypeId: string;
     userType: string;
 }
+
+export interface APIUserResponse {
+    id: string;
+    name: string;
+    description: string;
+}

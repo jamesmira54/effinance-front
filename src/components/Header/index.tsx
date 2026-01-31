@@ -4,7 +4,7 @@ import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
-import { APIUserProfileResponse } from "@/lib/AuthService/authService.types";
+import { APIUserProfileResponse } from "@/types";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
