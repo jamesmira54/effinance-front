@@ -4,8 +4,6 @@ import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { SponsorshipFormProps } from "./Sponsorship.types";
-import { APIUserProfileResponse } from "@/types";
-import { SchoolListProps } from "@/types/shools.types";
 import { useMemo, useState } from "react";
 import { APISponsorhipPayload, APISponsorshipListResponse } from "@/types/sponsorship.types";
 import { SponsorshipAPIService } from "@/api";
@@ -54,8 +52,8 @@ const SponsorshipForm: React.FC<
       slot: initialData?.slot || 0,
       fundAllocation: initialData?.fundAllocation || 0,
       sponsorshipRequirements: initialData?.sponsorshipRequirements?.map((item) => ({
-        label: selectOptionsData.requirements.find((option) => option.value === item.fileId)?.label || "",
-        value: item.fileId,
+        label: selectOptionsData.requirements.find((option) => option.value === item.id)?.label || "",
+        value: item.id,
       })) || [],
       sponsorshipSchool: initialData?.sponsorshipSchool?.map((item) => ({
         label: selectOptionsData.schools.find((option) => option.value === item.schoolId)?.label || "",

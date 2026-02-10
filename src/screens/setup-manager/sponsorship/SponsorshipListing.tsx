@@ -80,13 +80,12 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         })),
     }), [coordinators, schools, requirements, academicYears]);
 
-    // console.log("selectOptionsData", selectOptionsData);
 
 
     const columns = [
         { name: "Financial Assistance Name", selector: (row:APISponsorshipListResponse) => row.name, sortable: true },
         { name: "Sponsor", selector: (row:APISponsorshipListResponse) => row.sponsorName },
-        { name: "Duration", minWidth: '250px', selector: (row:APISponsorshipListResponse) => (
+        { name: "Duration", width: '300px', selector: (row:APISponsorshipListResponse) => (
             `${FormattedDate(row.durationFrom)} - ${FormattedDate(row.durationTo)}`
         )},
         { name: "Fund Allocation", selector: (row:APISponsorshipListResponse) => formatCurrency(row.fundAllocation) },

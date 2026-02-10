@@ -731,7 +731,7 @@ const StudentProfileForm: React.FC<
                             <Input 
                                 id="permanentZipCode"
                                 label="Permanent Zipcode" 
-                                type="text" 
+                                type="number" 
                                 placeholder="Permanent Zipcode" 
                                 name="permanentZipCode"
                                 value={formik.values.permanentZipCode}
@@ -879,7 +879,7 @@ const StudentProfileForm: React.FC<
                             <Input 
                                 id="currentZipCode"
                                 label="Current Zipcode" 
-                                type="text" 
+                                type="number" 
                                 placeholder="Current Zipcode" 
                                 name="currentZipCode"
                                 value={formik.values.currentZipCode}

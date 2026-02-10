@@ -14,7 +14,7 @@ import StudentAPIService from "@/api/student-api";
 import { IoEyeOutline } from "react-icons/io5";
 import Badge from "@/components/Badge/Badge";
 import { MdUpdate } from "react-icons/md";
-import PoolingForm from "./PoolingForm";
+import ApplicationForm from "./ApplicationForm";
 import { APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse } from "@/types";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ interface serverDataProps {
     totalCount: number;
 }
 
-const PoolingList: React.FC<{serverData: serverDataProps}> = ({
+const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
@@ -60,17 +60,23 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: "Status", center: true, cell: (row:any) => ( 
             <Badge variants={
-                row.appStatus === APPLICATION_STATUS.PENDING_POOLING ? "warning" : 
-                row.appStatus === APPLICATION_STATUS.FOLLOW_UP ? "warning" : 
-                row.appStatus === APPLICATION_STATUS.COMPLETE ? "success" : 
-                row.appStatus === APPLICATION_STATUS.REJECTED ? "error" : 
+                row.appStatus === APPLICATION_STATUS.APPROVED ? "success" : 
+                row.appStatus === APPLICATION_STATUS.PENDING_RANKING_SELECTION ? "success" : 
                 "default"}>
-                    {row.appStatus
+                {(() => {
+                    // Format the status string
+                    const formatted = row.appStatus
                         .toLowerCase()
                         .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char: string) => char.toUpperCase())
+                        .replace(/\b\w/g, (char: string) => char.toUpperCase());
+                    // Remove the third word
+                    const words = formatted.split(' ');
+                    if (words.length >= 3) {
+                        words.splice(2, 1);
                     }
-            </Badge> 
+                    return words.join(' ');
+                })()}
+            </Badge>
         )},
         { name: "Action", center: true, cell: (row:any) => ( 
             <>
@@ -157,7 +163,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
 
 
             <StyledModal isFullscreen={false} title="Update Status" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <PoolingForm initialData={selectedItem}  onSuccess={(item: any) => handleSuccess(item)} />
+                <ApplicationForm initialData={selectedItem}  onSuccess={(item: any) => handleSuccess(item)} />
             </StyledModal>
 
             <StyledModal isFullscreen={false} title="Remarks" className="max-w-180" isOpen={openRemarksModal} onClose={() => setOpenRemarksModal(false)}>
@@ -185,4 +191,4 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     )
 };
 
-export default PoolingList;
+export default ApplicationList;

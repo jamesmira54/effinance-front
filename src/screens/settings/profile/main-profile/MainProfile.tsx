@@ -35,9 +35,7 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
   const handleBack = () => {
     if (allowRouterBack) {
       router.back();
-    } else {
-      console.log("Back navigation is not allowed.");
-    }
+    } 
   };
 
   

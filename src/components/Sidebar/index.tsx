@@ -28,8 +28,6 @@ interface SidebarProps {
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-
-  console.log("User Role in Sidebar:", userDetails);
   
   let role:UserRole = 'admin';
   if(userDetails) {
@@ -41,8 +39,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails }: SidebarProps) => 
       role = 'coordinator';
     }
   }
-
-  console.log("Determined Role in Sidebar:", role);
   
   const menuItems = filterMenuByRole(MENU_ITEMS, role);
 

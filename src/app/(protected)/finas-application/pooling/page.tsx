@@ -1,6 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import PoolingList from "@/screens/finas-application/pooling/PoolingList";
 import { SponsorshipAPIService } from "@/api";
 
@@ -21,7 +20,7 @@ const Pooling = async () => {
   const applications = await getApplicationsData();
 
   const serverData = {
-    applications: applications?.data || [],
+    applications: applications?.applicants || [],
     totalCount: applications?.totalCount || 0,
   }
 

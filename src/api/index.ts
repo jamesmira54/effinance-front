@@ -7,3 +7,4 @@ export { default as AcademicAPIService } from './academics-api';
 export { default as SchoolAPIService } from './schools-api';
 export { default as AddressAPIService } from './address-api';
 export { default as SponsorshipAPIService } from './sponsorships-api';
+export { default as ApplicationAPIService } from './application-api';

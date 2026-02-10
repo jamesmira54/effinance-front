@@ -35,4 +35,14 @@ export default class SponsorshipStudentAPIService extends AxiosAPI implements Sp
             throw error;
         }
     }
+
+    async getSpecificSponsorship(sponsorshipId: string) {
+        try {
+            const response = await this.get({ path: `/${sponsorshipId}` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch specific sponsorship for student", error);
+            throw error;
+        }
+    }
 }

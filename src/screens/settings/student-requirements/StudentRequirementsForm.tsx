@@ -62,9 +62,8 @@ const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId
       .required("Required Field!"),
     }),
     onSubmit: (values, { setSubmitting, resetForm }) => {
-      submitHandler(values, setSubmitting, resetForm);
-      setSubmitting(true);
       setShowAlert(false);
+      submitHandler(values, setSubmitting, resetForm);
     }
   });
 
@@ -120,6 +119,7 @@ const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId
 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    multiple: false,
     onDrop,
     accept: {
       "image/*": [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp"],
@@ -155,17 +155,18 @@ const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId
             className={`border-2 border-dashed p-6 rounded-lg cursor-pointer text-center ${
               isDragActive ? "border-blue-500" : "border-gray-300"
             }`}
-          >
+            >
             <Input
-              id="file" 
-              {...getInputProps()} 
+              id="file-input-trigger"
+              style={{ display: "none" }}
+              {...getInputProps()}
               name="file"
               onChange={(e) => {
-                const file = e.currentTarget.files?.[0];
-                if (file) {
-                  formik.setFieldValue("file", file);
-                  setFilePreview(URL.createObjectURL(file));
-                }
+              const file = e.currentTarget.files?.[0];
+              if (file) {
+                formik.setFieldValue("file", file);
+                setFilePreview(URL.createObjectURL(file));
+              }
               }}
               onBlur={() => formik.handleBlur}
               error={formik.touched.file && formik.errors.file ? true : false}

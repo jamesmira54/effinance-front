@@ -42,8 +42,9 @@ export interface SponsorshipSchoolProps {
 }
 
 export interface SponsorshipRequirements {
-    fileId: string;
-    fileName: string;
+    id: string;
+    filetype: string;
+    filename: string;
 }
 
 export interface SponsorshipApplicationResponse {

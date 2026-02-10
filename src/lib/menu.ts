@@ -3,6 +3,9 @@ import { RiListSettingsLine } from "react-icons/ri";
 import { CiSettings } from "react-icons/ci";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { IconType } from "react-icons";
+import { GrAnnounce } from "react-icons/gr";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
+
 
 export type UserRole = 'admin' | 'student' | 'sponsor' | 'coordinator';
 
@@ -25,6 +28,13 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: ['admin', 'student'],
   },
   {
+    id: 'announcements',
+    icon: GrAnnounce,
+    label: "Announcements",
+    route: "/announcements",
+    roles: ['admin', 'student'],
+  },
+  {
     id: 'finas-application',
     icon: IoNewspaperOutline,
     label: "Finas Application",
@@ -35,20 +45,12 @@ export const MENU_ITEMS: MenuItem[] = [
         label: 'Pooling',
         route: '/finas-application/pooling',
         roles: ['admin'],
-        children: [
-            {
-              id: 'randomw',
-              label: 'Random',
-              route: '/finas-application/application-list',
-              roles: ['admin'],
-          }
-        ]
       },
       {
         id: 'application-list',
         label: 'Application List',
         route: '/finas-application/application-list',
-        roles: ['admin'],
+        roles: ['admin', 'student'],
       },
       {
         id: 'ranking-selection',
@@ -64,6 +66,50 @@ export const MENU_ITEMS: MenuItem[] = [
       }
     ],
     roles: ['admin', 'student'],
+  },
+  {
+    id: 'financing',
+    icon: HiOutlineOfficeBuilding,
+    label: "Financing",
+    route: "",
+    roles: ['admin'],
+    children: [
+      {
+        id: 'budget-office',
+        icon: HiOutlineOfficeBuilding,
+        label: "Budget Office",
+        route: "/financing/budget-office",
+        roles: ['admin'],
+      },
+      {
+        id: 'mayors-office',
+        icon: HiOutlineOfficeBuilding,
+        label: "Mayor's Office",
+        route: "/financing/mayors-office",
+        roles: ['admin'],
+      },
+      {
+        id: 'treasurers-office',
+        icon: HiOutlineOfficeBuilding,
+        label: "Treasurer's Office",
+        route: "/financing/treasurers-office",
+        roles: ['admin'],
+      },
+      {
+        id: 'cashiering',
+        icon: HiOutlineOfficeBuilding,
+        label: "Cashiering",
+        route: "/financing/cashiering",
+        roles: ['admin'],
+      },
+      {
+        id: 'accounting',
+        icon: HiOutlineOfficeBuilding,
+        label: "Accounting",
+        route: "/financing/accounting",
+        roles: ['admin'],
+      },
+    ]
   },
   {
     id: 'setup-manager',
@@ -105,6 +151,13 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: ['admin'],
   },
   {
+    id: 'manage-report',
+    icon: HiOutlineOfficeBuilding,
+    label: "Manage Report",
+    route: "/manage-report",
+    roles: ['admin'],
+  },
+  {
     id: 'settings',
     icon: CiSettings,
     label: "Settings",
@@ -120,7 +173,7 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'requirements',
         label: 'Requirements',
         route: '/settings/requirements',
-        roles: ['admin'],
+        roles: ['student'],
       },
       {
         id: 'user-accounts',
@@ -136,5 +189,5 @@ export const MENU_ITEMS: MenuItem[] = [
       }
     ],
     roles: ['admin', 'student'],
-  },
+  }
 ];

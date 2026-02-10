@@ -22,9 +22,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
   const handleBack = () => {
     if (allowRouterBack) {
       router.back();
-    } else {
-      console.log("Back navigation is not allowed.");
-    }
+    } 
   };
 
 
