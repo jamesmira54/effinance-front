@@ -68,8 +68,7 @@ const StudentAccountListing: React.FC<{studentAccounts: APIStudentListResponse[]
             <ActionModal isTextCentered={true} title="Are you Sure?" className="max-w-100" isOpen={openActionModal} onClose={() => setOpenActionModal(false)}>
                 <div className="text-center">
                     <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque euismod est quis mauris lacinia pharetra.
+                        Are you sure you want to delete this student account? This action cannot be undone.
                     </p>
 
                     <div className="flex items-center justify-center w-full gap-6 mt-8">

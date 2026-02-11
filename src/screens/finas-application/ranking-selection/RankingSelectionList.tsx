@@ -14,7 +14,7 @@ import StudentAPIService from "@/api/student-api";
 import { IoEyeOutline } from "react-icons/io5";
 import Badge from "@/components/Badge/Badge";
 import { MdUpdate } from "react-icons/md";
-import ApplicationForm from "./ApplicationForm";
+import ApplicationForm from "./RankingSelectionForm";
 import { APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse } from "@/types";
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ interface serverDataProps {
     totalCount: number;
 }
 
-const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
+const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
@@ -81,7 +81,6 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
                 </Link>
             ),
         },
-        { name: "Program", selector: (row:SponsorshipApplicationResponse) => row.program, sortable: true },
         { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
         { name: "Date of Application", selector: (row:SponsorshipApplicationResponse) => FormattedDate(row.dateOfApp), sortable: true },
         { name: "Attachments", center: true, cell: (row:any) => (
@@ -202,4 +201,4 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     )
 };
 
-export default ApplicationList;
+export default RankingSelectionList;

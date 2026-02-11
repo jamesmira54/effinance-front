@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ApplicationFormProps } from "./Application.types";
+import { RankingSelectionFormProps } from "./RankingSelection.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Alert from "@/components/Alert/Alert";
@@ -8,7 +8,7 @@ import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import Throbber from "@/components/common/Throbber";
 import { ApplicationAPIService } from "@/api";
 
-const ApplicationForm: React.FC<
+const RankingSelectionForm: React.FC<
 {
     initialData: any, 
     onSuccess: (item: any) => void
@@ -22,7 +22,7 @@ const ApplicationForm: React.FC<
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [showAlert, setShowAlert] = useState<boolean>(false);
 
-    const initialValues = useMemo<ApplicationFormProps>(() => ({
+    const initialValues = useMemo<RankingSelectionFormProps>(() => ({
         studentId: initialData.studentId,
         sponsorshipId: initialData.sponsorshipId,
         appStage: initialData.appStage || APPLICATION_STAGE.POOLING,
@@ -30,7 +30,7 @@ const ApplicationForm: React.FC<
         remarks: initialData.remarks || "",
     }), [initialData]);
 
-    const formik = useFormik<ApplicationFormProps>({
+    const formik = useFormik<RankingSelectionFormProps>({
         initialValues,
         enableReinitialize: true,
         onSubmit: async (values, {setSubmitting}) => {
@@ -58,7 +58,7 @@ const ApplicationForm: React.FC<
     }, []);
 
 
-    const submitHandler = async (values: ApplicationFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
+    const submitHandler = async (values: RankingSelectionFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
         try {
             let response: any = null;     
             response = await ApplicationAPI.updateApplicationStatus(initialData.studentId, values);
@@ -136,4 +136,4 @@ const ApplicationForm: React.FC<
     )
 }
 
-export default ApplicationForm;
+export default RankingSelectionForm;

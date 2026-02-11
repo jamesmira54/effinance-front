@@ -1,17 +1,35 @@
+import SponsorshipAPIService from "@/api/sponsorships-api";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import RankingSelectionList from "@/screens/finas-application/ranking-selection/RankingSelectionList";
+import CriteriaPage from "@/screens/setup-manager/sponsorship/SponsorshipCriteriaForm";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
   title: "Effinance - Ranking Selection",
 };
 
-const RankingSelection = () => {
+const SponsorshipAPI = new SponsorshipAPIService();
+
+const getApplicationsData = async () => {
+  const response = await SponsorshipAPI.getAllApplications('RANKING_SELECTION');
+  return response;
+}
+  
+
+const Application = async () => {
+  const applications = await getApplicationsData();
+
+  const serverData = {
+    applications: applications?.applicants || [],
+    totalCount: applications?.totalCount || 0,
+  }
+
   return (
     <>
-      <Breadcrumb pageName="Ranking Selection" />
+      <Breadcrumb pageName="Ranking Selection List" />
+      <CriteriaPage/>
     </>
   );
 };
 
-export default RankingSelection;
+export default Application;

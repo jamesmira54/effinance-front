@@ -19,6 +19,7 @@ import { APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse } from "@/types";
 import { useRouter } from "next/navigation";
 import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
+import Link from "next/link";
 
 
 const ActionModal = styled(Modal)`
@@ -49,8 +50,17 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     }, [serverData.applications]);
 
     const columns = [
-        { name: "Application Number", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
-        { name: "Applicants Name", selector: (row:SponsorshipApplicationResponse) => row.applicantName, sortable: true },
+        { name: "Application #", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
+        {
+            name: "Applicants Name", 
+            selector: (row:SponsorshipApplicationResponse) => row.applicantName, 
+            sortable: true,  
+            cell: (row: SponsorshipApplicationResponse) => (
+                <Link href={`/settings/student-accounts/view/${row.studentId}`} className="text-primary hover:underline">
+                    {row.applicantName}
+                </Link>
+            ),
+        },
         { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
         { name: "Date of Application", selector: (row:SponsorshipApplicationResponse) => FormattedDate(row.dateOfApp), sortable: true },
         { name: "Attachments", center: true, cell: (row:any) => (
