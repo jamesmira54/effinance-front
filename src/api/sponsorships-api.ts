@@ -75,4 +75,14 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
             throw error;
         }
     }
+
+    async getAllCriterionCategories() {
+        try {
+            const response = await this.get({ path: "/criterion-category" });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch criterion categories", error);
+            throw error;
+        }
+    }
 }

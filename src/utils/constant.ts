@@ -38,3 +38,19 @@ export const EvaluationStatus = {
     PASSED: "PASSED",
     FAILED: "FAILED",
 } as const;
+
+export const DATA_SOURCE_OPTIONS = [
+    { label: 'Custom Input', value: 'CUSTOM_INPUT' },
+    { label: 'Column', value: 'COLUMN' },
+    { label: 'Computed', value: 'COMPUTED' }
+];
+
+export const PREFERENCE_OPTIONS = [
+    { label: 'Max', value: 'MAX' },
+    { label: 'Min', value: 'MIN' }
+];
+
+export const FORMULA_TYPE_OPTIONS = [
+    { label: 'Sum', value: 'SUM' },
+    { label: 'Average', value: 'AVG' },
+];

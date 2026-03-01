@@ -48,3 +48,21 @@ export const filterMenuByRole = (menu: MenuItem[], role: UserRole): MenuItem[] =
         : undefined,
     }))
 }
+
+
+export const capitalized = (str: string) => {
+  if (!str) return '';
+  return str.split(' ')
+            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+}
+
+
+export const capitalizeAndSpace = (text: string) => {
+  if (!text) return '';
+  return text
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};

@@ -100,12 +100,18 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
                 <Button onClick={() => ShowSchools(row.sponsorshipSchool) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </>
         )},
+         { name: "Criterion", center: true, cell: (row:APISponsorshipListResponse) => (
+            <>
+                <div className="flex items-center space-x-3.5">
+                    <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill title="Update Criterion" size={20}/>}/>
+                </div>
+            </>
+        )},
         { name: "Action", cell: (row:APISponsorshipListResponse) => (
             <>
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
-                    <Button onClick={() => {}} variants="text" startIcon={<BsClipboard2DataFill size={20}/>}/>
-                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line size={20}/>}/>
+                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit title="Edit" size={22}/>}/>
+                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line title="Delete" size={20}/>}/>
                 </div>
             </>
         )},
@@ -135,6 +141,10 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     const onDeleteWaring = async (fileId: string) => {
         setOpenActionModal(true);
         setPendingDelId(fileId);
+    }
+
+    const changeCritation = (sponsorId: string) => {
+        router.push(`/setup-manager/sponsorships/update-criterion/${sponsorId}`);
     }
 
 

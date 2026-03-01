@@ -1,5 +1,8 @@
-// pages/criteria.tsx
+"use client";
+
+import Tabs from '@/components/Tabs';
 import React from 'react';
+import { useRouter } from "next/navigation";
 
 const payload = {
   criterionCategoryId: "b75369ed-2517-11f0-b26b-a2aab4486a89",
@@ -54,9 +57,24 @@ const payload = {
   ]
 };
 
+const tabs = [
+  { label: 'test 1', content: 'Rest'},
+  { label: 'test 2', content: 'Rest 2'}
+]
+
 export default function CriteriaPage() {
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <div className="p-6">
+      <Tabs tabs={tabs}>
+
+      </Tabs>
       <h1 className="text-2xl font-bold mb-4">Criteria Inputs</h1>
 
       <form className="grid gap-4">
