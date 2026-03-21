@@ -1,4 +1,4 @@
-import React, { ForwardedRef } from "react";
+import React, { ForwardedRef, useRef } from "react";
 import { SelectProps, SelectOption } from "./Select.types";
 import Select, { StylesConfig } from "react-select";
 import { styled } from "styled-components";
@@ -25,9 +25,10 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
         onBlur,
         isLoading=false,
         ...props
-    }, ref?: ForwardedRef<HTMLDivElement>
+    },
 ) => {
 
+        const modalRef = useRef<HTMLDivElement>(null);
         const isDarkMode = typeof window !== "undefined" && document.body.classList.contains("dark");
 
         const customStyles: StylesConfig<SelectOption, false> = {
@@ -78,23 +79,31 @@ const SelectComponent:React.FC<SelectProps> = React.forwardRef(
         };
 
         return (
-            <div ref={ref}>
-                <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
+            <div ref={modalRef}>
+              {label && (
+                <label htmlFor={name} className="mb-2.5 block text-sm font-medium text-black dark:text-white">
                     {label}
                 </label>
-                <StyledSelect
-                    name={name}
-                    value={value}
-                    placeholder={placeholder}
-                    options={options}
-                    styles={customStyles}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    isMulti={isMultiple}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${className}`}
-                    {...props}
-                    isLoading={isLoading}
-                />
+              )}
+
+              <StyledSelect
+                name={name}
+                value={value}
+                placeholder={placeholder}
+                options={options}
+                onChange={onChange}
+                onBlur={onBlur}
+                isMulti={isMultiple}
+                className={`relative z-20 appearance-none rounded border border-stroke bg-transparent outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${className}`}
+                {...props}
+                isLoading={isLoading}
+                 menuPortalTarget={modalRef.current}
+                menuPosition="fixed"
+                styles={{
+                  ...customStyles,
+                  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+                }}
+              />
                 {error && <p className="text-meta-1">{errorMessage}</p>}
             </div>
         );

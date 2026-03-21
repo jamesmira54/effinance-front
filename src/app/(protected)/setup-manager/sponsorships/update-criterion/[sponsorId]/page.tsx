@@ -14,11 +14,18 @@ const getCriterionCategories = async () => {
   return response;
 }
 
+const getDataSources = async () => {
+    const response = await SponsorshipAPI.getCriterionCategoryDataSource();
+    return response;
+}
+
 const CriteriaPage= async () => {
     const criterionCategories = await getCriterionCategories();
+    const dataSources = await getDataSources();
 
     const serverData = {
         criterionCategories: criterionCategories || [],
+        dataSources: dataSources || [],
     }
     
     return (

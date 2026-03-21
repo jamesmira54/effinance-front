@@ -7,7 +7,7 @@ export interface RequiredColumn {
   column: string;
 }
 
-export interface Criterion {
+export interface Criteria {
   name: string;
   label: string;
   dataSource: DataSource;
@@ -24,13 +24,13 @@ export interface Pairwise {
 
 export interface CriteriaPayload {
   criterionCategoryId: string;
-  criteria: Criterion[];
+  criteria: Criteria[];
   pairwise: Pairwise[];
 }
 
 export interface CriteriaFormValues {
   criterionCategoryId: string;
-  criteria: Criterion[];
+  criteria: Criteria[];
   pairwiseValues: Record<string, number>;
 }
 
@@ -38,4 +38,9 @@ export interface CriterionCategory {
   id: string;
   name: string;
   criterions: CriterionCategory[];
+}
+
+export interface CriteriaColumnData {
+  name: string;
+  columns: string[];
 }

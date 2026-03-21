@@ -3,7 +3,7 @@ import { ApplicationFormProps } from "./Application.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Alert from "@/components/Alert/Alert";
-import Select from "@/components/Inputs/Select/Select";
+import Select from '@/components/Inputs/Select';
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import Throbber from "@/components/common/Throbber";
 import { ApplicationAPIService } from "@/api";

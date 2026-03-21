@@ -1,7 +1,6 @@
 import SponsorshipAPIService from "@/api/sponsorships-api";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import RankingSelectionList from "@/screens/finas-application/ranking-selection/RankingSelectionList";
-import CriteriaPage from "@/screens/setup-manager/sponsorship/SponsorshipCriteriaForm";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,7 +26,6 @@ const Application = async () => {
   return (
     <>
       <Breadcrumb pageName="Ranking Selection List" />
-      <CriteriaPage/>
     </>
   );
 };

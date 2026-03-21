@@ -85,4 +85,14 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
             throw error;
         }
     }
+
+    async getCriterionCategoryDataSource() {
+        try {
+            const response = await this.get({ path: `/criterion-category/data-sources` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch criterion category data source", error);
+            throw error;
+        } 
+    }
 }
