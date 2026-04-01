@@ -1,18 +1,19 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import DataTable from "@/components/DataTable";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
 import { FaRegEye } from "react-icons/fa";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import UserAccountForm from "./UserAccountForm";
 import { APIUserListResponse, APIUserProfileResponse, APIUserRoles } from "@/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { TableColumn } from "react-data-table-component";
 
 
 const StyledModal = styled(Modal)`
@@ -39,24 +40,24 @@ const UserAccountListing: React.FC<{userAccounts: APIUserListResponse, roles: AP
     const router = useRouter();
 
 
-    const columns = [
+    const columns: TableColumn<APIUserProfileResponse>[] = useMemo(() => [
         { 
             name: "Username", 
-            selector: (row:any) => row.username, 
+            selector: (row: APIUserProfileResponse) => row.username, 
             sortable: true,  
-            cell: (row: any) => (
+            cell: (row: APIUserProfileResponse) => (
                 <Link href={`/settings/user-accounts/${row.userId}`} className="text-primary hover:underline">
                     {row.username}
                 </Link>
             ),
         },
-        { name: "First Name", selector: (row:any) => row.firstName, sortable: true },
-        { name: "Middle Name	", selector: (row:any) => row.middleName, sortable: true },
-        { name: "Last Name	", selector: (row:any) => row.lastName, sortable: true },
-        { name: "Email", selector: (row:any) => row.email, width: "250px"},
-        { name: "Phone #", selector: (row:any) => row.mobileNumber },
-        { name: "Role", selector: (row:any) => row.userType, sortable: true },
-        { name: "Action", cell: (row:any) => (
+        { name: "First Name", selector: (row: APIUserProfileResponse) => row.firstName ?? "", sortable: true },
+        { name: "Middle Name", selector: (row: APIUserProfileResponse) => row.middleName ?? "", sortable: true },
+        { name: "Last Name	", selector: (row: APIUserProfileResponse) => row.lastName ?? "", sortable: true },
+        { name: "Email", selector: (row: APIUserProfileResponse) => row.email ?? "", width: "250px"},
+        { name: "Phone #", selector: (row: APIUserProfileResponse) => row.mobileNumber ?? "" },
+        { name: "Role", selector: (row: APIUserProfileResponse) => row.userType ?? "", sortable: true },
+        { name: "Action", cell: (row: APIUserProfileResponse) => (
             <>
                 <div className="flex items-center space-x-3.5">
                     <Button onClick={() => router.push(`/settings/user-accounts/${row.userId}`) } variants="text" startIcon={<FaRegEye size={22}/>}/>
@@ -64,7 +65,7 @@ const UserAccountListing: React.FC<{userAccounts: APIUserListResponse, roles: AP
                 </div>
             </>
         )},
-    ];
+    ], []);
     
 
     return (

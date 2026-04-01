@@ -1,11 +1,11 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import DataTable from "@/components/DataTable";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import { CiEdit } from "react-icons/ci";
@@ -13,6 +13,7 @@ import StudentRequirementsForm from "./StudentRequirementsForm";
 import { IoEyeOutline } from "react-icons/io5";
 import { APIFileTypesRes, APIStudentFilesRes } from "@/types";
 import { UploadAPIService } from "@/api";
+import { TableColumn } from "react-data-table-component";
 
 
 const StyledModal = styled(Modal)`
@@ -28,14 +29,14 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
     studentId,
     files
 }) => {
-
+    
     const uploadAPI = new UploadAPIService();
     
 
-    const columns = [
-        { name: "Requirement", selector: (row:any) => row.filetype, sortable: true },
-        { name: "Filename", selector: (row:any) => row.filename },
-        { name: "Action", cell: (row:any) => (
+    const columns: TableColumn<APIStudentFilesRes>[] = useMemo(() => [
+        { name: "Requirement", selector: (row: APIStudentFilesRes) => row.filetype, sortable: true },
+        { name: "Filename", selector: (row: APIStudentFilesRes) => row.filename },
+        { name: "Action", cell: (row: APIStudentFilesRes) => (
             <>
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => openFile(row.filename)} variants="text" startIcon={<IoEyeOutline size={21}/>}/>
@@ -43,7 +44,7 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
                 </div>
             </>
         )},
-    ];
+    ], []);
 
     const openFile = (fileUrl: string) => {
         window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${fileUrl}`, "_blank", "noopener,noreferrer");

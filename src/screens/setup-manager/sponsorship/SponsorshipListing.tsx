@@ -1,6 +1,6 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import type { TableColumn } from 'react-data-table-component';
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
@@ -18,7 +18,7 @@ import { FaRegEye } from "react-icons/fa6";
 import { SponsorshipAPIService } from "@/api";
 import { useRouter } from "next/navigation";
 import { BsClipboard2DataFill } from "react-icons/bs";
-
+import DataTable from "@/components/DataTable";
 
 
 const StyledModal = styled(Modal)`
@@ -40,8 +40,7 @@ interface serverDataProps {
 const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
-
-    const sponsorshipAPI = new SponsorshipAPIService();
+    const SponsorshipAPI = new SponsorshipAPIService();
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openReqModal, setOpenReqModal] = useState<boolean>(false);
     const [openSchoolsModal, setOpenSchoolsModal] = useState<boolean>(false);
@@ -82,7 +81,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
 
 
 
-    const columns = [
+    const columns: TableColumn<APISponsorshipListResponse>[] = useMemo(() => [
         { name: "Financial Assistance Name", selector: (row:APISponsorshipListResponse) => row.name, sortable: true },
         { name: "Sponsor", selector: (row:APISponsorshipListResponse) => row.sponsorName },
         { name: "Duration", width: '300px', selector: (row:APISponsorshipListResponse) => (
@@ -90,17 +89,17 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: "Fund Allocation", selector: (row:APISponsorshipListResponse) => formatCurrency(row.fundAllocation) },
         { name: "Status", selector: (row:APISponsorshipListResponse) => row.status.toUpperCase() },
-        { name: "Req's", center: true, cell: (row:APISponsorshipListResponse) => (
-            <>
+        { name: "Req's", cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center">
                 <Button onClick={() => ShowRequirements(row.sponsorshipRequirements) } variants="text" startIcon={<FaRegEye size={20}/>}/>
-            </>
+            </div>
         )},
-        { name: "Schools", center: true, cell: (row:APISponsorshipListResponse) => (
+        { name: "Schools", cell: (row:APISponsorshipListResponse) => (
             <>
                 <Button onClick={() => ShowSchools(row.sponsorshipSchool) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </>
         )},
-         { name: "Criterion", center: true, cell: (row:APISponsorshipListResponse) => (
+         { name: "Criterion",cell: (row:APISponsorshipListResponse) => (
             <>
                 <div className="flex items-center space-x-3.5">
                     <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill title="Update Criterion" size={20}/>}/>
@@ -115,7 +114,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
                 </div>
             </>
         )},
-    ];
+    ], []);
 
     const ShowRequirements = (reqs: SponsorshipRequirements[]) => {
         setOpenReqModal(true);
@@ -153,7 +152,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
             
             setOpenActionModal(false);
 
-            const response = await sponsorshipAPI.deleteSponsorship(pendingDelId);
+            const response = await SponsorshipAPI.deleteSponsorship(pendingDelId);
             if (response) {
                 setData((prevData) => prevData.filter((item) => item.id !== pendingDelId));
                 setPendingDelId(null);
@@ -166,11 +165,22 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         setOpenActionModal(false);
         setPendingDelId(null);
     };
+
+    const reFetchData = async () => {
+        const res = await SponsorshipAPI.getAllSponsorships();
+        if (res) {
+            setData(res || []);
+        }
+    };
     
 
     const handleSuccess = (updateItem: APISponsorshipListResponse) => {
-        setSelectedItem(updateItem)
-        router.refresh();
+        setSelectedItem(updateItem);
+        setData(prev =>
+            prev.map(item => item.id === updateItem.id ? updateItem : item)
+        );
+
+        reFetchData();
     };
 
     
@@ -178,7 +188,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <DataTable 
+              <DataTable
                   columns={columns} 
                   data={data} 
                   pagination 

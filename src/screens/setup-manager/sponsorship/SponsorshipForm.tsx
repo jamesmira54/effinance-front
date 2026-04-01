@@ -52,8 +52,8 @@ const SponsorshipForm: React.FC<
       slot: initialData?.slot || 0,
       fundAllocation: initialData?.fundAllocation || 0,
       sponsorshipRequirements: initialData?.sponsorshipRequirements?.map((item) => ({
-        label: selectOptionsData.requirements.find((option) => option.value === item.id)?.label || "",
-        value: item.id,
+        label: selectOptionsData.requirements.find((option) => option.value === item.fileId)?.label || "",
+        value: item.fileId,
       })) || [],
       sponsorshipSchool: initialData?.sponsorshipSchool?.map((item) => ({
         label: selectOptionsData.schools.find((option) => option.value === item.schoolId)?.label || "",

@@ -9,10 +9,10 @@ import {
   FORMULA_TYPE_OPTIONS,
   PREFERENCE_OPTIONS,
 } from '@/utils/constant';
-import { capitalizeAndSpace, capitalized } from '@/utils/helpers';
-import { v4 as uuidv4 } from 'uuid';
+import { capitalizeAndSpace } from '@/utils/helpers';
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { useEffect } from 'react';
 
 interface Props {
   formik: FormikProps<{
@@ -89,8 +89,29 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
     setFieldValue('matrix', updatedMatrix);
   };
 
+
+  useEffect(() => {
+    const updatedMatrix = { ...values.matrix };
+    let hasChange = false;
+
+    values.criteria.forEach((row) => {
+      values.criteria.forEach((col) => {
+        const key = `${row.name}-${col.name}`;
+
+        if (row.name === col.name && updatedMatrix[key] !== 1) {
+          updatedMatrix[key] = 1;
+          hasChange = true;
+        }
+      });
+    });
+
+    if (hasChange) {
+      setFieldValue('matrix', updatedMatrix, false);
+    }
+  }, [values.criteria]);
+
   return (
-    <div className="bg-white shadow-sm rounded-xl p-8 space-y-10">
+    <div className="dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800 shadow-sm rounded-xl p-8 space-y-10">
       <div>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">
@@ -98,8 +119,8 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
           </h3>
           <div className="flex gap-3 items-center">
             <Select
-              id="select-data-source"
-              name="select-data-source"
+              id="criterion"
+              name="criterion"
               label=""
               options={allCriterions.map((col: any) => ({
                 label: capitalizeAndSpace(col.name),
@@ -357,10 +378,6 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
                   {criteriaNames.map((col, j) => {
                     const key = `${row}|${col}`;
                     const oppositeKey = `${col}|${row}`;
-
-                    if (i === j && values.matrix[key] !== 1) {
-                      setFieldValue(`matrix.${key}`, 1, false);
-                    }
 
                     return (
                       <td key={key} className="py-4">

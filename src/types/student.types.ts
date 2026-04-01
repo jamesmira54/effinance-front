@@ -107,7 +107,7 @@ export interface SiblingRequest {
 export interface APIStudentFilesRes {
     id: string;
     filename: string;
-    fileType: string;
+    filetype: string;
 }
 
 

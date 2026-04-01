@@ -1,11 +1,11 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import DataTable from "@/components/DataTable";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import SchoolForm from "./SchoolForm";
@@ -14,6 +14,7 @@ import { ProvinceProps, SchoolDataProps } from "./School.types";
 import { SchoolAPIService } from "@/api";
 import { APISchoolPayload } from "@/types/shools.types";
 import { useRouter } from "next/navigation";
+import { TableColumn } from "react-data-table-component";
 
 
 const StyledModal = styled(Modal)`
@@ -44,13 +45,13 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
     }, [serverData.schools]);
     
 
-    const columns = [
-        { name: "School Name	", selector: (row:any) => row.name, sortable: true },
-        { name: "Province", selector: (row:any) => row.provinceName, sortable: true },
-        { name: "City/Municipality", selector: (row:any) => row.cityMunName, sortable: true },
-        { name: "Barangay	", selector: (row:any) => row.brgyName, sortable: true },
-        { name: "School Type	", selector: (row:any) => getSchoolType(row.schoolType), sortable: true },
-        { name: "Action", cell: (row:any) => (
+    const columns: TableColumn<SchoolDataProps>[] = useMemo(() => [
+        { name: "School Name	", selector: (row: SchoolDataProps) => row.name, sortable: true },
+        { name: "Province", selector: (row: SchoolDataProps) => row.provinceName, sortable: true },
+        { name: "City/Municipality", selector: (row: SchoolDataProps) => row.cityMunName, sortable: true },
+        { name: "Barangay	", selector: (row: SchoolDataProps) => row.brgyName, sortable: true },
+        { name: "School Type	", selector: (row: SchoolDataProps) => getSchoolType(row.schoolType), sortable: true },
+        { name: "Action", cell: (row: SchoolDataProps) => (
             <>
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
@@ -58,7 +59,7 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
                 </div>
             </>
         )},
-    ];
+    ], []);
     
 
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
@@ -112,9 +113,20 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
         setPendingDelId(null);
     };
 
-     const handleSuccess = (updateItem: SchoolDataProps) => {
-        setSelectedItem(updateItem)
-        router.refresh();
+    const refetchData = async () => {
+        const res = await schoolAPI.getAllSchools();
+        if (res) {
+            setData(res || []);
+        }
+    };
+
+     const handleSuccess = async (updateItem: SchoolDataProps) => {
+        setSelectedItem(updateItem);
+        await refetchData();
+
+        setTimeout(() => {
+            setOpenFormModal(false);
+        }, 1000);
     };
 
 

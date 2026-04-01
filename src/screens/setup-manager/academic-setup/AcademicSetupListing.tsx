@@ -1,11 +1,11 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import DataTable from "@/components/DataTable";
 import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import AcademicSetupForm from "./AcademicSetupForm";
@@ -15,6 +15,7 @@ import { APIAcademicYearProps } from "@/types";
 import { useRouter } from "next/navigation";
 import { AcademicAPIService } from "@/api";
 import { FormattedDate } from "@/utils/helpers";
+import { TableColumn } from "react-data-table-component";
 
 
 
@@ -34,17 +35,16 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     const AcademicAPI = new AcademicAPIService();
     const [data, setData] = useState<APIAcademicYearProps[]>(academics || []);
     const [selectedItem, setSelectedItem] = useState<APIAcademicYearProps>({} as APIAcademicYearProps);
-    const router = useRouter();
     const [pendingDelId, setPendingDelId] = useState<string | null>(null);
     
 
-    const columns = [
-        { name: "Year Start", selector: (row:any) => row.academicYearStart},
-        { name: "Year End", selector: (row:any) => row.academicYearEnd},
-        { name: "School Term", selector: (row:any) => row.schoolTerm},
-        { name: "Date From	", selector: (row:any) => FormattedDate(row.dateFrom), sortable: true },
-        { name: "Date To	", selector: (row:any) => FormattedDate(row.dateTo), sortable: true },
-        { name: "Action", cell: (row:any) => (
+    const columns: TableColumn<APIAcademicYearProps>[] = useMemo(() => [
+        { name: "Year Start", selector: (row: APIAcademicYearProps) => row.academicYearStart},
+        { name: "Year End", selector: (row: APIAcademicYearProps) => row.academicYearEnd},
+        { name: "School Term", selector: (row: APIAcademicYearProps) => row.schoolTerm},
+        { name: "Date From	", selector: (row: APIAcademicYearProps) => FormattedDate(row.dateFrom), sortable: true },
+        { name: "Date To	", selector: (row: APIAcademicYearProps) => FormattedDate(row.dateTo), sortable: true },
+        { name: "Action", cell: (row: APIAcademicYearProps) => (
             <>
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit size={22}/>}/>
@@ -52,7 +52,7 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
                 </div>
             </>
         )},
-    ];
+    ], []);
 
 
     useEffect(() => {
@@ -73,9 +73,20 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openActionModal, setOpenActionModal] = useState<boolean>(false);
 
-    const handleSuccess = (updateItem: APIAcademicYearProps) => {
-        setSelectedItem(updateItem)
-        router.refresh();
+
+    const reFetchData = async () => {
+        const res = await AcademicAPI.getAllAcademicYears();
+        if (res) {
+            setData(res || []);
+        }
+    }
+
+    const handleSuccess = async (updateItem: APIAcademicYearProps) => {
+        setSelectedItem(updateItem);
+        await reFetchData();
+        setTimeout(() => {
+            setOpenFormModal(false);
+        }, 1000);
     };
 
 
