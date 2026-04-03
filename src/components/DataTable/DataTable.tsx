@@ -6,6 +6,7 @@ import type {
   TableColumn,
   TableProps,
 } from 'react-data-table-component';
+import "./../../styles/styles.css";
 
 const DataTableBase = dynamic(
   () => import('react-data-table-component'),

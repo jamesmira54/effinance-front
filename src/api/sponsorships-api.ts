@@ -46,6 +46,16 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
         }
     }
 
+    async getSponsorshipDetails(sponsorshipId: string) {
+        try {
+            const response = await this.get({ path: `/coordinator/${sponsorshipId}` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch sponsorship details", error);
+            throw error;
+        }
+    }
+
     async deleteSponsorship(sponsorshipId: string) {
         try {
             const response = await this.delete({ path: `/coordinator/${sponsorshipId}` });
@@ -94,5 +104,15 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
             console.error("Failed to fetch criterion category data source", error);
             throw error;
         } 
+    }
+
+    async updateSponsorshipCriterion(sponsorshipId: string, payload: any) {
+        try {
+            const response = await this.put({ path: `/update-criterion/${sponsorshipId}`, body: payload });
+            return response;
+        } catch (error) {
+            console.error("Failed to update sponsorship criterion", error);
+            throw error;
+        }
     }
 }

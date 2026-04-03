@@ -5,15 +5,21 @@ import { Criteria, CriteriaColumnData, CriterionCategory } from './CriteriaSetup
 import { useFormik } from 'formik';
 import { v4 as uuidv4 } from 'uuid';
 import Select from '@/components/Inputs/Select';
+import { SponsorshipAPIService } from "@/api";
+import { SponsorshipDetailsProps } from '../sponsorship/Sponsorship.types';
+import { useMemo } from 'react';
+
 interface CriteriaSetupProps {
   serverData: {
+    sponsorshipDetails: SponsorshipDetailsProps;
     criterionCategories: CriterionCategory[];
     dataSources: CriteriaColumnData[];
   };
 }
 
 export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
-  const { criterionCategories, dataSources } = serverData;
+  const SponsorshipAPI = new SponsorshipAPIService();
+  const { sponsorshipDetails, criterionCategories, dataSources } = serverData;
   const allCriterions = criterionCategories.flatMap((cat) => cat.criterions);
   const studentColumns = dataSources.find((data) => data.name === 'student')?.columns || [];
   const sponsorAppColumns = dataSources.find((data) => data.name === 'sponsorshipApplications')?.columns || [];
@@ -24,18 +30,21 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
 
-  const defaultCategory = criterionCategories[0];
+  const defaultCriterions =
+    sponsorshipDetails.criterion.length > 0
+      ? sponsorshipDetails.criterion
+      : criterionCategories[0].criterions;
 
   const formik = useFormik({
     initialValues: {
-      criterionCategoryId: defaultCategory?.id || '',
-      criteria: (defaultCategory?.criterions || []).map((criterion: any) => ({
+      criterionCategoryId: criterionCategories[0].id,
+      criteria: (defaultCriterions || []).map((criterion: any) => ({
         name: criterion.name,
         label: formatLabel(criterion.name),
-        dataSource: 'CUSTOM_INPUT',
-        formulaType: null,
-        preference: 'MAX',
-        requiredColumns: []
+        dataSource: criterion.dataSource || 'CUSTOM_INPUT',
+        formulaType: criterion.formulaType || null,
+        preference: criterion.preference || 'MAX',
+        requiredColumns: criterion.requiredColumns || []
       })) as Criteria[],
       matrix: {} as Record<string, number>
     },
@@ -50,7 +59,18 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
         pairwise
       };
 
-      console.log('Submitting payload:', payload);
+      try {
+
+        console.log('Submitting payload:', payload);
+        let response: any = null;     
+
+        response = await SponsorshipAPI.updateSponsorshipCriterion('dummy-sponsorship-id', payload);
+      }  catch (err: any) {
+
+      } finally {
+        console.log('Submission complete');
+      }
+
     }
   });
 
@@ -97,33 +117,45 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
     return result;
   };
 
+  const categoryOptions = useMemo(() => {
+    return criterionCategories.map((cat) => ({
+      label: cat.name.replace(/\b\w/g, (c) => c.toUpperCase()),
+      value: cat.id,
+    }));
+  }, [criterionCategories]);
+
+  const selectedCategory = useMemo(() => {
+    if (!formik.values.criterionCategoryId) return null;
+
+    const found = criterionCategories.find(
+      (cat) => cat.id === formik.values.criterionCategoryId
+    );
+
+    if (!found) return null;
+
+    return {
+      label: found.name.replace(/\b\w/g, (c) => c.toUpperCase()),
+      value: found.id,
+    };
+  }, [formik.values.criterionCategoryId, criterionCategories]);
+
+
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 space-y-6">
       
       <div>
         <label className="block font-medium mb-2">
-          Select Criteria Category
+          Select Criterion Category
         </label>
 
 
         <Select
-          id="select-data-source"
-          name="select-data-source"
+          id="criterionCategory"
+          name="criterionCategory"
           label=""
-          options={criterionCategories.map((cat) => ({
-            key: cat.id,
-            label: cat.name.replace(/\b\w/g, (c) => c.toUpperCase()),
-            value: cat.id,
-          }))}
+          options={ categoryOptions }
           isMultiple={false}
-          value={
-            formik.values.criterionCategoryId
-            ? {
-                label: criterionCategories.find((cat) => cat.id === formik.values.criterionCategoryId)?.name.replace(/\b\w/g, (c) => c.toUpperCase()) || '',
-                value: formik.values.criterionCategoryId,
-              }
-            : null
-          }
+          value={ selectedCategory }
           onChange={(option) => handleCategoryChange(option?.value || '')}
           className='w-full'
         />

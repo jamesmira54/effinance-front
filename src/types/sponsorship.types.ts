@@ -1,3 +1,4 @@
+import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 export interface APISponsorhipPayload {
     name: string;
     sponsorId: string;
@@ -33,7 +34,9 @@ export interface APISponsorshipListResponse {
     studentCount: number;
     sponsorshipSchool: SponsorshipSchoolProps[];
     sponsorshipRequirements: SponsorshipRequirements[];
-    students: any[]
+    students: any[],
+    criterion: any[];
+    pairwise: any[];
 }
 
 export interface SponsorshipSchoolProps {
@@ -60,4 +63,20 @@ export interface SponsorshipApplicationResponse {
     municipality: string; 
     finAssname: string;
     dateOfApp: string;
+}
+
+export interface AppliedSponsorshipDetailResponse {
+    appId: string;
+    studentId: string;
+    studentName: string;
+    studentSex: string;
+    programName: string;
+    yearLevel: string;
+    sponsorshipId: string;
+    sponsorshipName: string;
+    sponsorshipRemarks: string;
+    sponsorshipStatus: typeof APPLICATION_STATUS[keyof typeof APPLICATION_STATUS];
+    sponsorshipStage: typeof APPLICATION_STAGE[keyof typeof APPLICATION_STAGE];
+    applicationDate: string;
+    sponsorshipRequirement: SponsorshipRequirements[];
 }

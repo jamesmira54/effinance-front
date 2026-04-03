@@ -1,7 +1,6 @@
 "use client";
 
 import type { TableColumn } from 'react-data-table-component';
-import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
@@ -89,30 +88,28 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: "Fund Allocation", selector: (row:APISponsorshipListResponse) => formatCurrency(row.fundAllocation) },
         { name: "Status", selector: (row:APISponsorshipListResponse) => row.status.toUpperCase() },
-        { name: "Req's", cell: (row:APISponsorshipListResponse) => (
-            <div className="flex justify-center">
+        { name: <div className="flex justify-center w-full">Requirements</div>, cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center w-full">
                 <Button onClick={() => ShowRequirements(row.sponsorshipRequirements) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
-        { name: "Schools", cell: (row:APISponsorshipListResponse) => (
-            <>
+        { name: <div className="flex justify-center w-full">Schools</div>, cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center w-full">
                 <Button onClick={() => ShowSchools(row.sponsorshipSchool) } variants="text" startIcon={<FaRegEye size={20}/>}/>
-            </>
+            </div>
         )},
-         { name: "Criterion",cell: (row:APISponsorshipListResponse) => (
-            <>
-                <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill title="Update Criterion" size={20}/>}/>
-                </div>
-            </>
+         { name: <div className="flex justify-center w-full">Criterion</div>,cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center w-full">
+                <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill title="Update Criterion" size={20}/>}/>
+            </div>
         )},
-        { name: "Action", cell: (row:APISponsorshipListResponse) => (
-            <>
+        { name: <div className="flex justify-center w-full">Action</div>, cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center w-full">
                 <div className="flex items-center space-x-3.5">
                     <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit title="Edit" size={22}/>}/>
                     <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line title="Delete" size={20}/>}/>
                 </div>
-            </>
+            </div>
         )},
     ], []);
 
@@ -216,7 +213,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
             </StyledModal>
 
 
-             <StyledModal isFullscreen={false} title="Schools List" className="min-w-125" isOpen={openSchoolsModal} onClose={() => setOpenSchoolsModal(false)}>
+            <StyledModal isFullscreen={false} title="Schools List" className="min-w-125" isOpen={openSchoolsModal} onClose={() => setOpenSchoolsModal(false)}>
                 <ul className="flex flex-col gap-4">
                     {selectedSchools.map((item: any, index) => (
                         <li key={index} className="flex items-center justify-between">

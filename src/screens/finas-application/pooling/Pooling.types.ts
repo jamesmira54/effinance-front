@@ -1,4 +1,4 @@
-import { APPLICATION_STAGE, APPLICATION_STATUS, EvaluationStatus } from "@/utils/constant";
+import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 
 export interface PoolingFormProps {
     studentId: string;

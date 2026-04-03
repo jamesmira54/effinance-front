@@ -1,7 +1,6 @@
 "use client";
 
 import DataTable from "@/components/DataTable";
-import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
@@ -12,7 +11,6 @@ import SchoolForm from "./SchoolForm";
 import { CiEdit } from "react-icons/ci";
 import { ProvinceProps, SchoolDataProps } from "./School.types";
 import { SchoolAPIService } from "@/api";
-import { APISchoolPayload } from "@/types/shools.types";
 import { useRouter } from "next/navigation";
 import { TableColumn } from "react-data-table-component";
 

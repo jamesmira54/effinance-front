@@ -16,9 +16,19 @@ export default class SponsorshipStudentAPIService extends AxiosAPI implements Sp
         SponsorshipStudentAPIService._instance = this;
     }
 
+    async applyForSponsorship(studentId: string, sponsorshipId: string) {
+        try {
+            const response = await this.post({ body: { studentId, sponsorshipId } });
+            return response;
+        } catch (error) {
+            console.error("Failed to apply for sponsorship", error);
+            throw error;
+        }
+    }
+
     async getAvailableSponsorships(studentId: string) {
         try {
-            const response = await this.get({ path: `/student/available/${studentId}` });
+            const response = await this.get({ path: `/available/${studentId}` });
             return response;
         } catch (error) {
             console.error("Failed to fetch available sponsorships", error);
@@ -28,7 +38,7 @@ export default class SponsorshipStudentAPIService extends AxiosAPI implements Sp
 
     async getSponsorshipApplied(studentId: string) {
         try {
-            const response = await this.get({ path: `/student/my-sponsorships/${studentId}` });
+            const response = await this.get({ path: `/my-sponsorships/${studentId}` });
             return response;
         } catch (error) {
             console.error("Failed to fetch sponsorships by student ID", error);

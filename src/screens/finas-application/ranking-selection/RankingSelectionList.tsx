@@ -1,7 +1,6 @@
 "use client";
 
 import DataTable from "react-data-table-component";
-import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useEffect, useState } from "react";

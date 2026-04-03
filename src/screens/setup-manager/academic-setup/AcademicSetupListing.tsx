@@ -1,7 +1,6 @@
 "use client";
 
 import DataTable from "@/components/DataTable";
-import "./../../../styles/styles.css";
 import Button from "@/components/Button";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";

@@ -65,7 +65,28 @@ export const MENU_ITEMS: MenuItem[] = [
         roles: ['admin'],
       }
     ],
-    roles: ['admin', 'student'],
+    roles: ['admin'],
+  },
+  {
+      id: 'sponsorhip-list',
+      label: 'Sponsorship List',
+      route: '',
+      icon: IoNewspaperOutline,
+      roles: ['student'],
+      children:[
+        {
+          id: 'applied-sponsorships',
+          label: 'Applied',
+          route: '/sponsorship-list/applied',
+          roles: ['student'],
+        },
+        {
+          id: 'recommended-sponsorships',
+          label: 'Recommended',
+          route: '/sponsorship-list/recommended',
+          roles: ['student'],
+        },
+      ]
   },
   {
     id: 'financing',
