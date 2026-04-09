@@ -35,8 +35,6 @@ const RecommendedSponsorships = async () => {
       studentId: studentId
   };
 
-  console.log("Server Data: ", serverData);
-
   return (
     <>
       <Breadcrumb pageName="Recommended Sponsorships" />

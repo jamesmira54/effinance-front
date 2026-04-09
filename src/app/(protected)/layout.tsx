@@ -31,10 +31,11 @@ export default async function AdminLayout({
   }
   
   const userDetails = await fetchProfile(userId);
+  const permissions = getUserSession?.permissions || [];
 
   return (
     <Fragment>
-      <DefaultLayout userDetails={userDetails}>
+      <DefaultLayout userDetails={userDetails} permissions={permissions}>
         {children}
       </DefaultLayout>
     </Fragment>

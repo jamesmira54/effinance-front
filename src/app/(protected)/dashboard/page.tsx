@@ -1,17 +1,28 @@
-import Dashboard from "@/components/Dashboard/dashboard";
+
+import { DashboardAPIService } from "@/api";
+import { DashboardData } from "@/components/Dashboard/dashboard.types";
+import Dashboard from "@/screens/dashboard/dashboard";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 
 export const metadata: Metadata = {
-  title:
-    "Effinance",
-  description: "Sample Tag Line",
+  title: "Effinance",
 };
 
-export default function Home() {
+const DashboardAPI = new DashboardAPIService();
+
+
+const getDashboardData = async () => {
+  const response = await DashboardAPI.dashboardData();
+  return response;
+}
+  
+export default async function Home() {
+
+  const serverData = await getDashboardData();
+
   return (
     <>
-      <Dashboard />
+      <Dashboard serverData={serverData} />
     </>
   );
 }

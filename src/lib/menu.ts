@@ -25,14 +25,14 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: RxDashboard,
     label: "Dashboard",
     route: "/dashboard",
-    roles: ['admin', 'student'],
+    roles: ['admin', 'sponsor', 'coordinator'],
   },
   {
     id: 'announcements',
     icon: GrAnnounce,
     label: "Announcements",
     route: "/announcements",
-    roles: ['admin', 'student'],
+    roles: ['admin', 'student', 'coordinator'],
   },
   {
     id: 'finas-application',
@@ -42,30 +42,30 @@ export const MENU_ITEMS: MenuItem[] = [
     children: [
       {
         id: 'pooling',
-        label: 'Pooling',
+        label: 'Pooling List',
         route: '/finas-application/pooling',
-        roles: ['admin'],
+        roles: ['admin', 'coordinator', 'sponsor'],
       },
       {
         id: 'application-list',
         label: 'Application List',
         route: '/finas-application/application-list',
-        roles: ['admin', 'student'],
+        roles: ['admin', 'coordinator'],
       },
       {
         id: 'ranking-selection',
         label: 'Ranking Selection',
         route: '/finas-application/ranking-selection',
-        roles: ['admin'],
+        roles: ['admin', 'coordinator'],
       },
       {
         id: 'finas-proper',
         label: 'Finas Proper',
         route: '/finas-application/finas-proper',
-        roles: ['admin'],
+        roles: ['admin', 'coordinator'],
       }
     ],
-    roles: ['admin'],
+    roles: ['admin', 'coordinator', 'sponsor'],
   },
   {
       id: 'sponsorhip-list',
@@ -135,7 +135,7 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: 'setup-manager',
     icon: RiListSettingsLine,
-    label: "Set-up Manager",
+    label: "Setup Manager",
     route: "",
     children: [
       {
@@ -169,14 +169,14 @@ export const MENU_ITEMS: MenuItem[] = [
         roles: ['admin'],
       }
     ],
-    roles: ['admin'],
+    roles: ['admin', 'sponsor'],
   },
   {
     id: 'manage-report',
     icon: HiOutlineOfficeBuilding,
     label: "Manage Report",
     route: "/manage-report",
-    roles: ['admin'],
+    roles: ['admin', 'coordinator',],
   },
   {
     id: 'settings',

@@ -80,11 +80,8 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
 
       try {
 
-        // console.log('Submitting payload:', payload);
         let response: any = null;     
         response = await SponsorshipAPI.updateSponsorshipCriterion(sponsorshipDetails.id, payload);
-
-        console.log('API response:', response);
 
         if(response) {
           setError(false);

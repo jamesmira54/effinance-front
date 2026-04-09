@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CollapsibleProps } from "./Collapsible.types";
-
 
 const Collapsible: React.FC<CollapsibleProps> = ({ title, children, isOpen }) => {
     const [isOpenS, setIsOpenS] = useState(isOpen);
+    const [maxHeight, setMaxHeight] = useState("0px");
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (isOpenS && contentRef.current) {
+        setMaxHeight(`${contentRef.current.scrollHeight}px`);
+        } else {
+        setMaxHeight("0px");
+        }
+    }, [isOpenS, children]); // recalc if children change dynamically
 
     return (
         <div className="w-full mx-auto mt-2 mb-2">
@@ -26,15 +35,15 @@ const Collapsible: React.FC<CollapsibleProps> = ({ title, children, isOpen }) =>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-        <div
-            className={`transition-all duration-300 ease-in-out ${
-                isOpenS ? "max-h-100 opacity-100" : "max-h-0 opacity-0"
-            }`}
-        >
-            {children}
-        </div>
+
+            <div
+                style={{ maxHeight }}
+                className="overflow-hidden transition-all duration-300 ease-in-out"
+            >
+                <div ref={contentRef}>{children}</div>
+            </div>
         </div>
     );
 };
-  
+
 export default Collapsible;

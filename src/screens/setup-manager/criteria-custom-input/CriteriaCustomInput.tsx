@@ -39,8 +39,6 @@ const CriteriaCustomInput: React.FC<{ serverData: serverDataProps }> = ({ server
         return acc;
     }, {});
 
-    console.log('Lookup Object:', lookup);
-
     const initialValues = {
         inputs: studentList.reduce((acc: any, student) => {
             acc[student.studentId] = {};
@@ -80,9 +78,7 @@ const CriteriaCustomInput: React.FC<{ serverData: serverDataProps }> = ({ server
 
             if (payload.length > 0) {
                 submitHandler(payload);
-            } else {
-                console.log('No data to submit');
-            }
+            } 
         }
     });
 

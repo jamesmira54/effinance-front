@@ -1,21 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { RxDashboard } from "react-icons/rx";
-import { RiListSettingsLine } from "react-icons/ri";
-import { LuUser } from "react-icons/lu";
-import { CiSettings } from "react-icons/ci";
-import { IoNewspaperOutline } from "react-icons/io5";
-import { APIUserProfileResponse, APIUserResponse } from "@/types/user.types";
+import { APIUserProfileResponse } from "@/types/user.types";
 import { filterMenuByRole } from "@/utils/helpers";
 import { MENU_ITEMS, UserRole } from "@/lib/menu";
 import { USER_ROLE } from "@/utils/constant";
+import { APIModuleProps } from "@/types";
 
 
 
@@ -23,10 +18,11 @@ interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
   userDetails: APIUserProfileResponse;
+  permissions: APIModuleProps[];
 }
 
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails }: SidebarProps) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails, permissions }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
   
   let role:UserRole = 'admin';
@@ -39,13 +35,61 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails }: SidebarProps) => 
       role = 'coordinator';
     }
   }
-  
+
   const menuItems = filterMenuByRole(MENU_ITEMS, role);
+
+
+  const permissionMap = (permissions: APIModuleProps[]) => {
+    const map: Record<string, any> = {};
+
+    permissions.forEach((p) => {
+      map[p.moduleName.toLowerCase()] = p;
+    });
+
+    return map;
+  };
+
+
+  const filterMenuByPermissions = (menu: any[], permissions: APIModuleProps[]) => {
+    const map = permissionMap(permissions);
+
+    const hasAccess = (label: string) => {
+      const key = label.toLowerCase();
+      return map[key]?.show === true;
+    };
+
+    const recursiveFilter = (items: any[]): any[] => {
+      return items
+        .map((item) => {
+          if (item.children) {
+            const filteredChildren = recursiveFilter(item.children);
+
+            if (filteredChildren.length > 0) {
+              return {
+                ...item,
+                children: filteredChildren,
+              };
+            }
+          }
+
+          if (hasAccess(item.label)) {
+            return item;
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+    };
+
+    return recursiveFilter(menu);
+  };
+
+  const filteredMenu = filterMenuByPermissions(MENU_ITEMS, permissions);
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

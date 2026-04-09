@@ -5,16 +5,23 @@ import Link from "next/link";
 import SidebarDropdown from "@/components/Sidebar/SidebarDropdown";
 import { usePathname } from "next/navigation";
 import { FaCaretDown,FaCaretUp } from "react-icons/fa";
+import { useLoader } from "@/context/LoaderContext";
 
 const SidebarItem = ({ item, pageName, setPageName }: any) => {
   const [mounted, setMounted] = useState(false);
+  const { showLoader } = useLoader();
 
   useEffect(() => setMounted(true), []);
   
   const handleClick = () => {
     const updatedPageName =
       pageName !== item.label.toLowerCase() ? item.label.toLowerCase() : "";
-    return setPageName(updatedPageName);
+    
+    setPageName(updatedPageName);
+
+    if (item.route && item.route !== pathname) {
+      showLoader();
+    }
   };
 
   const pathname = usePathname();

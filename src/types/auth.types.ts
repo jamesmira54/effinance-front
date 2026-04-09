@@ -16,8 +16,12 @@ export interface SignUpFormProps {
 export interface APIModuleProps {
     moduleId: string;
     moduleName: string;
+    parentId: string | null;
+    parentName: string | null;
     roleId: string;
+    roleName: string;
     show: boolean;
+    edit: boolean;
     save: boolean;
     delete: boolean;
 }

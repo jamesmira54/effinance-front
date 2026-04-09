@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import Input from "@/components/Inputs/Input";
 import { CiLock, CiMail } from "react-icons/ci";
-// import { login } from "@/lib/AuthService/authService";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -11,6 +10,7 @@ import { LoginFormProps } from "./Auth.types";
 import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
 import { AuthAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const SignIn: React.FC = () => {
@@ -20,18 +20,27 @@ const SignIn: React.FC = () => {
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const authAPI = new AuthAPIService();
+  const { showLoader, hideLoader } = useLoader();
+
 
   const LoginHandler = async(values: LoginFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
     try {
       setSubmitting(true);
-      await authAPI.login(values);
-      router.push("/dashboard");
+      const response = await authAPI.login(values);
+      if(response.studentId === null) {
+        router.push("/dashboard");
+      } else {
+        router.push("/announcements");
+      }
+
     } catch (err: any) {
-      setError(true);
-      setErrorMessage(err.response?.data.errorDetails || "Invalid credentials")
+      setTimeout(() => {
+        setError(true);
+        setErrorMessage(err.response?.data.errorDetails || "Invalid credentials");
+      }, 2000);
     } finally {
-      setLoading(false);
       setSubmitting(false);
+      setLoading(false);
     }
   }
 
@@ -47,6 +56,8 @@ const SignIn: React.FC = () => {
       password: Yup.string().required("Password is required")
     }),
     onSubmit: (values, { setSubmitting }) => {
+      setError(false);
+      showLoader();
       LoginHandler(values, setSubmitting);
       setLoading(true);
     }

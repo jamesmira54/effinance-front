@@ -13,6 +13,7 @@ import { FaRegEye } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import DataTable from "@/components/DataTable";
+import { usePathname } from "next/navigation";
 
 
 
@@ -80,8 +81,9 @@ const RankingStudentListing: React.FC<{serverData: serverDataProps}> = ({
     }
 
 
+    const pathname = usePathname();
     const rankStudents = (sponsorId: string) => {
-        router.push(`/setup-manager/ranking-order/${sponsorId}`);
+        router.push(`${pathname}/${sponsorId}`);
     }
     
 

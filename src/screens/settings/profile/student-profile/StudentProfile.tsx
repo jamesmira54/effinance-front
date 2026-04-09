@@ -376,10 +376,10 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
   return (
     <>
       <div className="w-full">
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start mb-5">
           {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button> }
-          <Button className="self-end bg-primary" variants="default" onClick={() => router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
           <Tabs tabs={tabData} />
+          <Button className="self-end bg-primary mt-5" variants="default" onClick={() => router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
         </div>
       </div>
       {/* <Modal   

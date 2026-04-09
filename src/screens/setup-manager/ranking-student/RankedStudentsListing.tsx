@@ -47,7 +47,6 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
     const [selectedEvaluation, setSelectedEvaluation] = useState<any[]>([]);
 
     const showEvaluation = (evaluation: any[]) => {
-        console.log("Showing evaluation for student. Evaluation data: ", evaluation);
         let evalString: SetStateAction<any[]> = [];
         Object.entries(evaluation).forEach(([key, value]) => {
             evalString.push(`${capitalized(key)}: ${value}`);

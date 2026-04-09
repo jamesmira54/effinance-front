@@ -1,16 +1,18 @@
 "use client";
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import { APIUserProfileResponse, APIUserResponse } from "@/types";
+import { APIModuleProps, APIUserProfileResponse } from "@/types";
 
 
 export default function DefaultLayout({
   children,
-  userDetails
+  userDetails,
+  permissions
 }: {
   children: React.ReactNode;
   userDetails: APIUserProfileResponse;
+  permissions: APIModuleProps[];
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -19,7 +21,7 @@ export default function DefaultLayout({
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex">
         {/* <!-- ===== Sidebar Start ===== --> */}
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails}/>
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} permissions={permissions}/>
         {/* <!-- ===== Sidebar End ===== --> */}
 
         {/* <!-- ===== Content Area Start ===== --> */}

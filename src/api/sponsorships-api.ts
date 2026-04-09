@@ -137,7 +137,6 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
     }
 
     async rankApplicants(sponsorshipId: string) {
-        console.log("Ranking applicants for sponsorship ID: ", sponsorshipId);
         try {
             const response = await this.get({ path: `/rank-student/${sponsorshipId}` });
             return response;
