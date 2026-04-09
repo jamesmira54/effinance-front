@@ -99,14 +99,6 @@ const RecommendedListing: React.FC<{serverData: serverDataProps}> = ({
         setSelectedSchools(schools);
     }
 
-    const getRemarks = async(sponsorshipId: string) => {
-        const remarksData = await SponsorshipStudentAPI.getSpecificSponsorship(sponsorshipId);
-        if(remarksData) {
-            setRemarks(remarksData.sponsorshipRemarks || "No remarks available.");
-            setOpenRemarksModal(true);
-        }
-    }
-
     const onApply = async (studentId: string | null, sponsorshipId: string) => {
         setShowAlert(false);
         setError(false);

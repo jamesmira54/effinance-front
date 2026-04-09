@@ -42,7 +42,7 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 bg-white dark:bg-slate-800">
-        {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Back</Button> }
+        {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button> }
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="w-[80%]">
             <h4 className="text-lg font-semibold text-form-strokedark dark:text-white/90 lg:mb-6">

@@ -22,6 +22,11 @@ export interface Pairwise {
   value: number;
 }
 
+export interface InitialPairwise {
+  criterionAName: string;
+  criterionBName: string;
+  value: number;
+}
 export interface CriteriaPayload {
   criterionCategoryId: string;
   criteria: Criteria[];

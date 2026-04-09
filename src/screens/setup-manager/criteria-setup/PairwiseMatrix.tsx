@@ -18,7 +18,7 @@ interface Props {
   formik: FormikProps<{
     criterionCategoryId: string;
     criteria: Criteria[];
-    matrix: Record<string, number>;
+    pairwise: Record<string, number>;
   }>;
   studentColumns: any;
   sponsorAppColumns: any;
@@ -52,8 +52,8 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
 
     const updatedCriteria = [...values.criteria, newCriterion];
 
-    // Ensure every pairwise combination exists in the matrix
-    const updatedMatrix = { ...values.matrix };
+    // Ensure every pairwise combination exists in the pairwise
+    const updatedMatrix = { ...values.pairwise };
     updatedCriteria.forEach((row) => {
       updatedCriteria.forEach((col) => {
         const key = `${row.name}-${col.name}`;
@@ -64,21 +64,20 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
     });
 
     setFieldValue('criteria', updatedCriteria);
-    setFieldValue('matrix', updatedMatrix);
+    setFieldValue('pairwise', updatedMatrix);
     setSelectedColumn(''); // reset dropdown
   };
 
   // --- REMOVE CRITERION ---
   const handleRemoveCriterion = (index: number) => {
-    const criterionToRemove = values.criteria[index];
     const updatedCriteria = values.criteria.filter((_, i) => i !== index);
 
     const updatedMatrix: Record<string, number> = {};
     updatedCriteria.forEach((row) => {
       updatedCriteria.forEach((col) => {
-        const key = `${row.name}-${col.name}`;
-        if (values.matrix[key] !== undefined) {
-          updatedMatrix[key] = values.matrix[key];
+        const key = `${row.name}|${col.name}`;
+        if (values.pairwise[key] !== undefined) {
+          updatedMatrix[key] = values.pairwise[key];
         } else {
           updatedMatrix[key] = row.name === col.name ? 1 : 0;
         }
@@ -86,12 +85,12 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
     });
 
     setFieldValue('criteria', updatedCriteria);
-    setFieldValue('matrix', updatedMatrix);
+    setFieldValue('pairwise', updatedMatrix);
   };
 
 
   useEffect(() => {
-    const updatedMatrix = { ...values.matrix };
+    const updatedMatrix = { ...values.pairwise };
     let hasChange = false;
 
     values.criteria.forEach((row) => {
@@ -106,7 +105,7 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
     });
 
     if (hasChange) {
-      setFieldValue('matrix', updatedMatrix, false);
+      setFieldValue('pairwise', updatedMatrix, false);
     }
   }, [values.criteria]);
 
@@ -352,9 +351,9 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
         </div>
       </div>
 
-      {/* --- PAIRWISE MATRIX TABLE --- */}
+      {/* --- PAIRWISE pairwise TABLE --- */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Pairwise Matrix</h3>
+        <h3 className="text-lg font-semibold mb-4">Pairwise pairwise</h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-center border-collapse">
@@ -386,18 +385,18 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
                           className={`w-16 border rounded-md text-center py-1 ${
                             i === j ? 'bg-gray-100' : ''
                           }`}
-                          value={i === j ? 1 : values.matrix[key] ?? ''}
+                          value={i === j ? 1 : values.pairwise[key] ?? ''}
                           disabled={j <= i}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             // Set A vs B
-                            setFieldValue(`matrix.${key}`, val);
+                            setFieldValue(`pairwise.${key}`, val);
 
                             // Set B vs A automatically as reciprocal
                             if (val && val > 0) {
-                              setFieldValue(`matrix.${oppositeKey}`, 1 / val);
+                              setFieldValue(`pairwise.${oppositeKey}`, 1 / val);
                             } else {
-                              setFieldValue(`matrix.${oppositeKey}`, '');
+                              setFieldValue(`pairwise.${oppositeKey}`, '');
                             }
                           }}
                         />

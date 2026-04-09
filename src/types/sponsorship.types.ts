@@ -34,7 +34,7 @@ export interface APISponsorshipListResponse {
     studentCount: number;
     sponsorshipSchool: SponsorshipSchoolProps[];
     sponsorshipRequirements: SponsorshipRequirements[];
-    students: any[],
+    students: studentsAPI[],
     criterion: any[];
     pairwise: any[];
 }
@@ -47,6 +47,11 @@ export interface SponsorshipSchoolProps {
 export interface SponsorshipRequirements {
     fileId: string;
     fileName: string;
+}
+
+export interface studentsAPI {
+    studentId: string;
+    studentName: string;
 }
 
 export interface SponsorshipApplicationResponse {
@@ -79,4 +84,20 @@ export interface AppliedSponsorshipDetailResponse {
     sponsorshipStage: typeof APPLICATION_STAGE[keyof typeof APPLICATION_STAGE];
     applicationDate: string;
     sponsorshipRequirement: SponsorshipRequirements[];
+}
+
+
+export interface CustomCriterionData {
+    id: string;
+    studentId: string;
+    sponsorshipId: string;
+    sponsorshipCriterionId: string;
+    value: number;
+}
+
+export interface RankStudentResponse {
+    id: string;
+    name: string;
+    score: number;
+    evaluation: any[];
 }

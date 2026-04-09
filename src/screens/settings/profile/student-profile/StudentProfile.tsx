@@ -377,7 +377,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
     <>
       <div className="w-full">
         <div className="flex flex-col items-start">
-          {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Back</Button> }
+          {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button> }
           <Button className="self-end bg-primary" variants="default" onClick={() => router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
           <Tabs tabs={tabData} />
         </div>

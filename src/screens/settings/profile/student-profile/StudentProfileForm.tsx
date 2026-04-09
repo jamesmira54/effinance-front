@@ -239,7 +239,7 @@ const StudentProfileForm: React.FC<
     return(
         <>
             <form onSubmit={formik.handleSubmit}>
-                <Button startIcon={<IoIosArrowRoundBack/>} onClick={() =>  router.back()} variants={'text'}>Back</Button>   
+                <Button startIcon={<IoIosArrowRoundBack/>} onClick={() =>  router.back()} variants={'text'}>Go Back</Button>   
                 {showAlert &&
                     <div className="mt-5 w-[50%]">
                         <Alert 

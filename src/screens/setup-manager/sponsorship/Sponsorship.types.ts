@@ -1,6 +1,6 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { SponsorshipRequirements, SponsorshipSchoolProps } from "@/types/sponsorship.types";
-import { Criteria, Pairwise } from "../criteria-setup/CriteriaSetup.types";
+import { Criteria, InitialPairwise } from "../criteria-setup/CriteriaSetup.types";
 
 export interface SponsorshipFormProps {
     name: string;
@@ -39,5 +39,5 @@ export interface SponsorshipDetailsProps {
     sponsorshipRequirements: SponsorshipRequirements[];
     students: any[],
     criterion: Criteria[];
-    pairwise: Pairwise[];
+    pairwise: InitialPairwise[];
 }

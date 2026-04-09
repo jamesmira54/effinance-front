@@ -18,6 +18,8 @@ import { SponsorshipAPIService } from "@/api";
 import { useRouter } from "next/navigation";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import DataTable from "@/components/DataTable";
+import { MdDashboardCustomize } from "react-icons/md";
+
 
 
 const StyledModal = styled(Modal)`
@@ -33,7 +35,7 @@ interface serverDataProps {
     schools: SchoolListProps[];
     requirements: APIFileTypesProps[];
     academicYears: APIAcademicYearProps[];
-    sponsorships: APISponsorshipListResponse[]
+    sponsorships: APISponsorshipListResponse[];
 }
 
 const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
@@ -50,7 +52,6 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     const [selectedItem, setSelectedItem] = useState<APISponsorshipListResponse>({} as APISponsorshipListResponse);
     const [pendingDelId, setPendingDelId] = useState<string | null>(null);
     const router = useRouter();
-
 
     const { coordinators, schools, requirements, academicYears } = serverData || {};
 
@@ -79,7 +80,6 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     }), [coordinators, schools, requirements, academicYears]);
 
 
-
     const columns: TableColumn<APISponsorshipListResponse>[] = useMemo(() => [
         { name: "Financial Assistance Name", selector: (row:APISponsorshipListResponse) => row.name, sortable: true },
         { name: "Sponsor", selector: (row:APISponsorshipListResponse) => row.sponsorName },
@@ -98,16 +98,23 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
                 <Button onClick={() => ShowSchools(row.sponsorshipSchool) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
-         { name: <div className="flex justify-center w-full">Criterion</div>,cell: (row:APISponsorshipListResponse) => (
+        { name: <div className="flex justify-center w-full">Criterion</div>,cell: (row:APISponsorshipListResponse) => (
             <div className="flex justify-center w-full">
-                <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill title="Update Criterion" size={20}/>}/>
+                <Button onClick={() => changeCritation(row.id)} variants="text" startIcon={<BsClipboard2DataFill className='text-success hover:text-primary' title="Update Criterion" size={20}/>}/>
+            </div>
+        )},
+        { name: <div className="flex justify-center w-full">Custom</div>,cell: (row:APISponsorshipListResponse) => (
+            <div className="flex justify-center w-full">
+                {row.studentCount > 0 && (
+                    <Button onClick={() => updateCustomCriterion(row.id)} variants="text" startIcon={<MdDashboardCustomize className='text-primary hover:text-success' title="Update Custom Criterion" size={20}/>}/>
+                )}
             </div>
         )},
         { name: <div className="flex justify-center w-full">Action</div>, cell: (row:APISponsorshipListResponse) => (
             <div className="flex justify-center w-full">
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit title="Edit" size={22}/>}/>
-                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line title="Delete" size={20}/>}/>
+                    <Button onClick={() => handleEdit(row)} variants="text" startIcon={<CiEdit className='text-warning hover:text-primary' title="Edit" size={22}/>}/>
+                    <Button onClick={() => onDeleteWaring(row.id)} variants="text" startIcon={<RiDeleteBin5Line className='text-danger hover:text-primary' title="Delete" size={20}/>}/>
                 </div>
             </div>
         )},
@@ -141,6 +148,10 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
 
     const changeCritation = (sponsorId: string) => {
         router.push(`/setup-manager/sponsorships/update-criterion/${sponsorId}`);
+    }
+
+    const updateCustomCriterion = (sponsorId: string) => {
+        router.push(`/setup-manager/sponsorships/update-custom-criterion/${sponsorId}`);
     }
 
 
@@ -185,14 +196,14 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <DataTable
-                  columns={columns} 
-                  data={data} 
-                  pagination 
-                  highlightOnHover 
-                  striped
-              />
-              <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+                <DataTable
+                    columns={columns} 
+                    data={data} 
+                    pagination 
+                    highlightOnHover 
+                    striped
+                />
+                <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
             <StyledModal isFullscreen={true} title="Sponsorship Form" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
                 <SponsorshipForm 

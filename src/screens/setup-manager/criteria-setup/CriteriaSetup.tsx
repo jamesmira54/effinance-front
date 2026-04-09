@@ -1,13 +1,17 @@
 'use client';
 
 import PairwiseMatrix from './PairwiseMatrix';
-import { Criteria, CriteriaColumnData, CriterionCategory } from './CriteriaSetup.types';
+import { Criteria, CriteriaColumnData, CriterionCategory, Pairwise } from './CriteriaSetup.types';
 import { useFormik } from 'formik';
 import { v4 as uuidv4 } from 'uuid';
 import Select from '@/components/Inputs/Select';
 import { SponsorshipAPIService } from "@/api";
 import { SponsorshipDetailsProps } from '../sponsorship/Sponsorship.types';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Button from '@/components/Button';
+import { useRouter } from "next/navigation";
+import Alert from '@/components/Alert';
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 interface CriteriaSetupProps {
   serverData: {
@@ -23,6 +27,12 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   const allCriterions = criterionCategories.flatMap((cat) => cat.criterions);
   const studentColumns = dataSources.find((data) => data.name === 'student')?.columns || [];
   const sponsorAppColumns = dataSources.find((data) => data.name === 'sponsorshipApplications')?.columns || [];
+  const [isEditable, setIsEditable] = useState<boolean>(sponsorshipDetails.criterion.length > 0);
+  const [showCancel, setShowCancel] = useState<boolean>(false);
+  const router = useRouter();
+  const [isError, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const formatLabel = (name: string) =>
     name
@@ -35,6 +45,15 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
       ? sponsorshipDetails.criterion
       : criterionCategories[0].criterions;
 
+  const pairwiseInitial = (sponsorshipDetails.pairwise || []).reduce(
+    (acc: Record<string, number>, item) => {
+      const key = `${item.criterionAName}|${item.criterionBName}`;
+      acc[key] = item.value;
+      return acc;
+    },
+    {}
+  );
+
   const formik = useFormik({
     initialValues: {
       criterionCategoryId: criterionCategories[0].id,
@@ -46,12 +65,12 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
         preference: criterion.preference || 'MAX',
         requiredColumns: criterion.requiredColumns || []
       })) as Criteria[],
-      matrix: {} as Record<string, number>
+      pairwise: pairwiseInitial
     },
 
     onSubmit: async (values) => {
       const criteriaNames = values.criteria.map((c) => c.name);
-      const pairwise = buildPairwiseArray(criteriaNames, values.matrix);
+      const pairwise = buildPairwiseArray(criteriaNames, values.pairwise);
 
       const payload = {
         criterionCategoryId: values.criterionCategoryId,
@@ -61,14 +80,27 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
 
       try {
 
-        console.log('Submitting payload:', payload);
+        // console.log('Submitting payload:', payload);
         let response: any = null;     
+        response = await SponsorshipAPI.updateSponsorshipCriterion(sponsorshipDetails.id, payload);
 
-        response = await SponsorshipAPI.updateSponsorshipCriterion('dummy-sponsorship-id', payload);
+        console.log('API response:', response);
+
+        if(response) {
+          setError(false);
+          setErrorMessage("");
+        }
       }  catch (err: any) {
-
+        setError(true);
+        setErrorMessage(err.message || "An error occurred");
       } finally {
-        console.log('Submission complete');
+        setShowAlert(true);
+        const formElemet = document.querySelector('form');
+        if(formElemet) {
+            formElemet.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
 
     }
@@ -92,18 +124,18 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
         preference: 'MAX',
         requiredColumns: []
       })),
-      matrix: {} as Record<string, number> // reset matrix when switching
+      pairwise: {} as Record<string, number> // reset pairwise when switching
     });
   };
 
 
-  const buildPairwiseArray = (criteria: string[], matrix: Record<string, number>) => {
+  const buildPairwiseArray = (criteria: string[], pairwise: Record<string, number>) => {
     const result: { criteriaNameA: string; criteriaNameB: string; value: number }[] = [];
     criteria.forEach((a, i) => {
       criteria.forEach((b, j) => {
         if (i <= j) {
           const key = `${a}|${b}`;
-          const value = i === j ? 1 : matrix[key] ?? '';
+          const value = i === j ? 1 : pairwise[key] ?? '';
           if (value !== undefined && value !== null) {
             result.push({
               criteriaNameA: a,
@@ -140,26 +172,68 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   }, [formik.values.criterionCategoryId, criterionCategories]);
 
 
+  useEffect(() => {
+      if(showAlert) {
+          const timer = setTimeout(() => {
+              setShowAlert(false);
+          }, 5000);
+          return () => clearTimeout(timer);
+      }
+  }, [showAlert]);
+
+  const handleBack = () => {
+    router.back();
+  };
+
+
   return (
     <div className="p-4 space-y-6">
+      <h2 className="text-title-md2 font-semibold text-black dark:text-white">
+        {sponsorshipDetails.name}
+      </h2>
+      <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button>
+      {showAlert && (
+          <div className="mt-5">
+              <Alert 
+                  variant={isError ? 'error' : 'success'}
+                  title={isError ? 'Error' : "Success!"}
+                  message={isError ? errorMessage : "Sponsorship Criteria Updated Successfully!"}
+                  showLink={false} 
+              />
+          </div>
+      )}
       
-      <div>
-        <label className="block font-medium mb-2">
-          Select Criterion Category
-        </label>
+      {!isEditable ?
+        <div>
+          <label className="block font-medium mb-2">
+            Select Criterion Category
+          </label>
 
+          <Select
+            id="criterionCategory"
+            name="criterionCategory"
+            label=""
+            options={ categoryOptions }
+            isMultiple={false}
+            value={ selectedCategory }
+            onChange={(option) => handleCategoryChange(option?.value || '')}
+            className='w-full'
+          />
+        </div>
+      :
+       <Button variants="default" className='bg-primary' onClick={() => {
+          setIsEditable(false);
+          setShowCancel(true);
+        }}>
+          Edit Criteria
+        </Button>
+      }
 
-        <Select
-          id="criterionCategory"
-          name="criterionCategory"
-          label=""
-          options={ categoryOptions }
-          isMultiple={false}
-          value={ selectedCategory }
-          onChange={(option) => handleCategoryChange(option?.value || '')}
-          className='w-full'
-        />
-      </div>
+      {showCancel && !isEditable && (
+        <Button className='mt-5 bg-warning' variants="default" onClick={() => handleBack()}>
+          Cancel
+        </Button>
+      )}
 
       <form onSubmit={formik.handleSubmit} className="space-y-6">
         <PairwiseMatrix formik={formik} studentColumns={studentColumns} sponsorAppColumns={sponsorAppColumns} allCriterions={allCriterions} />

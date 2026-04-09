@@ -115,4 +115,35 @@ export default class SponsorshipAPIService extends AxiosAPI implements Sponsorsh
             throw error;
         }
     }
+
+    async getCustomCriterionData() {
+        try {
+            const response = await this.get({ path: `/custom-input` });
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch custom criterion data", error);
+            throw error;
+        }
+    }
+
+    async updateCustomCriterionData(payload: any[]) {
+        try {
+            const response = await this.post({ path: `/bulk-upsert-custom-input`, body: payload });
+            return response;
+        } catch (error) {
+            console.error("Failed to update custom criterion data", error);
+            throw error;
+        }
+    }
+
+    async rankApplicants(sponsorshipId: string) {
+        console.log("Ranking applicants for sponsorship ID: ", sponsorshipId);
+        try {
+            const response = await this.get({ path: `/rank-student/${sponsorshipId}` });
+            return response;
+        } catch (error) {
+            console.error("Failed to rank applicants", error);
+            throw error;
+        }
+    }
 }
