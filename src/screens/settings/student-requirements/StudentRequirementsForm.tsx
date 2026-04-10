@@ -48,11 +48,19 @@ const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId
             return true;
         })
         .test("fileType", "Unsupported File Format", (value) => {
-            if (value) {
-                const supportedFormats = ["image/png", "image/jpeg", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-                return supportedFormats.includes((value as File).type);
-            }
-            return true;
+          if (value) {
+            const file = value as File;
+
+            const isImage = file.type.startsWith("image/");
+            const allowedDocs = [
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ];
+
+            return isImage || allowedDocs.includes(file.type);
+          }
+          return true;
         }),
       requirment: Yup.object()
           .shape({
@@ -156,21 +164,8 @@ const AcademicSetupForm: React.FC<{ requirements: APIFileTypesProps[], studentId
               isDragActive ? "border-blue-500" : "border-gray-300"
             }`}
             >
-            <Input
-              id="file-input-trigger"
-              style={{ display: "none" }}
+            <input 
               {...getInputProps()}
-              name="file"
-              onChange={(e) => {
-              const file = e.currentTarget.files?.[0];
-              if (file) {
-                formik.setFieldValue("file", file);
-                setFilePreview(URL.createObjectURL(file));
-              }
-              }}
-              onBlur={() => formik.handleBlur}
-              error={formik.touched.file && formik.errors.file ? true : false}
-              errorMessage={formik.errors.file}
             />
             {isDragActive ? (
               <p className="text-blue-500">Drop the file here...</p>

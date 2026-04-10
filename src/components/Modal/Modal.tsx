@@ -58,8 +58,8 @@ const Modal: React.FC<ModalProps> = ({
       )}
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-black p-8 overflow-y-auto ${contentClasses} ${isTextCentered && 'text-center'}  ${className}`}
-        onClick={(e) => e.stopPropagation()}
+          className={`bg-white dark:bg-black p-8 overflow-y-auto ${!isFullscreen ? 'max-h-[80%]' : ''} ${contentClasses} ${isTextCentered ? 'text-center' : ''}  ${className}`}
+          onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-title-md mb-4.5">{title}</h3>
         {showCloseButton && (
