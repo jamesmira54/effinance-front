@@ -1,5 +1,5 @@
 import { AppliedSponsorshipDetailResponse } from "@/types/sponsorship.types";
-import { capitalizeAndSpace, FormattedDate } from "@/utils/helpers";
+import { FormattedDate } from "@/utils/helpers";
 
 const AppliedViewing: React.FC<{details: AppliedSponsorshipDetailResponse}> = ({
     details

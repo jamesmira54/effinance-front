@@ -1,8 +1,8 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
-import PoolingList from "@/screens/finas-application/pooling/PoolingList";
 import { SponsorshipAPIService } from "@/api";
 import { APPLICATION_STAGE } from "@/utils/constant";
+import RankingList from "@/screens/finas-application/ranking-list/RankingList";
 
 export const metadata: Metadata = {
   title: "Effinance - Pooling",
@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 const SponsorshipAPI = new SponsorshipAPIService();
 
 const getApplicationsData = async () => {
-  const response = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.POOLING);
+  const response = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.RANKING_SELECTION);
   return response;
 }
 
 
 
-const Pooling = async () => {
+const RankingListPage = async () => {
   const applications = await getApplicationsData();
 
   const serverData = {
@@ -27,10 +27,10 @@ const Pooling = async () => {
 
   return (
     <>
-      <Breadcrumb pageName="Pooling" />
-      <PoolingList serverData={serverData}/>
+      <Breadcrumb pageName="Ranking List" />
+      <RankingList serverData={serverData}/>
     </>
   );
 };
 
-export default Pooling;
+export default RankingListPage;

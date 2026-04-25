@@ -14,7 +14,7 @@ export default function DefaultLayout({
   userDetails: APIUserProfileResponse;
   permissions: APIModuleProps[];
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   
   return (
     <>

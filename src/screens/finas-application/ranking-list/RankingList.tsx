@@ -1,29 +1,25 @@
 "use client";
 
-import DataTable from "react-data-table-component";
+import DataTable from "@/components/DataTable";
 import Button from "@/components/Button";
 import { CiSquarePlus } from "react-icons/ci";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
-import { SponsorshipApplicationResponse, SponsorshipRequirements } from "@/types/sponsorship.types";
+import { SponsorshipApplicationResponse } from "@/types/sponsorship.types";
 import { FormattedDate } from "@/utils/helpers";
 import { FaRegEye } from "react-icons/fa6";
 import StudentAPIService from "@/api/student-api";
 import { IoEyeOutline } from "react-icons/io5";
 import Badge from "@/components/Badge/Badge";
 import { MdUpdate } from "react-icons/md";
-import ApplicationForm from "./RankingSelectionForm";
-import { APPLICATION_STATUS } from "@/utils/constant";
-import { APIApplicationResponse } from "@/types";
-import { useRouter } from "next/navigation";
+import RankingListForm from "./RankingListForm";
+import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
+import { APIApplicationResponse, APIStudentFilesRes } from "@/types";
 import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import Link from "next/link";
-
-
-const ActionModal = styled(Modal)`
-
-`;
+import { SponsorshipAPIService } from "@/api";
+import { TableColumn } from "react-data-table-component";
 
 const StyledModal = styled(Modal)`
     overflow: auto;
@@ -36,11 +32,12 @@ interface serverDataProps {
     totalCount: number;
 }
 
-const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
+const RankingList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
     const StudentAPI = new StudentAPIService();
+    const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
 
@@ -48,28 +45,8 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
         setData(serverData.applications || []);
     }, [serverData.applications]);
 
-    const columns = [
+    const columns: TableColumn<SponsorshipApplicationResponse>[] = useMemo(() => [
         { name: "Application #", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
-        { name: "Status", center: true, cell: (row:any) => ( 
-            <Badge variants={
-                row.appStatus === APPLICATION_STATUS.APPROVED ? "success" : 
-                row.appStatus === APPLICATION_STATUS.PENDING_RANKING_SELECTION ? "success" : 
-                "default"}>
-                {(() => {
-                    // Format the status string
-                    const formatted = row.appStatus
-                        .toLowerCase()
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char: string) => char.toUpperCase());
-                    // Remove the third word
-                    const words = formatted.split(' ');
-                    if (words.length >= 3) {
-                        words.splice(2, 1);
-                    }
-                    return words.join(' ');
-                })()}
-            </Badge>
-        )},
         {
             name: "Applicants Name", 
             selector: (row:SponsorshipApplicationResponse) => row.applicantName, 
@@ -82,33 +59,47 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
         },
         { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
         { name: "Date of Application", selector: (row:SponsorshipApplicationResponse) => FormattedDate(row.dateOfApp), sortable: true },
-        { name: "Attachments", center: true, cell: (row:any) => (
-            <>
+        { name: <div className="flex justify-center w-full">Attachments</div>, cell: (row:any) => (
+            <div className="flex justify-center w-full">
                 <Button onClick={() => getAttachments(row.studentId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
-            </>
+            </div>
         )},
-        { name: "Action", center: true, cell: (row:any) => ( 
-            <>
+        { name: <div className="flex justify-center w-full">Status</div>, cell: (row:any) => ( 
+            <div className="flex justify-center w-full">
+                <Badge variants={
+                    row.appStatus === APPLICATION_STATUS.PENDING_RANKING_SELECTION ? "warning" : 
+                    row.appStatus === APPLICATION_STATUS.RANKED ? "success" : 
+                    row.appStatus === APPLICATION_STATUS.NOT_QUALIFIED ? "error" :
+                    "default"}>
+                        {row.appStatus
+                            .toLowerCase()
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (char: string) => char.toUpperCase())
+                        }
+                </Badge> 
+            </div>
+        )},
+        { name: <div className="flex justify-center w-full">Action</div>, cell: (row:any) => ( 
+            <div className="flex justify-center w-full">
                 <div className="flex items-center space-x-4">
                     <Button onClick={() => handleAction(row)} variants="text" color="warning" startIcon={<MdUpdate size={18}/>}>Update Status</Button>
                 </div>
-            </>
+            </div>
         )},
-        { name: "Remarks", center: true, cell: (row:any) => (
-            <>
+        { name: <div className="flex justify-center w-full">Remarks</div>, cell: (row:any) => (
+            <div className="flex justify-center w-full">
                 <Button onClick={() => getRemarks(row.sponsorshipId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
-            </>
+            </div>
         )},
-    ];
+    ], []);
 
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openReqModal, setOpenReqModal] = useState<boolean>(false);
-    const [selectedReqs, setSelectedReqs] = useState<SponsorshipRequirements[]>([]);
+    const [selectedReqs, setSelectedReqs] = useState<APIStudentFilesRes[]>([]);
     const [selectedItem, setSelectedItem] = useState<APIApplicationResponse>({} as APIApplicationResponse);
     const [remarks, setRemarks] = useState<string>("");
     const [openRemarksModal, setOpenRemarksModal] = useState<boolean>(false);
 
-    const router = useRouter();
 
 
     const getAttachments = async(studentId: string) => {
@@ -136,9 +127,16 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
         setOpenFormModal(true);
     }
 
-    const handleSuccess = (updateItem: any) => {
+    const fetchApplications = async () => {
+        const res = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.POOLING);
+        if (res) {
+            setData(res?.applicants || []);
+        }
+    };
+
+    const handleSuccess = async (updateItem: any) => {
         setSelectedItem(updateItem)
-        router.refresh();
+        await fetchApplications();
         setTimeout(() => {
             setOpenFormModal(false);
         }, 1000);
@@ -154,13 +152,12 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => setOpenFormModal(true)} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
             </div>
 
 
             <StyledModal isFullscreen={false} title="Attachments" className="min-w-125" isOpen={openReqModal} onClose={() => setOpenReqModal(false)}>
                 <ul className="flex flex-col gap-4">
-                    {selectedReqs.map((item: SponsorshipRequirements, index) => (
+                    {selectedReqs.map((item: APIStudentFilesRes, index) => (
                         <li key={index} className="flex items-center justify-between">
                             <Button onClick={() => openFile(item.filename)} variants="text" startIcon={<IoEyeOutline size={21}/>}>
                                 {index + 1}. {item.filetype}
@@ -172,7 +169,7 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
 
 
             <StyledModal isFullscreen={false} title="Update Status" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
-                <ApplicationForm initialData={selectedItem}  onSuccess={(item: any) => handleSuccess(item)} />
+                <RankingListForm initialData={selectedItem}  onSuccess={(item: any) => handleSuccess(item)} />
             </StyledModal>
 
             <StyledModal isFullscreen={false} title="Remarks" className="max-w-180" isOpen={openRemarksModal} onClose={() => setOpenRemarksModal(false)}>
@@ -200,4 +197,4 @@ const RankingSelectionList: React.FC<{serverData: serverDataProps}> = ({
     )
 };
 
-export default RankingSelectionList;
+export default RankingList;

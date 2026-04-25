@@ -1,6 +1,6 @@
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 
-export interface RankingSelectionFormProps {
+export interface RankingStudentListingFormProps {
     studentId: string;
     sponsorshipId: string;
     appStage: typeof APPLICATION_STAGE[keyof typeof APPLICATION_STAGE];

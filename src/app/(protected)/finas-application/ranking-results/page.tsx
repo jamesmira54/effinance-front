@@ -1,12 +1,11 @@
-import { AcademicAPIService, SchoolAPIService, SponsorshipAPIService, UploadAPIService, UserAPIService } from "@/api";
+import { AcademicAPIService, SchoolAPIService, UploadAPIService, UserAPIService } from "@/api";
+import SponsorshipAPIService from "@/api/sponsorships-api";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import RankingStudentListing from "@/screens/setup-manager/ranking-student/RankingStudentListing";
+import RankingStudentListing from "@/screens/finas-application/ranking-results/RankingStudentListing";
 import { Metadata } from "next";
-import React from "react";
-
 
 export const metadata: Metadata = {
-  title: "Effinance - Ranking Order",
+  title: "Effinance - Ranking Selection",
 };
 
 const UserAPI = new UserAPIService();
@@ -34,14 +33,15 @@ const getAllAcademicYears = async () => {
 const getAllSponsorships = async () => {
     return await SponsorshipAPI.getAllSponsorships();
 }
+  
 
-const RankingOrderPage = async () => {
-
+const Application = async () => {
   const coordinators = await getAllCoordinators();
   const schools = await getAllSchools();
   const requirements = await getAllRequirements();
   const academicYears = await getAllAcademicYears();
   const sponsorships = await getAllSponsorships();
+
 
   const serverData = {
     coordinators: coordinators?.users || [],
@@ -51,11 +51,13 @@ const RankingOrderPage = async () => {
     sponsorships: sponsorships || [],
   };
 
+
   return (
     <>
-      <Breadcrumb pageName="Sponsorships | Ranking Order" />
+      <Breadcrumb pageName="Ranking ready for Sponsorships" />
       <RankingStudentListing serverData={serverData}/>
     </>
   );
 };
-export default RankingOrderPage;
+
+export default Application;

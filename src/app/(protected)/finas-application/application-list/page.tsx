@@ -1,6 +1,7 @@
 import SponsorshipAPIService from "@/api/sponsorships-api";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import ApplicationList from "@/screens/finas-application/applicatioon-list/ApplicationList";
+import { APPLICATION_STAGE } from "@/utils/constant";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 const SponsorshipAPI = new SponsorshipAPIService();
 
 const getApplicationsData = async () => {
-  const response = await SponsorshipAPI.getAllApplications('APPLICATION_LIST');
+  const response = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.APPLICATION_LIST);
   return response;
 }
   

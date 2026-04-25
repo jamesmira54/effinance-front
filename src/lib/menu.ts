@@ -53,9 +53,15 @@ export const MENU_ITEMS: MenuItem[] = [
         roles: ['admin', 'coordinator'],
       },
       {
-        id: 'ranking-selection',
-        label: 'Ranking Selection',
-        route: '/finas-application/ranking-selection',
+        id: 'ranked-list',
+        label: 'Pending Rankings',
+        route: '/finas-application/ranked-list',
+        roles: ['admin', 'coordinator'],
+      },
+        {
+        id: 'ranking-results',
+        label: 'Ranking Results',
+        route: '/finas-application/ranking-results',
         roles: ['admin', 'coordinator'],
       },
       {
@@ -160,12 +166,6 @@ export const MENU_ITEMS: MenuItem[] = [
         id: 'schedules',
         label: 'Schedules',
         route: '/setup-manager/schedules',
-        roles: ['admin'],
-      },
-      {
-        id: 'ranking-order',
-        label: 'Ranking Order',
-        route: '/setup-manager/ranking-order',
         roles: ['admin'],
       }
     ],

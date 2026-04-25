@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { RankingSelectionFormProps } from "./RankingSelection.types";
+import { RankingListFormProps } from "./RankingList.types";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Alert from "@/components/Alert/Alert";
@@ -7,8 +7,9 @@ import Select from "@/components/Inputs/Select/Select";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import Throbber from "@/components/common/Throbber";
 import { ApplicationAPIService } from "@/api";
+import { PoolingFormProps } from "../pooling/Pooling.types";
 
-const RankingSelectionForm: React.FC<
+const RankingListForm: React.FC<
 {
     initialData: any, 
     onSuccess: (item: any) => void
@@ -22,28 +23,30 @@ const RankingSelectionForm: React.FC<
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [showAlert, setShowAlert] = useState<boolean>(false);
 
-    const initialValues = useMemo<RankingSelectionFormProps>(() => ({
+    const initialValues = useMemo<RankingListFormProps>(() => ({
         studentId: initialData.studentId,
         sponsorshipId: initialData.sponsorshipId,
-        appStage: initialData.appStage || APPLICATION_STAGE.POOLING,
-        appStatus: initialData.appStatus || APPLICATION_STATUS.PENDING_POOLING,
+        appStage: initialData.appStage || APPLICATION_STAGE.RANKING_SELECTION,
+        appStatus: initialData.appStatus || APPLICATION_STATUS.PENDING_RANKING_SELECTION,
         remarks: initialData.remarks || "",
     }), [initialData]);
 
-    const formik = useFormik<RankingSelectionFormProps>({
+    const formik = useFormik<RankingListFormProps>({
         initialValues,
         enableReinitialize: true,
         onSubmit: async (values, {setSubmitting}) => {
             submitHandler(values, setSubmitting);
             setSubmitting(true);
-            setShowAlert(false);}
+            setShowAlert(false);
+        }
     });
     
 
     const statusOptions = useMemo(() => {
         const allowedStatuses = [
-            APPLICATION_STATUS.PENDING_APPLICATION_LIST, 
-            APPLICATION_STATUS.APPROVED
+            APPLICATION_STATUS.PENDING_RANKING_SELECTION, 
+            APPLICATION_STATUS.RANKED, 
+            APPLICATION_STATUS.NOT_QUALIFIED
         ];
 
         return Object.values(APPLICATION_STATUS)
@@ -58,7 +61,7 @@ const RankingSelectionForm: React.FC<
     }, []);
 
 
-    const submitHandler = async (values: RankingSelectionFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
+    const submitHandler = async (values: RankingListFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
         try {
             let response: any = null;     
             response = await ApplicationAPI.updateApplicationStatus(initialData.studentId, values);
@@ -136,4 +139,4 @@ const RankingSelectionForm: React.FC<
     )
 }
 
-export default RankingSelectionForm;
+export default RankingListForm;

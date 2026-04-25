@@ -73,8 +73,14 @@ export default class AxiosAPI {
         body = {}
       }: RequestOptionsWithBody
     ): Promise<T> {
+
+      const isFormData = body instanceof FormData;
+
       const config: AxiosRequestConfig = {
-        headers: headers as AxiosHeaders,
+        headers: {
+          ...(isFormData ? {} : { "Content-Type": "application/json" }),
+          ...headers,
+        },
         params,
       };
   

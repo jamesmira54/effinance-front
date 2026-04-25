@@ -10,6 +10,7 @@ import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
 import { useRouter } from "next/navigation";
 import { AuthAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const SignUp: React.FC = () => {
@@ -19,15 +20,23 @@ const SignUp: React.FC = () => {
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const authAPI = new AuthAPIService();
+  const { showLoader, hideLoader } = useLoader();
 
   const SignUpHandler = async(values: SignUpFormProps, setSubmitting: (isSubmitting: boolean) => void) => {
     try {
       setSubmitting(true);
-      await authAPI.signUp(values);
-      router.push("/dashboard");
+      const response = await authAPI.signUpStudent(values);
+
+      if(response) {
+        router.push("/announcements");
+      }
+      
     } catch (err: any) {
-      setError(true);
-      setErrorMessage(err.response?.data.errorDetails || "Something went wrong, please try again later.")
+      setTimeout(() => {
+        setError(true);
+        setErrorMessage(err.response?.data.errorDetails || "Something went wrong, please try again later.");
+        hideLoader();
+      }, 2000);
     } finally {
       setLoading(false);
       setSubmitting(false);
@@ -54,6 +63,7 @@ const SignUp: React.FC = () => {
       repassword: Yup.string().required("This field is required"),
     }),
     onSubmit: (values, { setSubmitting }) => {
+      showLoader();
       SignUpHandler(values, setSubmitting);
       setLoading(true);
     }

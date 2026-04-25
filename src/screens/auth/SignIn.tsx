@@ -37,6 +37,7 @@ const SignIn: React.FC = () => {
       setTimeout(() => {
         setError(true);
         setErrorMessage(err.response?.data.errorDetails || "Invalid credentials");
+        hideLoader();
       }, 2000);
     } finally {
       setSubmitting(false);

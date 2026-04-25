@@ -11,6 +11,11 @@ import { FaRegEye } from "react-icons/fa6";
 import { TableColumn } from "react-data-table-component";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { APIApplicationResponse } from "@/types";
+import { MdUpdate } from "react-icons/md";
+import RankedStudentsListingForm from "./RankedStudentsListingForm";
+import { SponsorshipAPIService } from "@/api";
+import { APPLICATION_STAGE } from "@/utils/constant";
 
 
 const StyledModal = styled(Modal)`
@@ -21,6 +26,7 @@ const StyledModal = styled(Modal)`
 
 interface serverDataProps {
     rankedStudents: RankStudentResponse[];
+    sponsorId: string;
 }
 
 const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
@@ -29,6 +35,8 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
 
     const router = useRouter();
     const [data, setData] = useState<RankStudentResponse[]>(serverData.rankedStudents || []);
+    const [openFormModal, setOpenFormModal] = useState<boolean>(false);
+    const [selectedItem, setSelectedItem] = useState<any>({} as any);
 
 
     const columns: TableColumn<RankStudentResponse>[] = useMemo(() => [
@@ -39,6 +47,13 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
         { name: <div className="flex justify-center w-full">Evaluation</div>, cell: (row:RankStudentResponse) => (
             <div className="flex justify-center w-full">
                 <Button onClick={() => showEvaluation(row.evaluation) } variants="text" startIcon={<FaRegEye className='text-success hover:text-primary' size={20}/>}/>
+            </div>
+        )},
+        { name: <div className="flex justify-center w-full">Action</div>, cell: (row:any) => ( 
+            <div className="flex justify-center w-full">
+                <div className="flex items-center space-x-4">
+                    <Button onClick={() => handleAction(row)} variants="text" color="warning" startIcon={<MdUpdate size={18}/>}>Update Status</Button>
+                </div>
             </div>
         )},
     ], []);
@@ -58,10 +73,30 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
         router.back();
     };
 
+     const handleAction = (item: APIApplicationResponse) => {    
+        setSelectedItem({ ...item, sponsorId: serverData.sponsorId });
+        setOpenFormModal(true);
+    }
+
+    // const fetchApplications = async () => {
+    //         const res = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.);
+    //     if (res) {
+    //         setData(res?.applicants || []);
+    //     }
+    // };
+
+    const handleSuccess = async (updateItem: any) => {
+        setSelectedItem(updateItem)
+        // await fetchApplications();
+        setTimeout(() => {
+            setOpenFormModal(false);
+        }, 1000);
+    };
+
 
     return (
        <div className="p-4 space-y-6">
-            <h2 className="text-title-md2 font-semibold text-black dark:text-white">Ranking | {data.length} Students</h2>
+            <h2 className="text-title-md2 font-semibold text-black dark:text-white">Ranking Results | {data.length} Students</h2>
             <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button>
             <div className="max-w-full overflow-x-auto">
               <DataTable 
@@ -81,6 +116,10 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
                         </li>
                     ))}
                 </ul>
+            </StyledModal>
+
+            <StyledModal isFullscreen={false} title="Update Status" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>
+                <RankedStudentsListingForm initialData={selectedItem}  onSuccess={(item: any) => handleSuccess(item)} />
             </StyledModal>
 
         </div>

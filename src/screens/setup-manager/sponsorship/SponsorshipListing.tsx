@@ -169,7 +169,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     }
 
 
-     const cancelDelete = () => {
+    const cancelDelete = () => {
         setOpenActionModal(false);
         setPendingDelId(null);
     };

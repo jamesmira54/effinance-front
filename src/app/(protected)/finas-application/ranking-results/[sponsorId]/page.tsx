@@ -1,11 +1,11 @@
 import SponsorshipAPIService from "@/api/sponsorships-api";
-import RankedStudentsListing from "@/screens/setup-manager/ranking-student/RankedStudentsListing";
+import RankedStudentsListing from "@/screens/finas-application/ranking-results/RankedStudentsListing";
 import { Metadata } from "next";
 
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Effinance - Ranked Students",
+  title: "Effinance - Ranked Results",
 };
 
 const SponsorshipAPI = new SponsorshipAPIService();
@@ -15,7 +15,7 @@ const rankedStudents = async (sponsorId: string) => {
     return response;
 }
 
-const RankingStudentsPage = async ({ params }: { params: { sponsorId: string } }) => {
+const RankingResultsPage = async ({ params }: { params: { sponsorId: string } }) => {
     const { sponsorId } = await params;
 
     let rankResults = [];
@@ -26,7 +26,8 @@ const RankingStudentsPage = async ({ params }: { params: { sponsorId: string } }
     }
 
     const serverData = {
-        rankedStudents: rankResults,
+      sponsorId: sponsorId,
+      rankedStudents: rankResults,
     }
     return (
       <>
@@ -35,4 +36,4 @@ const RankingStudentsPage = async ({ params }: { params: { sponsorId: string } }
     );
   };
   
-export default RankingStudentsPage;
+export default RankingResultsPage;
