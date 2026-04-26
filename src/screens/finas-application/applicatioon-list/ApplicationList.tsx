@@ -15,11 +15,11 @@ import { MdUpdate } from "react-icons/md";
 import ApplicationForm from "./ApplicationForm";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse, APIStudentFilesRes } from "@/types";
-import { useRouter } from "next/navigation";
 import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import Link from "next/link";
 import { TableColumn } from "react-data-table-component";
 import { SponsorshipAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const StyledModal = styled(Modal)`
@@ -37,6 +37,7 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
+    const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
@@ -111,19 +112,23 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
 
 
     const getAttachments = async(studentId: string) => {
+        showLoader();
         const reqData = await StudentAPI.getStudentFiles(studentId);
         if(reqData) {
             setSelectedReqs(reqData);
             setOpenReqModal(true);
         }
+        hideLoader();
     };
 
     const getRemarks = async(sponsorshipId: string) => {
+        showLoader();
         const remarksData = await SponsorshipStudentAPI.getSpecificSponsorship(sponsorshipId);
         if(remarksData) {
             setRemarks(remarksData.sponsorshipRemarks || "No remarks available.");
             setOpenRemarksModal(true);
         }
+        hideLoader();
     }
 
     const openFile = (filename: string) => {
@@ -143,11 +148,13 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     };
 
     const handleSuccess = async (updateItem: any) => {
-        setSelectedItem(updateItem)
+        setSelectedItem(updateItem);
+        showLoader();
         await fetchApplications();
         setTimeout(() => {
             setOpenFormModal(false);
         }, 1000);
+        hideLoader();
     };
 
     return (

@@ -87,10 +87,6 @@ const AppliedListing: React.FC<{serverData: serverDataProps}> = ({
         }
     }
 
-    const openFile = (filename: string) => {
-        window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${filename}`, "_blank", "noopener,noreferrer");
-    }
-
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">

@@ -11,8 +11,8 @@ import SchoolForm from "./SchoolForm";
 import { CiEdit } from "react-icons/ci";
 import { ProvinceProps, SchoolDataProps } from "./School.types";
 import { SchoolAPIService } from "@/api";
-import { useRouter } from "next/navigation";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const StyledModal = styled(Modal)`
@@ -32,11 +32,11 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
 
+    const { showLoader, hideLoader } = useLoader();
     const schoolAPI = new SchoolAPIService();
     const [data, setData] = useState<SchoolDataProps[]>(serverData.schools || []);
     const [selectedItem, setSelectedItem] = useState<SchoolDataProps>({} as SchoolDataProps);
     const [pendingDelId, setPendingDelId] = useState<string | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         setData(serverData.schools || []);
@@ -93,6 +93,7 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
     }
 
     const onConfirmDelete = async () => {
+        showLoader();
         if (pendingDelId) {
             
             setOpenActionModal(false);
@@ -103,6 +104,7 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
                 setPendingDelId(null);
             }
         }
+        hideLoader();
     }
 
 
@@ -119,12 +121,11 @@ const SchoolListing: React.FC<{serverData: serverDataProps}> = ({
     };
 
      const handleSuccess = async (updateItem: SchoolDataProps) => {
+        showLoader();
         setSelectedItem(updateItem);
         await refetchData();
-
-        setTimeout(() => {
-            setOpenFormModal(false);
-        }, 1000);
+        setOpenFormModal(false);
+        hideLoader();
     };
 
 

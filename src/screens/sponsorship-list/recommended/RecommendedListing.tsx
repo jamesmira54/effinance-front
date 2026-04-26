@@ -1,7 +1,7 @@
 "use client";
 
 import { APISponsorshipListResponse, SponsorshipRequirements, SponsorshipSchoolProps } from "@/types/sponsorship.types";
-import { Fragment, use, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { TableColumn } from "react-data-table-component";
 import { FormattedDate, formatCurrency } from "@/utils/helpers";
 import Button from "@/components/Button";
@@ -13,6 +13,7 @@ import { styled } from "styled-components";
 import { BsArrowDownLeftSquareFill } from "react-icons/bs";
 import Alert from "@/components/Alert/Alert";
 import RecommendedView from "./RecommendedView";
+import { useLoader } from "@/context/LoaderContext";
 
 
 
@@ -33,6 +34,7 @@ const RecommendedListing: React.FC<{serverData: serverDataProps}> = ({
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
     const studentId = serverData.studentId;
 
+    const { showLoader, hideLoader } = useLoader();
     const [openReqModal, setOpenReqModal] = useState<boolean>(false);
     const [selectedReqs, setSelectedReqs] = useState<SponsorshipRequirements[]>([]);
     const [remarks, setRemarks] = useState<string>("");
@@ -119,26 +121,25 @@ const RecommendedListing: React.FC<{serverData: serverDataProps}> = ({
     }
 
     const onApplyConfirmation = () => {
+        showLoader();
         if (pendingAppliedSponsorship) {
             const { studentId, sponsorshipId } = pendingAppliedSponsorship;
             if (studentId && sponsorshipId) {
                 SponsorshipStudentAPI.applyForSponsorship(studentId, sponsorshipId)
                     .then(async () => {
                         await refetchRecommendations();
-                        setTimeout(() => {
-                            setShowAlert(true);
-                            setOpenActionModal(false);
-                        }, 1000);
+                        setShowAlert(true);
+                        setOpenActionModal(false);
                         setError(false);
+                        hideLoader();
                     })
                     .catch((error) => {
                         if(error.response && error.response.data) {
                             setShowAlert(true);
                             setErrorMessage(error.response.data.errorDetails?.errors?.[0].msg || "Failed to apply for sponsorship. Please try again.");
                             setError(true);
-                            setTimeout(() => {
-                                setOpenActionModal(false);
-                            }, 2000);
+                            setOpenActionModal(false);
+                            hideLoader();
                         }
                     });
             }

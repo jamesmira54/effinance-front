@@ -2,16 +2,16 @@
 
 import DataTable from "@/components/DataTable";
 import Button from "@/components/Button";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa";
 import { Fragment, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import { APIStudentListResponse } from "@/types";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
+import { PiStudent } from "react-icons/pi";
 
 const ActionModal = styled(Modal)`
 
@@ -21,6 +21,7 @@ const StudentAccountListing: React.FC<{studentAccounts: APIStudentListResponse[]
     studentAccounts
 }) => {
 
+    const { showLoader } = useLoader();
     const [data, setData] = useState<APIStudentListResponse[]>(studentAccounts || []);
     const router = useRouter();
 
@@ -31,9 +32,9 @@ const StudentAccountListing: React.FC<{studentAccounts: APIStudentListResponse[]
             selector: (row: APIStudentListResponse) => row.lastName, 
             sortable: true,  
             cell: (row: APIStudentListResponse) => (
-                <Link href={`/settings/student-accounts/view/${row.studentId}`} className="text-primary hover:underline">
+                <Button onClick={() => seeDetails(row.studentId)} variants="text" startIcon={<PiStudent size={22}/>}>
                     {row.firstName}  {row.lastName}
-                </Link>
+                </Button>
             ),
         },
         { name: "Email", selector: (row: APIStudentListResponse) => row.email, width: "250px"},
@@ -42,12 +43,23 @@ const StudentAccountListing: React.FC<{studentAccounts: APIStudentListResponse[]
         { name: "Action", cell: (row: APIStudentListResponse) => (
             <>
                 <div className="flex items-center space-x-3.5">
-                    <Button onClick={() => router.push(`/settings/student-accounts/view/${row.studentId}`) } variants="text" startIcon={<FaRegEye size={22}/>}/>
-                    <Button onClick={() => router.push(`/settings/student-accounts/edit/${row.studentId}`) } variants="text" startIcon={<FaEdit size={22}/>}/>
+                    <Button onClick={() => seeDetails(row.studentId)} variants="text" startIcon={<FaRegEye size={22}/>}/>
+                    <Button onClick={() => goToEdit(row.studentId)} variants="text" startIcon={<FaEdit size={22}/>}/>
                 </div>
             </>
         )},
     ], []);
+    
+
+    const seeDetails = (id: string) => {
+        showLoader();
+        router.push(`/settings/student-accounts/view/${id}`);
+    }
+
+    const goToEdit = (id: string) => {
+        showLoader();
+        router.push(`/settings/student-accounts/edit/${id}`);
+    }
     
 
     return (

@@ -7,8 +7,8 @@ const AnnouncementsView: React.FC<{details: AnnouncementDetailsProps}> = ({
     details
 }) => {
 
-    const openFile = (filename: string) => {
-        window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${filename}`, "_blank", "noopener,noreferrer");
+    const openFile = (path: string) => {
+        window.open(`${process.env.NEXT_PUBLIC_API_URL}/${path}`, "_blank", "noopener,noreferrer");
     }
 
     return (
@@ -47,7 +47,7 @@ const AnnouncementsView: React.FC<{details: AnnouncementDetailsProps}> = ({
                     <ul className="list-none list-inside">
                         {details.files.map((attachment, index) => (
                             <li className="px-3" key={attachment.id}>
-                                <Button style={{textAlign: "left"}} onClick={() => openFile(attachment.fileName)} variants="text" startIcon={<IoEyeOutline size={21}/>}>
+                                <Button style={{textAlign: "left"}} onClick={() => openFile(attachment.path)} variants="text" startIcon={<IoEyeOutline size={21}/>}>
                                     {index + 1}. {attachment.fileName}
                                 </Button>
                             </li>

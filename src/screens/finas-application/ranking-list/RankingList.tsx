@@ -2,7 +2,6 @@
 
 import DataTable from "@/components/DataTable";
 import Button from "@/components/Button";
-import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
@@ -17,9 +16,10 @@ import RankingListForm from "./RankingListForm";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse, APIStudentFilesRes } from "@/types";
 import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
-import Link from "next/link";
 import { SponsorshipAPIService } from "@/api";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
+import { PiStudent } from "react-icons/pi";
 
 const StyledModal = styled(Modal)`
     overflow: auto;
@@ -36,6 +36,7 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
+    const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
@@ -52,9 +53,9 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
             selector: (row:SponsorshipApplicationResponse) => row.applicantName, 
             sortable: true,  
             cell: (row: SponsorshipApplicationResponse) => (
-                <Link href={`/settings/student-accounts/view/${row.studentId}`} className="text-primary hover:underline">
+                <Button onClick={() => seeStudentDetails(row.studentId)} variants="text" startIcon={<PiStudent size={22}/>}>
                     {row.applicantName}
-                </Link>
+                </Button>
             ),
         },
         { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
@@ -101,6 +102,11 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
     const [openRemarksModal, setOpenRemarksModal] = useState<boolean>(false);
 
 
+    const seeStudentDetails = (studentId: string) => {
+        showLoader();
+        window.open(`/settings/student-accounts/view/${studentId}`, "_blank");
+    }
+
 
     const getAttachments = async(studentId: string) => {
         const reqData = await StudentAPI.getStudentFiles(studentId);
@@ -135,11 +141,13 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
     };
 
     const handleSuccess = async (updateItem: any) => {
+        showLoader();
         setSelectedItem(updateItem)
         await fetchApplications();
         setTimeout(() => {
             setOpenFormModal(false);
         }, 1000);
+        hideLoader();
     };
 
     return (

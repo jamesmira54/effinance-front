@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import DataTable from "@/components/DataTable";
 import { MdDashboardCustomize } from "react-icons/md";
+import { useLoader } from '@/context/LoaderContext';
 
 
 
@@ -41,6 +42,8 @@ interface serverDataProps {
 const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
+    
+    const { showLoader, hideLoader } = useLoader();
     const SponsorshipAPI = new SponsorshipAPIService();
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [openReqModal, setOpenReqModal] = useState<boolean>(false);
@@ -147,17 +150,19 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
     }
 
     const changeCritation = (sponsorId: string) => {
+        showLoader();
         router.push(`/setup-manager/sponsorships/update-criterion/${sponsorId}`);
     }
 
     const updateCustomCriterion = (sponsorId: string) => {
+        showLoader();
         router.push(`/setup-manager/sponsorships/update-custom-criterion/${sponsorId}`);
     }
 
 
     const onConfirmDelete = async () => {
         if (pendingDelId) {
-            
+            showLoader();
             setOpenActionModal(false);
 
             const response = await SponsorshipAPI.deleteSponsorship(pendingDelId);
@@ -165,6 +170,7 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
                 setData((prevData) => prevData.filter((item) => item.id !== pendingDelId));
                 setPendingDelId(null);
             }
+            hideLoader();
         }
     }
 
@@ -179,10 +185,12 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         if (res) {
             setData(res || []);
         }
+        hideLoader();
     };
     
 
     const handleSuccess = (updateItem: APISponsorshipListResponse) => {
+        showLoader();
         setSelectedItem(updateItem);
         setData(prev =>
             prev.map(item => item.id === updateItem.id ? updateItem : item)

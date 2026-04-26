@@ -2,7 +2,6 @@
 
 import DataTable from "@/components/DataTable";
 import Button from "@/components/Button";
-import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
@@ -20,6 +19,7 @@ import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import Link from "next/link";
 import { SponsorshipAPIService } from "@/api";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
 
 const StyledModal = styled(Modal)`
     overflow: auto;
@@ -36,6 +36,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
+    const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
@@ -104,11 +105,13 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
 
 
     const getAttachments = async(studentId: string) => {
+        showLoader();
         const reqData = await StudentAPI.getStudentFiles(studentId);
         if(reqData) {
             setSelectedReqs(reqData);
             setOpenReqModal(true);
         }
+        hideLoader();
     };
 
     const getRemarks = async(sponsorshipId: string) => {
@@ -136,11 +139,13 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     };
 
     const handleSuccess = async (updateItem: any) => {
+        showLoader();
         setSelectedItem(updateItem)
         await fetchApplications();
         setTimeout(() => {
             setOpenFormModal(false);
         }, 1000);
+        hideLoader();
     };
 
     return (

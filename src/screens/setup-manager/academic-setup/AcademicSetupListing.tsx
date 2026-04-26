@@ -8,13 +8,12 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import AcademicSetupForm from "./AcademicSetupForm";
-import Switch from "@/components/Inputs/Switch";
 import { CiEdit } from "react-icons/ci";
 import { APIAcademicYearProps } from "@/types";
-import { useRouter } from "next/navigation";
 import { AcademicAPIService } from "@/api";
 import { FormattedDate } from "@/utils/helpers";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
 
 
 
@@ -30,7 +29,7 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     academics
 }) => {
 
-
+    const { showLoader, hideLoader } = useLoader();
     const AcademicAPI = new AcademicAPIService();
     const [data, setData] = useState<APIAcademicYearProps[]>(academics || []);
     const [selectedItem, setSelectedItem] = useState<APIAcademicYearProps>({} as APIAcademicYearProps);
@@ -81,11 +80,11 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     }
 
     const handleSuccess = async (updateItem: APIAcademicYearProps) => {
+        showLoader();
         setSelectedItem(updateItem);
         await reFetchData();
-        setTimeout(() => {
-            setOpenFormModal(false);
-        }, 1000);
+        setOpenFormModal(false);
+        hideLoader();
     };
 
 
@@ -96,6 +95,7 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
     }
 
     const onConfirmDelete = async () => {
+        showLoader();
         if (pendingDelId) {
             
             setOpenActionModal(false);
@@ -106,6 +106,7 @@ const AcademicSetupListing: React.FC<{academics: APIAcademicYearProps[] }> = ({
                 setPendingDelId(null);
             }
         }
+        hideLoader();
     }
 
     const cancelDelete = () => {

@@ -49,4 +49,14 @@ export default class UserAPIService extends AxiosAPI implements userAPI {
         }
     }
 
+    async deleteUser(userId: string) {
+        try {
+            const response = await this.delete({path: `/${userId}`});
+            return response;
+        } catch (error) {
+            console.error("Failed to delete user", error);
+            throw error;
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import DataTable from "@/components/DataTable";
 import { usePathname } from "next/navigation";
+import { useLoader } from '@/context/LoaderContext';
 
 
 
@@ -34,6 +35,7 @@ const RankingStudentListing: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
     
+    const { showLoader } = useLoader();
     const [openReqModal, setOpenReqModal] = useState<boolean>(false);
     const [openSchoolsModal, setOpenSchoolsModal] = useState<boolean>(false);
     const [data, setData] = useState<APISponsorshipListResponse[]>(serverData.sponsorships || []);
@@ -83,6 +85,7 @@ const RankingStudentListing: React.FC<{serverData: serverDataProps}> = ({
 
     const pathname = usePathname();
     const rankStudents = (sponsorId: string) => {
+        showLoader();
         router.push(`${pathname}/${sponsorId}`);
     }
     

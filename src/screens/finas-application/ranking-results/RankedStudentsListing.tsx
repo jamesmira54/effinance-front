@@ -16,6 +16,7 @@ import { MdUpdate } from "react-icons/md";
 import RankedStudentsListingForm from "./RankedStudentsListingForm";
 import { SponsorshipAPIService } from "@/api";
 import { APPLICATION_STAGE } from "@/utils/constant";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const StyledModal = styled(Modal)`
@@ -34,6 +35,7 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
 }) => {
 
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [data, setData] = useState<RankStudentResponse[]>(serverData.rankedStudents || []);
     const [openFormModal, setOpenFormModal] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<any>({} as any);
@@ -78,19 +80,13 @@ const RankedStudentsListing: React.FC<{serverData: serverDataProps}> = ({
         setOpenFormModal(true);
     }
 
-    // const fetchApplications = async () => {
-    //         const res = await SponsorshipAPI.getAllApplications(APPLICATION_STAGE.);
-    //     if (res) {
-    //         setData(res?.applicants || []);
-    //     }
-    // };
-
     const handleSuccess = async (updateItem: any) => {
+        showLoader();
         setSelectedItem(updateItem)
-        // await fetchApplications();
         setTimeout(() => {
             setOpenFormModal(false);
         }, 1000);
+        hideLoader();
     };
 
 

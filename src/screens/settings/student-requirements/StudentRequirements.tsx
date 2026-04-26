@@ -7,12 +7,12 @@ import { CiSquarePlus } from "react-icons/ci";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
-import { CiEdit } from "react-icons/ci";
 import StudentRequirementsForm from "./StudentRequirementsForm";
 import { IoEyeOutline } from "react-icons/io5";
 import { APIFileTypesRes, APIStudentFilesRes } from "@/types";
 import { UploadAPIService } from "@/api";
 import { TableColumn } from "react-data-table-component";
+import { useLoader } from "@/context/LoaderContext";
 
 
 const StyledModal = styled(Modal)`
@@ -30,7 +30,7 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
 }) => {
     
     const uploadAPI = new UploadAPIService();
-    
+    const { showLoader, hideLoader } = useLoader();
 
     const columns: TableColumn<APIStudentFilesRes>[] = useMemo(() => [
         { name: "Requirement", selector: (row: APIStudentFilesRes) => row.filetype, sortable: true },
@@ -68,6 +68,7 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
     }
 
     const onConfirmDelete = async () => {
+        showLoader();
         if (pendingId) {
             
             setOpenActionModal(false);
@@ -78,6 +79,7 @@ const StudentRequirements: React.FC<{fileTypes: APIFileTypesRes, studentId: stri
                 setPendingId(null);
             }
         }
+        hideLoader();
     }
 
     const cancelDelete = () => {
