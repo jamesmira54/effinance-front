@@ -12,7 +12,13 @@ import Button from '@/components/Button';
 import { useRouter } from "next/navigation";
 import Alert from '@/components/Alert';
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { useLoader } from '@/context/LoaderContext';
+import Modal from '@/components/Modal/Modal';
+import styled from 'styled-components';
 
+const ActionModal = styled(Modal)`
+
+`;
 interface CriteriaSetupProps {
   serverData: {
     sponsorshipDetails: SponsorshipDetailsProps;
@@ -22,6 +28,8 @@ interface CriteriaSetupProps {
 }
 
 export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
+
+  const { showLoader, hideLoader } = useLoader();
   const SponsorshipAPI = new SponsorshipAPIService();
   const { sponsorshipDetails, criterionCategories, dataSources } = serverData;
   const allCriterions = criterionCategories.flatMap((cat) => cat.criterions);
@@ -33,6 +41,7 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   const [isError, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
 
   const formatLabel = (name: string) =>
     name
@@ -79,13 +88,14 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
       };
 
       try {
-
+        showLoader();
         let response: any = null;     
         response = await SponsorshipAPI.updateSponsorshipCriterion(sponsorshipDetails.id, payload);
 
         if(response) {
           setError(false);
           setErrorMessage("");
+          setOpenConfirmModal(true);
         }
       }  catch (err: any) {
         setError(true);
@@ -94,10 +104,11 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
         setShowAlert(true);
         const formElemet = document.querySelector('form');
         if(formElemet) {
-            formElemet.scrollIntoView({ behavior: 'smooth' });
+          formElemet.scrollIntoView({ behavior: 'smooth' });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        hideLoader();
       }
 
     }
@@ -182,6 +193,10 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
     router.back();
   };
 
+  const confirmNotif = () => {
+      setOpenConfirmModal(false);
+  };
+
 
   return (
     <div className="p-4 space-y-6">
@@ -244,6 +259,18 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
           </button>
         </div>
       </form>
+
+       <ActionModal isTextCentered={true} title="Update Confirmation" className="max-w-100" isOpen={openConfirmModal} onClose={() => confirmNotif()}>
+          <div className="text-center">
+              <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
+                  Sponsorship Criteria Updated Successfully!
+              </p>
+
+              <div className="flex items-center justify-center w-full gap-6 mt-8">
+                  <Button className="bg-primary" onClick={() => confirmNotif()}> Okay </Button>
+              </div>
+          </div>
+      </ActionModal>
     </div>
   );
 }

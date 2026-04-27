@@ -9,6 +9,7 @@ import { APIStudentListResponse, SiblingRequest } from "@/types";
 import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { FormattedDate } from "@/utils/helpers";
+import { useLoader } from "@/context/LoaderContext";
 
 
 
@@ -18,12 +19,18 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
   }) => {
 
   const router = useRouter();
+  const { showLoader } = useLoader();
 
   const handleBack = () => {
     if (allowRouterBack) {
       router.back();
     } 
   };
+
+  const onEdit = () => {
+    showLoader();
+    router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`);
+  }
 
 
   const PersonalInfo = () => {
@@ -379,18 +386,9 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
         <div className="flex flex-col items-start mb-5">
           {allowRouterBack && <Button startIcon={<IoIosArrowRoundBack/>} onClick={handleBack} variants={'text'}>Go Back</Button> }
           <Tabs tabs={tabData} />
-          <Button className="self-end bg-primary mt-5" variants="default" onClick={() => router.push(`/settings/student-accounts/edit/${studentDetails.studentId}`)} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
+          <Button className="self-end bg-primary mt-5" variants="default" onClick={() => onEdit()} startIcon={<CiEdit size={18}/>}>Edit Student Profile</Button>
         </div>
       </div>
-      {/* <Modal   
-        isFullscreen={true} 
-        title="Edit Personal & Family Background Information" 
-        className="max-w-230" 
-        isOpen={isOpen} 
-        onClose={() => setOpenModal(false)}
-      >
-        <StudentProfileForm/>
-      </Modal> */}
     </>
   );
 };

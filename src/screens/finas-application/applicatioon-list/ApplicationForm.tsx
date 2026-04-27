@@ -33,6 +33,10 @@ const ApplicationForm: React.FC<
     const formik = useFormik<ApplicationFormProps>({
         initialValues,
         enableReinitialize: true,
+        validationSchema: Yup.object({
+            appStatus: Yup.string().required("Application status is required"),
+            remarks: Yup.string().required("Remarks are required"),
+        }),
         onSubmit: async (values, {setSubmitting}) => {
             submitHandler(values, setSubmitting);
             setSubmitting(true);

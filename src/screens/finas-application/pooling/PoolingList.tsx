@@ -40,11 +40,19 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
+
+    const [statusFilter, setStatusFilter] = useState<string>("ALL");
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
 
     useEffect(() => {
         setData(serverData.applications || []);
     }, [serverData.applications]);
+
+    const filteredData = useMemo(() => {
+        if (statusFilter === "ALL") return data;
+
+        return data.filter(item => item.appStatus === statusFilter);
+    }, [data, statusFilter]);
 
     const columns: TableColumn<SponsorshipApplicationResponse>[] = useMemo(() => [
         { name: "Application #", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
@@ -60,7 +68,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
         },
         { name: "Finas Applied", selector: (row:SponsorshipApplicationResponse) => row.finAssname, sortable: true },
         { name: "Date of Application", selector: (row:SponsorshipApplicationResponse) => FormattedDate(row.dateOfApp), sortable: true },
-        { name: <div className="flex justify-center w-full">Attachments</div>, cell: (row:any) => (
+        { name: <div className="flex justify-center w-full">Attachments</div>, cell: (row:SponsorshipApplicationResponse) => (
             <div className="flex justify-center w-full">
                 <Button onClick={() => getAttachments(row.studentId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </div>
@@ -69,7 +77,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
             <div className="flex justify-center w-full">
                 <Badge variants={
                     row.appStatus === APPLICATION_STATUS.PENDING_POOLING ? "warning" : 
-                    row.appStatus === APPLICATION_STATUS.FOLLOW_UP ? "warning" : 
+                    row.appStatus === APPLICATION_STATUS.FOLLOW_UP ? "default" : 
                     row.appStatus === APPLICATION_STATUS.COMPLETE ? "success" : 
                     row.appStatus === APPLICATION_STATUS.REJECTED ? "error" : 
                     "default"}>
@@ -84,7 +92,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
         { name: <div className="flex justify-center w-full">Action</div>, cell: (row:any) => ( 
             <div className="flex justify-center w-full">
                 <div className="flex items-center space-x-4">
-                    <Button onClick={() => handleAction(row)} variants="text" color="warning" startIcon={<MdUpdate size={18}/>}>Update Status</Button>
+                    <Button onClick={() => handleAction(row)} variants="text" color="warning" startIcon={<MdUpdate className="text-success" size={18}/>}>Update Status</Button>
                 </div>
             </div>
         )},
@@ -151,16 +159,48 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <DataTable 
-                  columns={columns} 
-                  data={data} 
-                  pagination 
-                  highlightOnHover 
-                  striped
-              />
+                <div className="flex gap-2 mb-4 flex-wrap">
+                    <Button
+                        className={`!h-2 ${statusFilter === "ALL" ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter("ALL")}
+                    >
+                        All
+                    </Button>
+
+                    <Button
+                        className={`!h-2 ${statusFilter === APPLICATION_STATUS.PENDING_POOLING ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter(APPLICATION_STATUS.PENDING_POOLING)}
+                    >
+                        Pending Pooling
+                    </Button>
+
+                    <Button
+                        className={`!h-2 ${statusFilter === APPLICATION_STATUS.FOLLOW_UP ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter(APPLICATION_STATUS.FOLLOW_UP)}
+                    >
+                        Follow Up
+                    </Button>
+
+                    <Button
+                        className={`!h-2 ${statusFilter === APPLICATION_STATUS.REJECTED ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter(APPLICATION_STATUS.REJECTED)}
+                    >
+                        Rejected
+                    </Button>
+                </div>
+
+                <DataTable 
+                    columns={columns} 
+                    data={filteredData} 
+                    pagination 
+                    highlightOnHover 
+                    striped
+                />
             </div>
-
-
             <StyledModal isFullscreen={false} title="Attachments" className="min-w-125" isOpen={openReqModal} onClose={() => setOpenReqModal(false)}>
                 <ul className="flex flex-col gap-4">
                     {selectedReqs.map((item: APIStudentFilesRes, index) => (
@@ -196,9 +236,6 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
                     />
                 </div>
             </StyledModal>
-            
-
-
         </Fragment>
     )
 };

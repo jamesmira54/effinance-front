@@ -42,17 +42,27 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     const SponsorshipAPI = new SponsorshipAPIService();
     const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
+    const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
     useEffect(() => {
         setData(serverData.applications || []);
     }, [serverData.applications]);
+
+
+    const filteredData = useMemo(() => {
+        if (statusFilter === "ALL") return data;
+
+        return data.filter(item => item.appStatus === statusFilter);
+    }, [data, statusFilter]);
+
+    console.log("Filtered Data: ", filteredData);
 
     const columns: TableColumn<SponsorshipApplicationResponse>[] = useMemo(() => [
         { name: "Application #", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
         { name: "Status", cell: (row:SponsorshipApplicationResponse) => ( 
             <Badge variants={
                 row.appStatus === APPLICATION_STATUS.APPROVED ? "success" : 
-                row.appStatus === APPLICATION_STATUS.PENDING_RANKING_SELECTION ? "success" : 
+                row.appStatus === APPLICATION_STATUS.PENDING_APPLICATION_LIST ? "success" : 
                 "default"}>
                 {(() => {
                     // Format the status string
@@ -160,13 +170,39 @@ const ApplicationList: React.FC<{serverData: serverDataProps}> = ({
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <DataTable 
-                  columns={columns} 
-                  data={data} 
-                  pagination 
-                  highlightOnHover 
-                  striped
-              />
+                <div className="flex gap-2 mb-4 flex-wrap">
+                    <Button
+                        className={`!h-2 ${statusFilter === "ALL" ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter("ALL")}
+                    >
+                        All
+                    </Button>
+
+                    <Button
+                        className={`!h-2 ${statusFilter === APPLICATION_STATUS.APPROVED ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter(APPLICATION_STATUS.APPROVED)}
+                    >
+                        Approved
+                    </Button>
+
+                    <Button
+                        className={`!h-2 ${statusFilter === APPLICATION_STATUS.PENDING_APPLICATION_LIST ? "!bg-primary !text-white" : "bg-transparent"}`}
+                        variants="outlined"
+                        onClick={() => setStatusFilter(APPLICATION_STATUS.PENDING_APPLICATION_LIST)}
+                    >
+                        Pending Application List
+                    </Button>
+                </div>
+
+                <DataTable 
+                    columns={columns} 
+                    data={filteredData} 
+                    pagination 
+                    highlightOnHover 
+                    striped
+                />
             </div>
 
 

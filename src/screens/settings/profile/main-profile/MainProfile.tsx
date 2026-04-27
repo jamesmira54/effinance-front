@@ -148,9 +148,9 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
               </div>
 
               <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">{userDetails.lastName}</p>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"> Last Name </p>
                 <p className="text-sm font-medium text-form-strokedark dark:text-white/90">
-                  Chowdhury
+                  {userDetails.lastName}
                 </p>
               </div>
 
