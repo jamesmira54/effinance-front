@@ -1,9 +1,8 @@
 'use client';
 
 import PairwiseMatrix from './PairwiseMatrix';
-import { Criteria, CriteriaColumnData, CriterionCategory, Pairwise } from './CriteriaSetup.types';
+import { Criteria, CriteriaColumnData, CriterionCategory } from './CriteriaSetup.types';
 import { useFormik } from 'formik';
-import { v4 as uuidv4 } from 'uuid';
 import Select from '@/components/Inputs/Select';
 import { SponsorshipAPIService } from "@/api";
 import { SponsorshipDetailsProps } from '../sponsorship/Sponsorship.types';
@@ -19,6 +18,12 @@ import styled from 'styled-components';
 const ActionModal = styled(Modal)`
 
 `;
+
+type CategoryOption = {
+  label: string;
+  value: string;
+};
+
 interface CriteriaSetupProps {
   serverData: {
     sponsorshipDetails: SponsorshipDetailsProps;
@@ -42,12 +47,24 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(() =>
+    criterionCategories[0]?.id ? [criterionCategories[0].id] : []
+  );
 
   const formatLabel = (name: string) =>
     name
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+
+  const mapCriterion = (criterion: any): Criteria => ({
+    name: criterion.name,
+    label: formatLabel(criterion.name),
+    dataSource: criterion.dataSource || 'CUSTOM_INPUT',
+    formulaType: criterion.formulaType || null,
+    preference: criterion.preference || 'MAX',
+    requiredColumns: criterion.requiredColumns || []
+  });
 
   const defaultCriterions =
     sponsorshipDetails.criterion.length > 0
@@ -66,14 +83,7 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   const formik = useFormik({
     initialValues: {
       criterionCategoryId: criterionCategories[0].id,
-      criteria: (defaultCriterions || []).map((criterion: any) => ({
-        name: criterion.name,
-        label: formatLabel(criterion.name),
-        dataSource: criterion.dataSource || 'CUSTOM_INPUT',
-        formulaType: criterion.formulaType || null,
-        preference: criterion.preference || 'MAX',
-        requiredColumns: criterion.requiredColumns || []
-      })) as Criteria[],
+      criteria: (defaultCriterions || []).map(mapCriterion) as Criteria[],
       pairwise: pairwiseInitial
     },
 
@@ -114,25 +124,50 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
     }
   });
 
-  const handleCategoryChange = (categoryId: string) => {
-    const selectedCategory = criterionCategories.find(
-      (c) => c.id === categoryId
+  const handleCategoryChange = (selectedOptions: CategoryOption | CategoryOption[] | null) => {
+    const options = Array.isArray(selectedOptions)
+      ? selectedOptions
+      : selectedOptions
+        ? [selectedOptions]
+        : [];
+    const nextSelectedIds = options.map((option) => option.value);
+    const newlySelectedIds = nextSelectedIds.filter(
+      (categoryId) => !selectedCategoryIds.includes(categoryId)
+    );
+    const categoriesToAdd = criterionCategories.filter((category) =>
+      newlySelectedIds.includes(category.id)
     );
 
-    if (!selectedCategory) return;
+    setSelectedCategoryIds(nextSelectedIds);
+
+    if (categoriesToAdd.length === 0) return;
+
+    const existingCriteriaNames = new Set(formik.values.criteria.map((criterion) => criterion.name));
+    const criteriaToAdd = categoriesToAdd
+      .flatMap((category) => category.criterions)
+      .filter((criterion: any) => !existingCriteriaNames.has(criterion.name))
+      .map(mapCriterion);
+
+    if (criteriaToAdd.length === 0) return;
+
+    const updatedCriteria = [...formik.values.criteria, ...criteriaToAdd];
+    const updatedPairwise = { ...formik.values.pairwise };
+
+    updatedCriteria.forEach((row) => {
+      updatedCriteria.forEach((col) => {
+        const key = `${row.name}|${col.name}`;
+
+        if (row.name === col.name && !(key in updatedPairwise)) {
+          updatedPairwise[key] = 1;
+        }
+      });
+    });
 
     formik.setValues({
-      criterionCategoryId: selectedCategory.id,
-      criteria: selectedCategory.criterions.map((criterion: any) => ({
-        id: criterion.id || uuidv4(),
-        name: criterion.name,
-        label: formatLabel(criterion.name),
-        dataSource: 'CUSTOM_INPUT',
-        formulaType: null,
-        preference: 'MAX',
-        requiredColumns: []
-      })),
-      pairwise: {} as Record<string, number> // reset pairwise when switching
+      ...formik.values,
+      criterionCategoryId: categoriesToAdd[categoriesToAdd.length - 1].id,
+      criteria: updatedCriteria,
+      pairwise: updatedPairwise
     });
   };
 
@@ -165,19 +200,10 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
   }, [criterionCategories]);
 
   const selectedCategory = useMemo(() => {
-    if (!formik.values.criterionCategoryId) return null;
-
-    const found = criterionCategories.find(
-      (cat) => cat.id === formik.values.criterionCategoryId
+    return categoryOptions.filter((option) =>
+      selectedCategoryIds.includes(option.value)
     );
-
-    if (!found) return null;
-
-    return {
-      label: found.name.replace(/\b\w/g, (c) => c.toUpperCase()),
-      value: found.id,
-    };
-  }, [formik.values.criterionCategoryId, criterionCategories]);
+  }, [categoryOptions, selectedCategoryIds]);
 
 
   useEffect(() => {
@@ -226,9 +252,9 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
             name="criterionCategory"
             label=""
             options={ categoryOptions }
-            isMultiple={false}
+            isMultiple={true}
             value={ selectedCategory }
-            onChange={(option) => handleCategoryChange(option?.value || '')}
+            onChange={(option) => handleCategoryChange(option as CategoryOption | CategoryOption[] | null)}
             className='w-full'
           />
         </div>

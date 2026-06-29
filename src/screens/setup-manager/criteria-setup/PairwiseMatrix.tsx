@@ -353,7 +353,7 @@ export default function PairwiseMatrix({ formik, studentColumns, sponsorAppColum
 
       {/* --- PAIRWISE pairwise TABLE --- */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Pairwise pairwise</h3>
+        <h3 className="text-lg font-semibold mb-4">Pairwise</h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-center border-collapse">

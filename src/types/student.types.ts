@@ -90,18 +90,18 @@ export interface APIStudentListResponse {
     emergencyContactName2: string;
     emergencyContactNumber2: string;
     gwa?: number;
-    siblings: SiblingRequest[];
+    siblings?: SiblingRequest[];
 }
 
 
 export interface SiblingRequest {
-    name?: string;
-    birthdate?: string;
-    age?: number;
-    status?: string;
-    remarks?: string;
-    livingWithParents?: boolean;
-    ownHouse?: boolean;
+    studentId: string;
+    siblingName: string;
+    siblingBdate: Date;
+    siblingAge: number;
+    siblingStatus: string;
+    livingWithParents: boolean;
+    ownHouse: boolean;
 }
 
 export interface APIStudentFilesRes {
