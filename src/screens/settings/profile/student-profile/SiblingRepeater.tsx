@@ -4,22 +4,23 @@ import Input from "@/components/Inputs/Input";
 import CheckBox from "@/components/Checkboxes";
 
 const emptySibling: SiblingRequest = {
-  name: "",
-  birthdate: "",
-  age: undefined,
-  status: "",
-  remarks: "",
+  studentId: "",
+  siblingName: "",
+  siblingBdate: new Date(),
+  siblingAge: 0,
+  siblingStatus: "",
   livingWithParents: false,
   ownHouse: false,
 };
 
 interface SiblingRepeaterProps {
-    siblingsSet?: SiblingRequest[];
+    siblingsSet: SiblingRequest[];
     setSiblingsInit?: (siblings: SiblingRequest[]) => void;
+    studentId: string;
 }
 
 
-const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSiblingsInit }) => {
+const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSiblingsInit, studentId }) => {
     const [siblings, setSiblings] = useState<SiblingRequest[]>([]);
     const initialized = useRef(false);
 
@@ -39,7 +40,7 @@ const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSibli
     
     const handleChange = (index: number, field: keyof SiblingRequest, value: any) => {
       const updatedSiblings = [...siblings];
-      updatedSiblings[index][field] = value;
+      (updatedSiblings[index][field] as typeof value) = value;
       setSiblings(updatedSiblings);
     };
   
@@ -63,36 +64,36 @@ const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSibli
               <Input
                 type="text"
                 placeholder="Name"
-                value={sibling.name || ""}
-                onChange={(e) => handleChange(index, "name", e.target.value)}
+                value={studentId}
+                onChange={(e) => handleChange(index, "studentId", e.target.value)}
+                className="input"
+              />
+              <Input
+                type="text"
+                placeholder="Name"
+                value={sibling.siblingName || ""}
+                onChange={(e) => handleChange(index, "siblingName", e.target.value)}
                 className="input"
               />
               <Input
                 type="date"
                 placeholder="Birthdate"
-                value={sibling.birthdate || ""}
-                onChange={(e) => handleChange(index, "birthdate", e.target.value)}
+                value={sibling.siblingBdate ? sibling.siblingBdate.toISOString().split("T")[0] : ""}
+                onChange={(e) => handleChange(index, "siblingBdate", new Date(e.target.value))}
                 className="input"
               />
               <Input
                 type="number"
                 placeholder="Age"
-                value={sibling.age || ""}
-                onChange={(e) => handleChange(index, "age", parseInt(e.target.value) || 0)}
+                value={sibling.siblingAge || ""}
+                onChange={(e) => handleChange(index, "siblingAge", parseInt(e.target.value) || 0)}
                 className="input"
               />
               <Input
                 type="text"
                 placeholder="Status"
-                value={sibling.status || ""}
-                onChange={(e) => handleChange(index, "status", e.target.value)}
-                className="input"
-              />
-              <Input
-                type="text"
-                placeholder="Remarks"
-                value={sibling.remarks || ""}
-                onChange={(e) => handleChange(index, "remarks", e.target.value)}
+                value={sibling.siblingStatus || ""}
+                onChange={(e) => handleChange(index, "siblingStatus", e.target.value)}
                 className="input"
               />
               <div className="flex items-center gap-2">
@@ -127,6 +128,7 @@ const SiblingRepeater: React.FC<SiblingRepeaterProps> = ({ siblingsSet, setSibli
         ))}
   
         <button
+          type="button"
           onClick={addSibling}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
         >

@@ -231,11 +231,6 @@ const StudentProfileForm: React.FC<
         }
       };
 
-
-
-
-
-
     return(
         <>
             <form onSubmit={formik.handleSubmit}>
@@ -620,6 +615,27 @@ const StudentProfileForm: React.FC<
                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Select 
                                 className="z-99"
+                                id="permanentRegionId"
+                                name="permanentRegionId"
+                                label="Permanent Region" 
+                                options={regionData} 
+                                isMultiple={false} 
+                                value={regionData.find(opt => opt.value.id === formik.values.permanentRegionId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                        formik.setFieldValue("permanentRegionId", option.value.id);
+                                    } else {
+                                        formik.setFieldValue("permanentRegionId", null);
+                                    }
+                                }}
+                                error={formik.touched.permanentRegionId && formik.errors.permanentRegionId ? true : false}
+                                errorMessage={formik.errors.permanentRegionId}
+                            />
+                        </div>
+
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
                                 id="permanentProvinceId"
                                 name="permanentProvinceId"
                                 label="Permanent Province" 
@@ -628,10 +644,10 @@ const StudentProfileForm: React.FC<
                                 value={provinceData.find(opt => opt.value.id === formik.values.permanentProvinceId) || null}
                                 onChange={(option) => {
                                     if (option) {
-                                    formik.setFieldValue("permanentProvinceId", option.value.id);
-                                    setPermanentCityMunOptions([]);
-                                    setPermanentBrgyOptions([]);
-                                    handlePermanetProvinceChange(option);
+                                        formik.setFieldValue("permanentProvinceId", option.value.id);
+                                        setPermanentCityMunOptions([]);
+                                        setPermanentBrgyOptions([]);
+                                        handlePermanetProvinceChange(option);
                                     } else {
                                     formik.setFieldValue("permanentProvinceId", null);
                                     }
@@ -686,7 +702,9 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
 
-                        <div className="w-full md:w-[48%] xl:w-1/3">
+                    </div>
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Input 
                                 id="permanentStreet"
                                 label="Primary Street" 
@@ -700,33 +718,6 @@ const StudentProfileForm: React.FC<
                                 errorMessage={formik.errors.permanentStreet}
                             />
                         </div>
-
-                    </div>
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Select 
-                                className="z-99"
-                                id="permanentRegionId"
-                                name="permanentRegionId"
-                                label="Permanent Region" 
-                                options={regionData} 
-                                isMultiple={false} 
-                                value={regionData.find(opt => opt.value.id === formik.values.permanentRegionId) || null}
-                                onChange={(option) => {
-                                    if (option) {
-                                    formik.setFieldValue("permanentRegionId", option.value.id);
-                                    setPermanentCityMunOptions([]);
-                                    setPermanentBrgyOptions([]);
-                                    handlePermanetProvinceChange(option);
-                                    } else {
-                                    formik.setFieldValue("permanentRegionId", null);
-                                    }
-                                }}
-                                error={formik.touched.permanentRegionId && formik.errors.permanentRegionId ? true : false}
-                                errorMessage={formik.errors.permanentRegionId}
-                            />
-                        </div>
-
                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Input 
                                 id="permanentZipCode"
@@ -764,6 +755,27 @@ const StudentProfileForm: React.FC<
                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Select 
                                 className="z-99"
+                                id="currentRegionId"
+                                name="currentRegionId"
+                                label="Current Region" 
+                                options={regionData} 
+                                isMultiple={false} 
+                                value={regionData.find(opt => opt.value.id === formik.values.currentRegionId) || null}
+                                onChange={(option) => {
+                                    if (option) {
+                                        formik.setFieldValue("currentRegionId", option.value.id);
+                                    } else {
+                                        formik.setFieldValue("currentRegionId", null);
+                                    }
+                                }}
+                                error={formik.touched.currentRegionId && formik.errors.currentRegionId ? true : false}
+                                errorMessage={formik.errors.currentRegionId}
+                            />
+                        </div>
+
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Select 
+                                className="z-99"
                                 id="currentProvinceId"
                                 name="currentProvinceId"
                                 label="Current Province" 
@@ -782,7 +794,6 @@ const StudentProfileForm: React.FC<
                                 }}
                                 error={formik.touched.currentProvinceId && formik.errors.currentProvinceId ? true : false}
                                 errorMessage={formik.errors.currentProvinceId}
-                                // isLoading={isLoading}
                             />
                         </div>
                         
@@ -831,7 +842,9 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
 
+                    </div>
 
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/3">
                             <Input 
                                 id="currentStreet"
@@ -844,34 +857,6 @@ const StudentProfileForm: React.FC<
                                 onBlur={() => formik.handleBlur}
                                 error={formik.touched.currentStreet && formik.errors.currentStreet ? true : false}
                                 errorMessage={formik.errors.currentStreet}
-                            />
-                            
-                        </div>
-
-                    </div>
-
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Select 
-                                className="z-99"
-                                id="currentRegionId"
-                                name="currentRegionId"
-                                label="Current Region" 
-                                options={regionData} 
-                                isMultiple={false} 
-                                value={regionData.find(opt => opt.value.id === formik.values.currentRegionId) || null}
-                                onChange={(option) => {
-                                    if (option) {
-                                    formik.setFieldValue("currentRegionId", option.value.id);
-                                    setPermanentCityMunOptions([]);
-                                    setPermanentBrgyOptions([]);
-                                    handlePermanetProvinceChange(option);
-                                    } else {
-                                    formik.setFieldValue("currentRegionId", null);
-                                    }
-                                }}
-                                error={formik.touched.currentRegionId && formik.errors.currentRegionId ? true : false}
-                                errorMessage={formik.errors.currentRegionId}
                             />
                         </div>
 
@@ -1362,7 +1347,7 @@ const StudentProfileForm: React.FC<
                             <Input 
                                 id="numberOfSiblings"
                                 label="Number of Siblings" 
-                                type="text" 
+                                type="number" 
                                 placeholder="Number of Siblings" 
                                 name="numberOfSiblings"
                                 value={formik.values.numberOfSiblings}
@@ -1373,7 +1358,7 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
                     </div>
-                    <SiblingRepeater siblingsSet={formik.values.siblings} setSiblingsInit={(siblings) => formik.setFieldValue('siblings', siblings)} />
+                    <SiblingRepeater studentId={studentDetails.studentId} siblingsSet={formik.values.siblings ?? []} setSiblingsInit={(siblings) => formik.setFieldValue('siblings', siblings)} />
                 </Collapsible>
 
                 <Collapsible title="Others">

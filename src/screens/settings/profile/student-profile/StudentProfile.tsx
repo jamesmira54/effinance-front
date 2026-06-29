@@ -362,7 +362,7 @@ const StudentProfile: React.FC<{studentDetails: APIStudentListResponse, allowRou
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Siblings</p>
                   {studentDetails.siblings?.map((sibling: SiblingRequest, index) => (
-                    <p key={index} className="text-sm font-medium text-form-strokedark dark:text-white/90">{sibling.name}</p>
+                    <p key={index} className="text-sm font-medium text-form-strokedark dark:text-white/90">{sibling.siblingName}</p>
                   ))}
                 </div>
               </div>

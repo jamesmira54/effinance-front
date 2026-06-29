@@ -1,4 +1,5 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
+import { SiblingRequest } from "@/types";
 
 export interface StudentProfileFormProps {
   userId: string;
@@ -72,15 +73,4 @@ export interface StudentProfileFormProps {
   numberOfSiblings?: number;
   siblings?: SiblingRequest[];
   gwa?: number;
-}
-
-
-export interface SiblingRequest {
-    name?: string;
-    birthdate?: string;
-    age?: number;
-    status?: string;
-    remarks?: string;
-    livingWithParents?: boolean;
-    ownHouse?: boolean;
 }
