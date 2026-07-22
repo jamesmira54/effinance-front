@@ -1,4 +1,4 @@
-import { SponsorshipAPIService, AnnouncementsAPIService, AddressAPIService } from "@/api";
+import { SponsorshipAPIService, AnnouncementsAPIService, AddressAPIService, AuthAPIService } from "@/api";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import AnnouncementsList from "@/screens/announcements/AnnouncementsList";
 import { AnnouncementsListProps } from "@/types";
@@ -8,9 +8,14 @@ export const metadata: Metadata = {
   title: "Effinance - Announcements",
 };
 
+const authAPI = new AuthAPIService();
 const AnnouncementsAPI = new AnnouncementsAPIService();
 const SponsorshipsAPI = new SponsorshipAPIService();
 const AddressAPI = new AddressAPIService();
+
+const fetchUserSession = async () => {
+  return await authAPI.me();
+}
 
 const getAnnouncementsData = async () => {
   const response = await AnnouncementsAPI.getAnnouncements({ offset: 0, limit: 50, mine: true });
@@ -35,7 +40,7 @@ const Announcements = async () => {
   let finalAnnouncementsData: AnnouncementsListProps[] = [];
 
   if(announcementsData) {
-    announcementsData.forEach(async (announcement: any) => {
+    announcementsData.forEach((announcement: any) => {
       const sponsorship = allSponsorships.find((sponsorship: any) => sponsorship.id === announcement.sponsorshipId);
       if(sponsorship) {
         announcement.sponsorshipName = sponsorship.name;
@@ -43,17 +48,20 @@ const Announcements = async () => {
       finalAnnouncementsData.push(announcement);
     });
   }
+  
+  const userDetails = await fetchUserSession();
 
   const serverData = {
-    announcements: announcementsData || [],
+    userSession: userDetails || {},
+    announcements: finalAnnouncementsData || [],
     provinces: provinces || [],
-    allSponsorships: allSponsorships || [],
+    allSponsorships: allSponsorships || [], 
   }
 
   return (
     <>
       <Breadcrumb pageName="Announcements" />
-      <AnnouncementsList serverData={serverData}/>
+      <AnnouncementsList serverData={serverData as any}/>
     </>
   );
 };

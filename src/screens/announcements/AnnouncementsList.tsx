@@ -7,7 +7,7 @@ import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import { FaRegEye } from "react-icons/fa6";
 import Badge from "@/components/Badge/Badge";
-import { AnnouncementDetailsProps, AnnouncementsListProps } from "@/types";
+import { AnnouncementDetailsProps, AnnouncementsListProps, APILoginResponse, APIModuleProps } from "@/types";
 import { TableColumn } from "react-data-table-component";
 import AnnouncementsView from "./AnnouncementsView";
 import { AnnouncementsAPIService } from "@/api";
@@ -27,14 +27,10 @@ const StyledModal = styled(Modal)`
 
 
 interface serverDataProps {
+    userSession: APILoginResponse;
     announcements: AnnouncementsListProps[];
     provinces: ProvinceProps[], 
     allSponsorships: APISponsorshipListResponse[],
-}
-
-interface selectOptionsData {
-    provinces: ProvinceProps[], 
-    sponsorships: APISponsorshipListResponse[],
 }
 
 
@@ -42,6 +38,9 @@ const AnnouncementsList: React.FC<{serverData: serverDataProps}> = ({
     serverData
 }) => {
 
+    console.log("serverData", serverData);
+
+    const isAdmin = serverData.userSession.studentId === null;
     const loadServerData = {
         provinces: serverData.provinces,
         sponsorships: serverData.allSponsorships
@@ -181,7 +180,9 @@ const AnnouncementsList: React.FC<{serverData: serverDataProps}> = ({
                   highlightOnHover 
                   striped
               />
-              <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+              {isAdmin && (
+                <Button onClick={() => handleAddNew()} style={{marginTop: '30px'}} startIcon={<CiSquarePlus size={24}/>} className="bg-primary">Add New</Button>
+              )}    
             </div>
 
             <StyledModal isFullscreen={true} title="Creating Announcement" className="max-w-180" isOpen={openFormModal} onClose={() => setOpenFormModal(false)}>

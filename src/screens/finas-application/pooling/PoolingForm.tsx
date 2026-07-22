@@ -35,7 +35,11 @@ const PoolingForm: React.FC<
         enableReinitialize: true,
         validationSchema: Yup.object({
             appStatus: Yup.string().required("Application status is required"),
-            remarks: Yup.string().required("Remarks are required"),
+            remarks: Yup.string().when("appStatus", {
+                is: APPLICATION_STATUS.COMPLETE,
+                then: (schema) => schema.notRequired(),
+                otherwise: (schema) => schema.required("Remarks are required"),
+            }),
         }),
         onSubmit: async (values, {setSubmitting}) => {
             submitHandler(values, setSubmitting);
@@ -124,6 +128,9 @@ const PoolingForm: React.FC<
                             onBlur={formik.handleBlur}
                             name="remarks"
                         ></textarea>
+                        {formik.touched.remarks && formik.errors.remarks && (
+                            <p className="mt-2 text-sm text-danger">{formik.errors.remarks}</p>
+                        )}
                     </div>
                 </div>
 

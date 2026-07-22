@@ -19,6 +19,36 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import Button from "@/components/Button";
 import { BrgyProps, CityMunProps, ProvinceProps, RegionProps, SchoolDataProps } from "@/screens/setup-manager/school/School.types";
 
+
+const genderOption: SelectOption[] = [
+    { value: "Female", label: "Female" },
+    { value: "Male", label: "Male" }
+];
+
+const academicTrackOption: SelectOption[] = [
+    { value: "ABM", label: "ABM (Accountancy, Business and Management)" },
+    { value: "STEM", label: "STEM (Science, Technology, Engineering, and Mathematics)" },
+    { value: "HUMSS", label: "HUMSS (Humanities and Social Sciences)" },
+    { value: "GAS", label: "GAS (General Academic Strand)" },
+    { value: "TVL", label: "TVL (Technical-Vocational-Livelihood)" },
+];
+
+const awardHonorOption: SelectOption[] = [
+    { value: "With Highest Honor", label: "With Highest Honor" },
+    { value: "With High Honor", label: "With High Honor" },
+    { value: "With Honor", label: "With Honor" },
+    { value: "Sports Excellence Award", label: "Sports Excellence Award" },
+];
+
+const collegeYearLevelOption: SelectOption[] = [
+    { value: "1", label: "1st Year Baccalaureate" },
+    { value: "2", label: "2nd Year Baccalaureate" },
+    { value: "3", label: "3rd Year Baccalaureate" },
+    { value: "4", label: "4th Year Baccalaureate" },
+    { value: "5", label: "5th Year Baccalaureate" },
+    { value: "6", label: "6th Year Baccalaureate" },
+];
+
 const StudentProfileForm: React.FC<
     {
         studentDetails: APIStudentListResponse, 
@@ -66,6 +96,7 @@ const StudentProfileForm: React.FC<
         value: school.id,
     }));
 
+    console.log("initial studentDetails:", studentDetails);
 
     const formik = useFormik<StudentProfileFormProps>({
         initialValues: { 
@@ -126,7 +157,6 @@ const StudentProfileForm: React.FC<
             motherFirstName: studentDetails.motherMaidenFirstName,
             motherMiddleName: studentDetails.motherMaidenMiddleName,
             motherLastName: studentDetails.motherMaidenLastName,
-            motherExtension: studentDetails.motherMaidenExtension,
             motherOccupation: studentDetails.motherOccupation,
             motherIncome: studentDetails.motherIncome,
             motherMobileNumber: studentDetails.motherMobileNumber,
@@ -350,15 +380,20 @@ const StudentProfileForm: React.FC<
                             </div>
 
                             <div className="w-full md:w-[48%] xl:w-1/3">
-                                <Input 
+                                <Select 
                                     id="sex"
-                                    label="Sex" 
-                                    type="text" 
-                                    placeholder="Sex" 
                                     name="sex"
-                                    value={formik.values.sex}
-                                    onChange={formik.handleChange}
-                                    onBlur={() => formik.handleBlur}
+                                    label="Sex" 
+                                    options={genderOption} 
+                                    isMultiple={false} 
+                                    value={genderOption.find(opt => opt.value === formik.values.sex) || null}
+                                    onChange={(option) => {
+                                        if (option && !Array.isArray(option) && "value" in option) {
+                                            formik.setFieldValue("sex", option.value);
+                                        } else {
+                                            formik.setFieldValue("sex", "");
+                                        }
+                                    }}
                                     error={formik.touched.sex && formik.errors.sex ? true : false}
                                     errorMessage={formik.errors.sex}
                                 />
@@ -431,15 +466,20 @@ const StudentProfileForm: React.FC<
                 <Collapsible title="Academic Information (Grade 12)">
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
+                            <Select 
                                 id="g12AcademicStrand"
-                                label="Academic Strand" 
-                                type="text" 
-                                placeholder="Academic Stran" 
                                 name="g12AcademicStrand"
-                                value={formik.values.g12AcademicStrand}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
+                                label="Academic Track" 
+                                options={academicTrackOption} 
+                                isMultiple={false} 
+                                value={academicTrackOption.find(opt => opt.value === formik.values.g12AcademicStrand) || null}
+                                onChange={(option) => {
+                                    if (option && !Array.isArray(option) && "value" in option) {
+                                        formik.setFieldValue("g12AcademicStrand", option.value);
+                                    } else {
+                                        formik.setFieldValue("g12AcademicStrand", "");
+                                    }
+                                }}
                                 error={formik.touched.g12AcademicStrand && formik.errors.g12AcademicStrand ? true : false}
                                 errorMessage={formik.errors.g12AcademicStrand}
                             />
@@ -459,15 +499,20 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
                         <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
+                            <Select 
                                 id="g12AwardHonor"
-                                label="Award/Honor" 
-                                type="text" 
-                                placeholder="Award/Honor" 
                                 name="g12AwardHonor"
-                                value={formik.values.g12AwardHonor}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
+                                label="Award/Honor" 
+                                options={awardHonorOption} 
+                                isMultiple={false} 
+                                value={awardHonorOption.find(opt => opt.value === formik.values.g12AwardHonor) || null}
+                                onChange={(option) => {
+                                    if (option && !Array.isArray(option) && "value" in option) {
+                                        formik.setFieldValue("g12AwardHonor", option.value);
+                                    } else {
+                                        formik.setFieldValue("g12AwardHonor", "");
+                                    }
+                                }}
                                 error={formik.touched.g12AwardHonor && formik.errors.g12AwardHonor ? true : false}
                                 errorMessage={formik.errors.g12AwardHonor}
                             />
@@ -524,6 +569,22 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
                     </div>
+                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
+                        <div className="w-full md:w-[48%] xl:w-1/3">
+                            <Input 
+                                id="gwa"
+                                label="GWA" 
+                                type="text" 
+                                placeholder="GWA" 
+                                name="gwa"
+                                value={formik.values.gwa}
+                                onChange={formik.handleChange}
+                                onBlur={() => formik.handleBlur}
+                                error={formik.touched.gwa && formik.errors.gwa ? true : false}
+                                errorMessage={formik.errors.gwa}
+                            />
+                        </div>
+                    </div>
                 </Collapsible>
 
                 <Collapsible title="Academic Information (College)">
@@ -543,15 +604,20 @@ const StudentProfileForm: React.FC<
                             />
                         </div>
                         <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
+                            <Select 
                                 id="collegeYearLevel"
-                                label="Year Level" 
-                                type="text" 
-                                placeholder="Year Level" 
                                 name="collegeYearLevel"
-                                value={formik.values.collegeYearLevel}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
+                                label="Year Level" 
+                                options={collegeYearLevelOption} 
+                                isMultiple={false} 
+                                value={collegeYearLevelOption.find(opt => Number(opt.value ?? "") === Number(formik.values.collegeYearLevel)) || null}
+                                onChange={(option) => {
+                                    if (option && !Array.isArray(option) && "value" in option) {
+                                        formik.setFieldValue("collegeYearLevel", option.value);
+                                    } else {
+                                        formik.setFieldValue("collegeYearLevel", "");
+                                    }
+                                }}
                                 error={formik.touched.collegeYearLevel && formik.errors.collegeYearLevel ? true : false}
                                 errorMessage={formik.errors.collegeYearLevel}
                             />
@@ -569,6 +635,8 @@ const StudentProfileForm: React.FC<
                                 error={formik.touched.collegeAwardHonor && formik.errors.collegeAwardHonor ? true : false}
                                 errorMessage={formik.errors.collegeAwardHonor}
                             />
+
+
                         </div>
                     </div>
 
@@ -1130,7 +1198,7 @@ const StudentProfileForm: React.FC<
                     </div>
                 </Collapsible>
 
-                <Collapsible title="Mother's Information">
+                <Collapsible title="Mother's Information (Maiden)">
                     <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                         <div className="w-full md:w-[48%] xl:w-1/4">
                             <Input 
@@ -1172,20 +1240,6 @@ const StudentProfileForm: React.FC<
                                 onBlur={() => formik.handleBlur}
                                 error={formik.touched.motherLastName && formik.errors.motherLastName ? true : false}
                                 errorMessage={formik.errors.motherLastName}
-                            />
-                        </div>
-                        <div className="w-full md:w-[48%] xl:w-1/4">
-                            <Input 
-                                id="motherExtension"
-                                label="Name Extension" 
-                                type="text" 
-                                placeholder="Name Extension" 
-                                name="motherExtension"
-                                value={formik.values.motherExtension}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.motherExtension && formik.errors.motherExtension ? true : false}
-                                errorMessage={formik.errors.motherExtension}
                             />
                         </div>
                     </div>
@@ -1360,26 +1414,6 @@ const StudentProfileForm: React.FC<
                     </div>
                     <SiblingRepeater studentId={studentDetails.studentId} siblingsSet={formik.values.siblings ?? []} setSiblingsInit={(siblings) => formik.setFieldValue('siblings', siblings)} />
                 </Collapsible>
-
-                <Collapsible title="Others">
-                    <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-                        <div className="w-full md:w-[48%] xl:w-1/3">
-                            <Input 
-                                id="gwa"
-                                label="GWA" 
-                                type="text" 
-                                placeholder="GWA" 
-                                name="gwa"
-                                value={formik.values.gwa}
-                                onChange={formik.handleChange}
-                                onBlur={() => formik.handleBlur}
-                                error={formik.touched.gwa && formik.errors.gwa ? true : false}
-                                errorMessage={formik.errors.gwa}
-                            />
-                        </div>
-                    </div>
-                </Collapsible>
-
 
                 <div className="flex justify-end mt-5">
                     {formik.isSubmitting ? 
