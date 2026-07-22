@@ -10,3 +10,4 @@ export { default as SponsorshipAPIService } from './sponsorships-api';
 export { default as ApplicationAPIService } from './application-api';
 export { default as DashboardAPIService } from './dashboard-api';
 export { default as AnnouncementsAPIService } from './announcements-api';
+export { default as ScheduleAPIService } from './schedules-api';

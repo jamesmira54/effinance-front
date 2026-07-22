@@ -164,12 +164,12 @@ export const MENU_ITEMS: MenuItem[] = [
       },
       {
         id: 'schedules',
-        label: 'Schedules',
+        label: 'Schedule',
         route: '/setup-manager/schedules',
-        roles: ['admin'],
+        roles: ['admin', 'coordinator'],
       }
     ],
-    roles: ['admin', 'sponsor'],
+    roles: ['admin', 'sponsor', 'coordinator'],
   },
   {
     id: 'manage-report',
