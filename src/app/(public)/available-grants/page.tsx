@@ -17,11 +17,21 @@ const formatDate = (value: string) => {
 export default async function AvailableGrantsPage() {
   const publicSponsorshipAPI = new PublicSponsorshipAPIService();
 
-  const sponsorships = await publicSponsorshipAPI.getSponsorships();
-   
+  let sponsorships;
+
+  try {
+    sponsorships = await publicSponsorshipAPI.getSponsorships();
+
+    if (!Array.isArray(sponsorships?.data) || sponsorships.data.length === 0) {
+      throw new Error("Sponsorship response is empty");
+    }
+  } catch (error) {
+    console.error("Failed to fetch sponsorships:", error);
+    sponsorships = { data: [] };
+  }
+
   const activeSponsorships = Array.isArray(sponsorships?.data)
-    ? sponsorships.data
-        .slice(0, 15)
+    ? sponsorships.data.slice(0, 15)
     : [];
 
   console.log("Active Sponsorships:", activeSponsorships);
