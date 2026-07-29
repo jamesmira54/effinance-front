@@ -179,6 +179,13 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: ['admin', 'coordinator',],
   },
   {
+    id: 'monitoring-list',
+    icon: IoNewspaperOutline,
+    label: 'Monitoring List',
+    route: '/monitoring-list',
+    roles: ['admin', 'coordinator', 'sponsor'],
+  },
+  {
     id: 'settings',
     icon: CiSettings,
     label: "Settings",

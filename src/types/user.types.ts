@@ -8,6 +8,7 @@ export interface APIUserProfileResponse {
     email: string;
     userTypeId: string;
     userType: string;
+    profileImageLink?: string | null;
 }
 
 export interface APIUserListResponse {
@@ -58,6 +59,7 @@ export interface APIUserUpdateResponse {
     email: string;
     userTypeId: string;
     userType: string;
+    profileImageLink?: string | null;
 }
 
 export interface APIUserResponse {

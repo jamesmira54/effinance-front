@@ -11,3 +11,6 @@ export { default as ApplicationAPIService } from './application-api';
 export { default as DashboardAPIService } from './dashboard-api';
 export { default as AnnouncementsAPIService } from './announcements-api';
 export { default as ScheduleAPIService } from './schedules-api';
+export { default as MonitoringAPIService } from './monitoring-api';
+export { default as PublicSponsorshipAPIService } from './public-sponsorships-api';
+export { default as PublicAnnouncementsAPIService } from './public-announcements-api';

@@ -1,6 +1,15 @@
 import { AppliedSponsorshipDetailResponse } from "@/types/sponsorship.types";
 import { FormattedDate } from "@/utils/helpers";
 
+const formatStatus = (status: unknown) => {
+    if (typeof status !== "string") return "Unknown";
+
+    return status
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 const AppliedViewing: React.FC<{details: AppliedSponsorshipDetailResponse}> = ({
     details
 }) => {
@@ -24,11 +33,7 @@ const AppliedViewing: React.FC<{details: AppliedSponsorshipDetailResponse}> = ({
             <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                 <div className="w-full">
                     <p>Status: <span className="font-bold">
-                        {details.sponsorshipStatus
-                            .toLowerCase()
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char: string) => char.toUpperCase())
-                        }
+                        {formatStatus(details.sponsorshipStatus)}
                     </span></p>
                 </div>
             </div>
@@ -44,7 +49,7 @@ const AppliedViewing: React.FC<{details: AppliedSponsorshipDetailResponse}> = ({
             </div>
             <div className="flex flex-col mb-4 gap-6 xl:flex-row">
                 <div className="w-full">
-                    <p>Application Date: <span className="font-bold">{FormattedDate(details.applicationDate)}</span></p>
+                    <p>Application Date: <span className="font-bold">{details.applicationDate ? FormattedDate(details.applicationDate) : "—"}</span></p>
                 </div>
             </div>
         </>

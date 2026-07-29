@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import Modal from "@/components/Modal";
 import MainProfileForm from "./MainProfileForm";
 import Button from "@/components/Button";
@@ -9,6 +9,10 @@ import { APIUserProfileResponse, APIUserRoles } from "@/types";
 import { MainProfileFormProps } from "./MainProfile.types";
 import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { MdOutlinePhotoCamera } from "react-icons/md";
+import { UserAPIService } from "@/api";
+import Alert from "@/components/Alert";
+import Throbber from "@/components/common/Throbber";
 
 
 const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUserRoles[], allowRouterBack: boolean}> = ({
@@ -19,7 +23,14 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
 
   
   const [isOpen, setOpenModal] = useState<boolean>(false);
+  const [profileImage, setProfileImage] = useState(userDetails.profileImageLink || "/images/user/user-01.png");
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState("");
+  const [imageSuccess, setImageSuccess] = useState("");
+  const [isSavingImage, setIsSavingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const userAPI = new UserAPIService();
 
   const formData:MainProfileFormProps = {
     userId: userDetails.userId,
@@ -30,12 +41,68 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
     email: userDetails.email,
     mobileNumber: userDetails.mobileNumber || undefined,
     roleId: userDetails.userType ? { label: userDetails.userType, value: userDetails.userTypeId } : null,
+    profileImageLink: userDetails.profileImageLink || null,
   };
 
   const handleBack = () => {
     if (allowRouterBack) {
       router.back();
     } 
+  };
+
+  const handleImageSelection = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    setImageError("");
+    setImageSuccess("");
+
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setImageError("Please select a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("Profile image must be 5 MB or smaller.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setPendingImage(reader.result);
+      }
+    };
+    reader.onerror = () => setImageError("Unable to read the selected image.");
+    reader.readAsDataURL(file);
+  };
+
+  const saveProfileImage = async () => {
+    if (!pendingImage) return;
+    setIsSavingImage(true);
+    setImageError("");
+    setImageSuccess("");
+    try {
+      const response = await userAPI.updateProfile(userDetails.userId, {
+        userId: userDetails.userId,
+        username: userDetails.username,
+        firstName: userDetails.firstName,
+        middleName: userDetails.middleName || undefined,
+        lastName: userDetails.lastName,
+        email: userDetails.email,
+        mobileNumber: userDetails.mobileNumber || undefined,
+        roleId: userDetails.userTypeId,
+        profileImageLink: pendingImage,
+      });
+      const savedImage = response?.profileImageLink || pendingImage;
+      setProfileImage(savedImage);
+      setPendingImage(null);
+      setImageSuccess("Profile image updated successfully.");
+      router.refresh();
+    } catch (error: any) {
+      setImageError(error?.response?.data?.description || error?.response?.data?.errorMessage || "Unable to update the profile image.");
+    } finally {
+      setIsSavingImage(false);
+    }
   };
 
   
@@ -50,14 +117,22 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
             </h4>
 
             <div className="flex flex-col items-center w-full gap-6 xl:flex-row mb-5 justify-between">
-              <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
+              <div className="relative h-24 w-24 shrink-0">
+                <div className="h-24 w-24 overflow-hidden rounded-full border border-gray-200 bg-gray-100 dark:border-gray-800">
                 <Image
-                  width={80}
-                  height={80}
-                  src={"/images/user/user-01.png"}
-                  alt="user"
+                  width={96}
+                  height={96}
+                  src={pendingImage || profileImage}
+                  alt={`${userDetails.firstName} ${userDetails.lastName}`}
+                  className="h-full w-full object-cover"
+                  unoptimized
                 />
                 </div>
+                <button type="button" aria-label="Choose profile image" onClick={() => imageInputRef.current?.click()} className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow hover:bg-opacity-90 dark:border-slate-800">
+                  <MdOutlinePhotoCamera size={17} />
+                </button>
+                <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageSelection} className="hidden" />
+              </div>
                 <div className="order-3 xl:order-2">
                   <h4 className="mb-2 text-lg font-semibold text-center text-form-strokedark dark:text-white/90 xl:text-left">
                     {userDetails.firstName} {userDetails.middleName} {userDetails.lastName}
@@ -135,6 +210,17 @@ const MainProfile: React.FC<{userDetails: APIUserProfileResponse, roles: APIUser
               </div>
 
             </div>
+
+            {(pendingImage || imageError || imageSuccess) && <div className="mb-6">
+              {pendingImage && <div className="mb-4 flex flex-wrap items-center gap-3">
+                {isSavingImage ? <Throbber /> : <>
+                  <Button className="bg-primary" onClick={saveProfileImage}>Save Profile Image</Button>
+                  <Button variants="outlined" onClick={() => { setPendingImage(null); setImageError(""); }}>Cancel</Button>
+                </>}
+              </div>}
+              {imageError && <Alert variant="error" title="Image update failed" message={imageError} showLink={false} />}
+              {imageSuccess && <Alert variant="success" title="Success!" message={imageSuccess} showLink={false} />}
+            </div>}
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
               <div>

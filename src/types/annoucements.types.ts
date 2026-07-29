@@ -1,5 +1,20 @@
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 
+export type FlattenedAnnouncementData = {
+    id: string;
+    title: string;
+    content: string;
+    caption: string;
+    sponsorshipId: string;
+    locations: { id: number; name: string }[];
+    files: { fileName: string; path: string }[];
+};
+
+export type PublicAnnouncementsListResponse = {
+    data: FlattenedAnnouncementData[];
+    total: number;
+};
+
 export interface AnnouncementsListProps {
     id: string;
     title: string;

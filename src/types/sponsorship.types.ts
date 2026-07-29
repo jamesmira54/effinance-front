@@ -1,4 +1,24 @@
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
+
+export interface PublicSponsorshipResponse {
+    id: string;
+    name: string;
+    sponsorName: string;
+    academicYearStart: number;
+    academicYearEnd: number;
+    durationFrom: string;
+    durationTo: string;
+    slot: number;
+    status: string;
+    sponsorshipSchool: { schoolId: string; schoolName: string }[];
+    sponsorshipRequirements: { fileId: string; fileName: string }[];
+}
+
+export interface PublicSponsorshipListResponse {
+    data: PublicSponsorshipResponse[];
+    total: number;
+}
+
 export interface APISponsorhipPayload {
     name: string;
     sponsorId: string;

@@ -39,6 +39,7 @@ const MainProfileForm: React.FC<{userDetails: MainProfileFormProps, roles: APIUs
         email: userDetails.email,
         mobileNumber: userDetails.mobileNumber,
         roleId: userDetails.roleId,
+        profileImageLink: userDetails.profileImageLink,
     },
     validateOnBlur: true,
     validateOnChange: true,

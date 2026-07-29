@@ -101,31 +101,121 @@ const ScheduleForm = ({ sponsorships, initialData, onSuccess }: {
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Select name="sponsorshipId" label="Sponsor" options={sponsorshipOptions}
+        <Select 
+          name="sponsorshipId" 
+          label="Sponsor" 
+          options={sponsorshipOptions}
           value={sponsorshipOptions.find((option) => option.value === formik.values.sponsorshipId) || null}
           onChange={(option) => formik.setFieldValue("sponsorshipId", option?.value || "")}
-          onBlur={() => formik.setFieldTouched("sponsorshipId")} error={!!errorFor("sponsorshipId")} errorMessage={formik.errors.sponsorshipId} />
-        <Input name="batchNo" label="Batch" type="number" min={1} value={formik.values.batchNo} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("batchNo")} error={!!errorFor("batchNo")} errorMessage={formik.errors.batchNo as string} />
-        <Input name="batchCode" label="Batch Code" value={formik.values.batchCode} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("batchCode")} error={!!errorFor("batchCode")} errorMessage={formik.errors.batchCode} />
-        <Select name="scheduleType" label="Type of Schedule" options={scheduleTypeOptions}
+          onBlur={() => formik.setFieldTouched("sponsorshipId")} 
+          error={!!errorFor("sponsorshipId")} 
+          errorMessage={formik.errors.sponsorshipId} 
+        />
+        <Input 
+          name="batchNo" 
+          label="Batch" 
+          type="number" 
+          min={1} 
+          value={formik.values.batchNo} 
+          onChange={formik.handleChange}
+          onBlur={() => formik.setFieldTouched("batchNo")} 
+          error={!!errorFor("batchNo")} 
+          errorMessage={formik.errors.batchNo as string} 
+        />
+        <Input 
+          name="batchCode" 
+          label="Batch Code" 
+          value={formik.values.batchCode} 
+          onChange={formik.handleChange}
+          onBlur={() => formik.setFieldTouched("batchCode")} 
+          error={!!errorFor("batchCode")} 
+          errorMessage={formik.errors.batchCode} 
+        />
+        <Select 
+          name="scheduleType" 
+          label="Type of Schedule" 
+          options={scheduleTypeOptions}
           value={scheduleTypeOptions.find((option) => option.value === formik.values.scheduleType)}
           onChange={(option) => formik.setFieldValue("scheduleType", option?.value)} />
-        <Select name="examinationType" label="Examination Type" options={examinationTypeOptions}
+        <Select 
+          name="examinationType" 
+          label="Examination Type" 
+          options={examinationTypeOptions}
           value={examinationTypeOptions.find((option) => option.value === formik.values.examinationType)}
-          onChange={(option) => formik.setFieldValue("examinationType", option?.value)} />
-        <Input name="specificDate" label="Specific Date" type="date" value={formik.values.specificDate} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("specificDate")} error={!!errorFor("specificDate")} errorMessage={formik.errors.specificDate} />
-        <div><label className="mb-2.5 block text-sm font-medium text-black dark:text-white">Time Start</label><input className={fieldClass} type="time" name="startTime" value={formik.values.startTime} onChange={formik.handleChange} onBlur={formik.handleBlur}/>{errorFor("startTime") && <p className="text-meta-1">{formik.errors.startTime}</p>}</div>
-        <div><label className="mb-2.5 block text-sm font-medium text-black dark:text-white">Time End</label><input className={fieldClass} type="time" name="endTime" value={formik.values.endTime} onChange={formik.handleChange} onBlur={formik.handleBlur}/>{errorFor("endTime") && <p className="text-meta-1">{formik.errors.endTime}</p>}</div>
-        <Input name="scheduleQuota" label="Limit (Examinees/Interviewees)" type="number" min={1} value={formik.values.scheduleQuota} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("scheduleQuota")} error={!!errorFor("scheduleQuota")} errorMessage={formik.errors.scheduleQuota as string} />
-        <Input name="location" label="Building/Room" value={formik.values.location} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("location")} error={!!errorFor("location")} errorMessage={formik.errors.location} />
-        <div className="md:col-span-2"><Input name="proctorInterviewer" label="Proctor/Interviewer" value={formik.values.proctorInterviewer} onChange={formik.handleChange}
-          onBlur={() => formik.setFieldTouched("proctorInterviewer")} error={!!errorFor("proctorInterviewer")} errorMessage={formik.errors.proctorInterviewer} /></div>
+          onChange={(option) => formik.setFieldValue("examinationType", option?.value)} 
+        />
+        <Input 
+          name="specificDate" 
+          label="Specific Date" 
+          type="date" 
+          value={formik.values.specificDate} 
+          onChange={formik.handleChange}
+          onBlur={() => formik.setFieldTouched("specificDate")} 
+          error={!!errorFor("specificDate")} 
+          errorMessage={formik.errors.specificDate} 
+        />
+
+        <div>
+          <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">Time Start</label>
+          <input 
+            className={fieldClass} 
+            type="time" 
+            name="startTime" 
+            value={formik.values.startTime} 
+            onChange={formik.handleChange} 
+            onBlur={formik.handleBlur}
+          />
+            {errorFor("startTime") && <p className="text-meta-1">{formik.errors.startTime}</p>}
+        </div>
+
+        <div>
+          <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">Time End</label>
+          <input 
+            className={fieldClass} 
+            type="time" 
+            name="endTime" 
+            value={formik.values.endTime} 
+            onChange={formik.handleChange} 
+            onBlur={formik.handleBlur}
+          />
+          {errorFor("endTime") && <p className="text-meta-1">{formik.errors.endTime}</p>}
+        </div>
+
+        <Input 
+          name="scheduleQuota" 
+          label="Limit (Examinees/Interviewees)" 
+          type="number" 
+          min={1} 
+          value={formik.values.scheduleQuota} 
+          onChange={formik.handleChange}
+          onBlur={() => formik.setFieldTouched("scheduleQuota")} 
+          error={!!errorFor("scheduleQuota")} 
+          errorMessage={formik.errors.scheduleQuota as string} 
+        />
+        <Input 
+          name="location" 
+          label="Building/Room" 
+          value={formik.values.location} 
+          onChange={formik.handleChange}
+          onBlur={() => formik.setFieldTouched("location")} 
+          error={!!errorFor("location")} 
+          errorMessage={formik.errors.location} 
+        />
+
+        <div 
+          className="md:col-span-2">
+            <Input 
+              name="proctorInterviewer" 
+              label="Proctor/Interviewer" 
+              value={formik.values.proctorInterviewer} 
+              onChange={formik.handleChange}
+              onBlur={() => formik.setFieldTouched("proctorInterviewer")} 
+              error={!!errorFor("proctorInterviewer")} 
+              errorMessage={formik.errors.proctorInterviewer} 
+            />
+        </div>
       </div>
+      
       <div className="mt-6 flex justify-end">
         {formik.isSubmitting ? <Throbber /> : <button type="submit" className="rounded-lg bg-primary px-8 py-3 text-white hover:bg-opacity-90">{initialData?.id ? "Update Schedule" : "Add Schedule"}</button>}
       </div>

@@ -40,6 +40,7 @@ type PublicPageProps = {
   };
   stats: StatItem[];
   panels: PanelItem[];
+  panelTitle?: string;
   asideTitle: string;
   asideItems: string[];
 };
@@ -52,10 +53,10 @@ export const pageContent: Record<string, PublicPageProps> = {
       "Track open grants, prepare required documents, read office announcements, and sign in to the portal when you are ready to submit or manage an application.",
     primaryAction: { label: "View Available Grants", href: "/available-grants" },
     stats: [
-      { label: "Open Grants", value: "12", icon: FiAward, tone: "text-primary" },
-      { label: "Upcoming Deadlines", value: "5", icon: FiCalendar, tone: "text-warning" },
-      { label: "Published Forms", value: "18", icon: FiFileText, tone: "text-meta-5" },
-      { label: "Active Scholars", value: "426", icon: FiUsers, tone: "text-success" },
+      // { label: "Open Grants", value: "12", icon: FiAward, tone: "text-primary" },
+      // { label: "Upcoming Deadlines", value: "5", icon: FiCalendar, tone: "text-warning" },
+      // { label: "Published Forms", value: "18", icon: FiFileText, tone: "text-meta-5" },
+      // { label: "Active Scholars", value: "426", icon: FiUsers, tone: "text-success" },
     ],
     panels: [
       {
@@ -88,11 +89,9 @@ export const pageContent: Record<string, PublicPageProps> = {
     description:
       "Browse scholarship opportunities, eligibility windows, funding categories, and document requirements before starting your portal application.",
     primaryAction: { label: "Portal Login", href: "/login" },
+    panelTitle: "Recently Posted Sponsorships",
     stats: [
-      { label: "Academic Grants", value: "6", icon: FiBookOpen, tone: "text-primary" },
-      { label: "Financial Aid", value: "4", icon: FiAward, tone: "text-success" },
-      { label: "Renewal Programs", value: "2", icon: FiCheckCircle, tone: "text-meta-5" },
-      { label: "Closing Soon", value: "3", icon: FiAlertCircle, tone: "text-warning" },
+
     ],
     panels: [
       {
@@ -126,10 +125,10 @@ export const pageContent: Record<string, PublicPageProps> = {
       "Download the official forms used for application validation, clearance requests, scholar certificates, and scholarship appeals.",
     primaryAction: { label: "Open Help Guide", href: "/help-faqs" },
     stats: [
-      { label: "Clearance Forms", value: "5", icon: FiFileText, tone: "text-primary" },
-      { label: "Certificates", value: "4", icon: FiDownload, tone: "text-meta-5" },
-      { label: "Appeal Forms", value: "3", icon: FiInfo, tone: "text-warning" },
-      { label: "Guides", value: "6", icon: FiHelpCircle, tone: "text-success" },
+      // { label: "Clearance Forms", value: "5", icon: FiFileText, tone: "text-primary" },
+      // { label: "Certificates", value: "4", icon: FiDownload, tone: "text-meta-5" },
+      // { label: "Appeal Forms", value: "3", icon: FiInfo, tone: "text-warning" },
+      // { label: "Guides", value: "6", icon: FiHelpCircle, tone: "text-success" },
     ],
     panels: [
       {
@@ -162,11 +161,12 @@ export const pageContent: Record<string, PublicPageProps> = {
     description:
       "Read public advisories from the Admission and Scholarship Office, including qualifier postings, schedule changes, and renewal reminders.",
     primaryAction: { label: "Get Support", href: "/contact-support" },
+    panelTitle: "Recently Posted Announcements",
     stats: [
-      { label: "News Posts", value: "9", icon: FiInfo, tone: "text-primary" },
-      { label: "Qualifiers Lists", value: "3", icon: FiUsers, tone: "text-success" },
-      { label: "Renewal Notices", value: "5", icon: FiCalendar, tone: "text-meta-5" },
-      { label: "Urgent Updates", value: "2", icon: FiAlertCircle, tone: "text-warning" },
+      // { label: "News Posts", value: "9", icon: FiInfo, tone: "text-primary" },
+      // { label: "Qualifiers Lists", value: "3", icon: FiUsers, tone: "text-success" },
+      // { label: "Renewal Notices", value: "5", icon: FiCalendar, tone: "text-meta-5" },
+      // { label: "Urgent Updates", value: "2", icon: FiAlertCircle, tone: "text-warning" },
     ],
     panels: [
       {
@@ -194,40 +194,71 @@ export const pageContent: Record<string, PublicPageProps> = {
     ],
   },
   help: {
-    eyebrow: "Help & FAQs",
-    title: "Application guides, submission checklists, and FAQs.",
+    eyebrow: "Scholarship & Grant-Aid Help",
+    title: "Frequently Asked Questions",
     description:
-      "Find step-by-step application reminders, document preparation notes, and answers to common scholarship portal questions.",
+      "General questions and guidance for all available scholarships and grant-aid programs.",
     primaryAction: { label: "Contact Support", href: "/contact-support" },
     stats: [
-      { label: "Guides", value: "8", icon: FiBookOpen, tone: "text-primary" },
-      { label: "FAQs", value: "24", icon: FiHelpCircle, tone: "text-meta-5" },
-      { label: "Checklists", value: "6", icon: FiCheckCircle, tone: "text-success" },
-      { label: "Support Channels", value: "3", icon: FiPhone, tone: "text-warning" },
+      // { label: "Eligibility Areas", value: "4", icon: FiBookOpen, tone: "text-primary" },
+      // { label: "FAQs", value: "9", icon: FiHelpCircle, tone: "text-meta-5" },
+      // { label: "Application Steps", value: "3", icon: FiCheckCircle, tone: "text-success" },
+      // { label: "Support Channels", value: "3", icon: FiPhone, tone: "text-warning" },
     ],
+    panelTitle: "Frequently Asked Questions",
     panels: [
       {
+        title: "Who is qualified to apply?",
+        description: "Eligibility depends on the specific sponsor, but most evaluate applicants in four key areas:\n\nAcademic Standing: Many merit scholarships require a minimum grade average or GPA, such as a GWA of 93% or higher for programs like the CHED Merit Scholarship.\n\nFinancial Need: Need-based grants require proof that your family's annual gross income falls below a set threshold, such as ₱500,000 or less.\n\nDemographic Profile: Certain scholarships target specific sectors, including first-generation college students, indigenous communities, or residents of specific regions.\n\nField of Study: Many government programs are restricted to designated priority courses, such as STEM majors for DOST or specified regional priority courses for CHED.",
+        meta: "Eligibility",
+      },
+      {
         title: "How do I apply?",
-        description: "Create or access your portal account, choose an open grant, and complete all required fields.",
-        meta: "Application guide",
+        description: "The process generally follows these structured steps:\n\nStep 1: Choose your desired scholarship or grant-aid program from the posted grants.\nStep 2: Make sure that you are pre-qualified based on the program criteria.\nStep 3: Submit all required documents completely and on time.",
+        meta: "Application",
       },
       {
         title: "What documents are required?",
-        description: "Requirements vary by grant, but most programs ask for enrollment, grades, and income documents.",
-        meta: "Submission checklist",
+        description: "While specific lists vary, standard applications require:\n\n1. Academic Records: A certified true copy of your latest Report Card (Form 138/SF9), Transcript of Records, or Certificate of GWA.\n2. Proof of Income: Your parents' latest Income Tax Return (ITR), BIR Certificate of Tax Exemption, or a social case study from the DSWD.\n3. Identity Documents: A PSA Birth Certificate and a valid Student ID.\n4. Good Conduct: A Certificate of Good Moral Character from your previous school.",
+        meta: "Requirements",
       },
       {
-        title: "Can I update my submission?",
-        description: "Updates are allowed while the application is still open and not yet under final review.",
-        meta: "Portal FAQ",
+        title: "Can I apply for more than one scholarship?",
+        description: "It depends. Some sponsors do not permit recipients to receive other financial assistance simultaneously and may require a Certificate of Non-Enjoyment or Non-Availment of another scholarship. You are encouraged to apply for multiple external or private scholarships to maximize your chances. However, if you qualify for multiple programs, you must choose which grant to accept and formally waive the others.",
+        meta: "Multiple Grants",
+      },
+      {
+        title: "What happens if my grades drop?",
+        description: "Academic Probation: Most programs grant a one-semester probationary or grace period to allow you to recover your academic standing. During this time, your financial privileges may continue or be temporarily held.\n\nSuspension or Termination: If you fail to meet the required academic standards after the probationary period, or incur failing, incomplete, or dropped grades, your scholarship privileges may be suspended or permanently revoked.",
+        meta: "Academic Standing",
+      },
+      {
+        title: "Do I ever have to pay scholarship money back?",
+        description: "Generally, grant-aid and scholarships are classified as gift aid and do not require repayment. However, you may be legally obligated to refund the total disbursed amount if you breach the terms of your scholarship agreement.",
+        meta: "Repayment",
+      },
+      {
+        title: "Is there a return-of-service requirement?",
+        description: "Yes. Several government and specialized institutional scholarships require a mandatory Return Service Agreement (RSA) as a condition of receiving the grant. Under this contract, you are legally obligated to work within the country, often in your specific field of study, upon graduation.",
+        meta: "Service Agreement",
+      },
+      {
+        title: "Can I shift courses or transfer to another university?",
+        description: "Generally, shifting courses or transferring institutions is restricted and requires prior written clearance from the scholarship provider.\n\nApproved Transfer or Shifting: If permitted, you must shift only to another approved priority course or transfer to an accredited institution of equal or higher standing.\n\nUnauthorized Shifting: Changing your program or school without official approval constitutes a breach of contract. This may result in immediate termination of your grant and require you to refund previously disbursed funds.",
+        meta: "Transfer & Shifting",
+      },
+      {
+        title: "What happens if I need to take a Leave of Absence (LOA)?",
+        description: "If you must temporarily suspend your studies due to health, family emergencies, or other valid reasons, formally apply for an LOA with both your university and scholarship sponsor.\n\nSuspension of Grant: During an approved LOA, your scholarship benefits and stipends will be temporarily suspended.\n\nResumption: When you officially return and enroll, submit a formal reinstatement letter with supporting documents, such as medical clearance, to reactivate your grant. An unapproved leave will result in automatic forfeiture of the scholarship.",
+        meta: "Leave of Absence",
       },
     ],
-    asideTitle: "Support Reminders",
+    asideTitle: "Important Reminders",
     asideItems: [
-      "Use the same name across all submitted documents.",
-      "Check file clarity before uploading scans.",
-      "Monitor announcements for office schedule changes.",
-      "Use your portal account for application status checks.",
+      "Eligibility and requirements vary by scholarship sponsor.",
+      "Review the official program criteria before applying.",
+      "Secure written approval before shifting, transferring, or taking leave.",
+      "Refer to your scholarship agreement for binding terms and obligations.",
     ],
   },
   about: {
@@ -237,10 +268,10 @@ export const pageContent: Record<string, PublicPageProps> = {
       "The office manages scholarship screening, application validation, grant coordination, scholar records, and renewal support across campus programs.",
     primaryAction: { label: "View Announcements", href: "/public-announcements" },
     stats: [
-      { label: "Grant Categories", value: "4", icon: FiAward, tone: "text-primary" },
-      { label: "Office Services", value: "9", icon: FiInfo, tone: "text-meta-5" },
-      { label: "Campus Partners", value: "7", icon: FiUsers, tone: "text-success" },
-      { label: "Support Desk", value: "1", icon: FiMapPin, tone: "text-warning" },
+      // { label: "Grant Categories", value: "4", icon: FiAward, tone: "text-primary" },
+      // { label: "Office Services", value: "9", icon: FiInfo, tone: "text-meta-5" },
+      // { label: "Campus Partners", value: "7", icon: FiUsers, tone: "text-success" },
+      // { label: "Support Desk", value: "1", icon: FiMapPin, tone: "text-warning" },
     ],
     panels: [
       {
@@ -274,10 +305,10 @@ export const pageContent: Record<string, PublicPageProps> = {
       "Reach the Admission and Scholarship Office for document concerns, portal access, deadline questions, and grant application support.",
     primaryAction: { label: "Portal Login", href: "/login" },
     stats: [
-      { label: "Campus Desk", value: "Rm 102", icon: FiMapPin, tone: "text-primary" },
-      { label: "Hotline", value: "215", icon: FiPhone, tone: "text-success" },
-      { label: "Email Queues", value: "2", icon: FiInfo, tone: "text-meta-5" },
-      { label: "Office Days", value: "Mon-Fri", icon: FiCalendar, tone: "text-warning" },
+      // { label: "Campus Desk", value: "Rm 102", icon: FiMapPin, tone: "text-primary" },
+      // { label: "Hotline", value: "215", icon: FiPhone, tone: "text-success" },
+      // { label: "Email Queues", value: "2", icon: FiInfo, tone: "text-meta-5" },
+      // { label: "Office Days", value: "Mon-Fri", icon: FiCalendar, tone: "text-warning" },
     ],
     panels: [
       {
@@ -311,10 +342,10 @@ export const pageContent: Record<string, PublicPageProps> = {
       "Review how applicant information is handled and the public guidelines that govern scholarship application, screening, award, and renewal processes.",
     primaryAction: { label: "Read FAQs", href: "/help-faqs" },
     stats: [
-      { label: "Privacy Notices", value: "3", icon: FiShield, tone: "text-primary" },
-      { label: "Guidelines", value: "6", icon: FiFileText, tone: "text-meta-5" },
-      { label: "Review Steps", value: "4", icon: FiCheckCircle, tone: "text-success" },
-      { label: "Appeal Window", value: "7 days", icon: FiCalendar, tone: "text-warning" },
+      // { label: "Privacy Notices", value: "3", icon: FiShield, tone: "text-primary" },
+      // { label: "Guidelines", value: "6", icon: FiFileText, tone: "text-meta-5" },
+      // { label: "Review Steps", value: "4", icon: FiCheckCircle, tone: "text-success" },
+      // { label: "Appeal Window", value: "7 days", icon: FiCalendar, tone: "text-warning" },
     ],
     panels: [
       {
@@ -350,6 +381,7 @@ const PublicPage = ({
   primaryAction,
   stats,
   panels,
+  panelTitle,
   asideTitle,
   asideItems,
 }: PublicPageProps) => {
@@ -436,7 +468,7 @@ const PublicPage = ({
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
             <h2 className="text-title-sm font-semibold text-black dark:text-white">
-              Latest Information
+              {panelTitle || "Latest Information"}
             </h2>
             <div className="mt-5 divide-y divide-stroke dark:divide-strokedark">
               {panels.map((panel) => (
@@ -446,7 +478,7 @@ const PublicPage = ({
                       <h3 className="font-semibold text-black dark:text-white">
                         {panel.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-6 text-body dark:text-bodydark">
+                      <p className="mt-2 whitespace-pre-line text-sm leading-6 text-body dark:text-bodydark">
                         {panel.description}
                       </p>
                     </div>

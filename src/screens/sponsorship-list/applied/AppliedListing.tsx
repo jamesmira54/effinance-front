@@ -1,7 +1,7 @@
 "use client";
 
 import { AppliedSponsorshipDetailResponse, SponsorshipRequirements } from "@/types/sponsorship.types";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import { TableColumn } from "react-data-table-component";
 import { FormattedDate } from "@/utils/helpers";
 import Button from "@/components/Button";
@@ -22,8 +22,32 @@ const StyledModal = styled(Modal)`
 
 
 interface serverDataProps {
-    sponsorships: AppliedSponsorshipDetailResponse[];
+    sponsorships: unknown;
 }
+
+const normalizeAppliedSponsorships = (payload: unknown): AppliedSponsorshipDetailResponse[] => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (!payload || typeof payload !== "object") {
+        return [];
+    }
+
+    const response = payload as Record<string, unknown>;
+    const nestedPayload = response.sponsorships ?? response.applications ?? response.items ?? response.data;
+
+    return nestedPayload === payload ? [] : normalizeAppliedSponsorships(nestedPayload);
+};
+
+const formatStatus = (status: unknown) => {
+    if (typeof status !== "string") return "Unknown";
+
+    return status
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
 const AppliedListing: React.FC<{serverData: serverDataProps}> = ({
     serverData
@@ -34,11 +58,11 @@ const AppliedListing: React.FC<{serverData: serverDataProps}> = ({
     const [selectedReqs, setSelectedReqs] = useState<SponsorshipRequirements[]>([]);
     const [remarks, setRemarks] = useState<string>("");
     const [openRemarksModal, setOpenRemarksModal] = useState<boolean>(false);
-    const [data, setData] = useState<AppliedSponsorshipDetailResponse[]>(serverData.sponsorships || []);
+    const [data] = useState<AppliedSponsorshipDetailResponse[]>(() => normalizeAppliedSponsorships(serverData.sponsorships));
     const [openViewingModal, setOpenViewingModal] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<AppliedSponsorshipDetailResponse>({} as AppliedSponsorshipDetailResponse);
 
-    const columns: TableColumn<AppliedSponsorshipDetailResponse>[] = useMemo(() => [
+    const columns: TableColumn<AppliedSponsorshipDetailResponse>[] = [
         { name: "Application #", selector: (row:AppliedSponsorshipDetailResponse) => row.appId, sortable: true,
             cell: (row: AppliedSponsorshipDetailResponse) => (
                 <Button variants="text" onClick={() => { setSelectedItem(row); setOpenViewingModal(true); }}><span className="text-primary">{row.appId}</span></Button>
@@ -59,11 +83,7 @@ const AppliedListing: React.FC<{serverData: serverDataProps}> = ({
                     row.sponsorshipStatus === APPLICATION_STATUS.COMPLETE ? "success" : 
                     row.sponsorshipStatus === APPLICATION_STATUS.REJECTED ? "error" : 
                     "default"}>
-                        {row.sponsorshipStatus
-                            .toLowerCase()
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char: string) => char.toUpperCase())
-                        }
+                        {formatStatus(row.sponsorshipStatus)}
                 </Badge> 
             </div>
         )},
@@ -72,11 +92,11 @@ const AppliedListing: React.FC<{serverData: serverDataProps}> = ({
                 <Button onClick={() => getRemarks(row.sponsorshipId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
-    ], []);
+    ];
 
     const ShowRequirements = (reqs: SponsorshipRequirements[]) => {
         setOpenReqModal(true);
-        setSelectedReqs(reqs);
+        setSelectedReqs(Array.isArray(reqs) ? reqs : []);
     };
 
     const getRemarks = async(sponsorshipId: string) => {
