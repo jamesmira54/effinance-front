@@ -1,47 +1,51 @@
 import { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Effinance - Edit Profile",
-};
-
-
+import { redirect } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { StudentProfileForm } from "@/screens/settings";
-import { AuthAPIService, StudentAPIService } from "@/api";
+import {
+  AddressAPIService,
+  AuthAPIService,
+  SchoolAPIService,
+  StudentAPIService,
+} from "@/api";
 
+export const metadata: Metadata = {
+  title: "Effinance - Edit Profile",
+};
 
 const authAPI = new AuthAPIService();
 const studentAPI = new StudentAPIService();
-
-const fetchUserSession = async () => {
-    return await authAPI.me();
-}
-
-const fetchStudentProfile = async (userId: string) => {
-    return await studentAPI.getStudentProfile(userId);
-  }
+const addressAPI = new AddressAPIService();
+const schoolAPI = new SchoolAPIService();
 
 const ProfileEdit = async () => {
+  const session = await authAPI.me();
+  if (!session?.studentId) {
+    redirect("/settings/profile");
+  }
 
-    let userId = '';
-    const getUserSession = await fetchUserSession();
-    if(getUserSession) {
-        userId = getUserSession.userId;
-    }
+  const [studentDetails, provinces, regions, schools] = await Promise.all([
+    studentAPI.getStudentProfile(session.studentId),
+    addressAPI.getAllProvinces(),
+    addressAPI.getAllRegions(),
+    schoolAPI.getAllSchools(),
+  ]);
 
-    let studentDetails = null;
-    const studentId = getUserSession.studentId;
-    if(studentId !== null) { 
-        studentDetails = await fetchStudentProfile(studentId);
-    }
-    
+  if (!studentDetails) {
+    redirect("/settings/profile");
+  }
 
-    return (
-        <>
-            <Breadcrumb pageName="Edit Profile"/>
-            <StudentProfileForm studentDetails={studentDetails}/>
-        </>
-    );
+  return (
+    <>
+      <Breadcrumb pageName="Edit Profile" />
+      <StudentProfileForm
+        studentDetails={studentDetails}
+        provinces={Array.isArray(provinces) ? provinces : []}
+        regions={Array.isArray(regions) ? regions : []}
+        schools={Array.isArray(schools) ? schools : []}
+      />
+    </>
+  );
 };
 
 export default ProfileEdit;

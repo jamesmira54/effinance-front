@@ -2,22 +2,22 @@ import { ForwardedRef, Fragment, useState } from "react";
 import { SwitchProps } from "./Switch.types";
 import React from "react";
 
-const Switch:React.FC<SwitchProps> = React.forwardRef(
-(
+const Switch: React.FC<SwitchProps> = React.forwardRef(
+  (
     {
-      enabled=false,
+      enabled = false,
       onChange,
       className,
       name,
-      disabled=false,
-      variant='style1',
+      disabled = false,
+      variant = "style1",
       id,
       ...props
-    }, ref?: ForwardedRef<HTMLDivElement>
-) => {
-
+    },
+    ref?: ForwardedRef<HTMLDivElement>,
+  ) => {
     const [switchOn, setEnabled] = useState<boolean>(enabled);
-    
+
     return (
       <div ref={ref} x-data="{ switcherToggle: false }">
         <label
@@ -36,20 +36,32 @@ const Switch:React.FC<SwitchProps> = React.forwardRef(
               name={name}
               {...props}
             />
-            {variant === 'style1' ?
+            {variant === "style1" ? (
               <Fragment>
-                <div className={`block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B] ${className}`}></div>
-                <div className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${ switchOn && "!right-1 !translate-x-full !bg-primary dark:!bg-white" }`} ></div>
+                <div
+                  className={`block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B] ${className}`}
+                ></div>
+                <div
+                  className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${switchOn && "!right-1 !translate-x-full !bg-primary dark:!bg-white"}`}
+                ></div>
               </Fragment>
-            : variant === 'style2' ?
+            ) : variant === "style2" ? (
               <Fragment>
-                <div className={`h-5 w-14 rounded-full bg-meta-9 shadow-inner dark:bg-[#5A616B] ${className}`}></div>
-                <div className={`dot absolute -top-1 left-0 h-7 w-7 rounded-full bg-white shadow-switch-1 transition ${ switchOn && "!right-0 !translate-x-full !bg-primary dark:!bg-white" }`}> </div>
+                <div
+                  className={`h-5 w-14 rounded-full bg-meta-9 shadow-inner dark:bg-[#5A616B] ${className}`}
+                ></div>
+                <div
+                  className={`dot absolute -top-1 left-0 h-7 w-7 rounded-full bg-white shadow-switch-1 transition ${switchOn && "!right-0 !translate-x-full !bg-primary dark:!bg-white"}`}
+                >
+                  {" "}
+                </div>
               </Fragment>
-            :  variant === 'style3' ?
+            ) : variant === "style3" ? (
               <Fragment>
                 <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
-                <div className={`dot absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition ${ switchOn && "!right-1 !translate-x-full !bg-primary dark:!bg-white" } ${className}`} >
+                <div
+                  className={`dot absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition ${switchOn && "!right-1 !translate-x-full !bg-primary dark:!bg-white"} ${className}`}
+                >
                   <span className={`hidden ${switchOn && "!block"}`}>
                     <svg
                       className="fill-white dark:fill-black"
@@ -84,17 +96,21 @@ const Switch:React.FC<SwitchProps> = React.forwardRef(
                   </span>
                 </div>
               </Fragment>
-            :
+            ) : (
               <Fragment>
                 <div className="block h-8 w-14 rounded-full bg-black"></div>
-                <div className={`absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition ${ enabled && "!right-1 !translate-x-full" } ${className}`} ></div>
+                <div
+                  className={`absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition ${enabled && "!right-1 !translate-x-full"} ${className}`}
+                ></div>
               </Fragment>
-            }
+            )}
           </div>
         </label>
       </div>
     );
-  }
+  },
 );
+
+Switch.displayName = "Switch";
 
 export default Switch;

@@ -11,29 +11,33 @@ export const metadata: Metadata = {
 const SponsorshipAPI = new SponsorshipAPIService();
 
 const rankedStudents = async (sponsorId: string) => {
-    const response = await SponsorshipAPI.rankApplicants(sponsorId);
-    return response;
-}
+  const response = await SponsorshipAPI.rankApplicants(sponsorId);
+  return response;
+};
 
-const RankingResultsPage = async ({ params }: { params: { sponsorId: string } }) => {
-    const { sponsorId } = await params;
+const RankingResultsPage = async ({
+  params,
+}: {
+  params: Promise<{ sponsorId: string }>;
+}) => {
+  const { sponsorId } = await params;
 
-    let rankResults = [];
-    try {
-        rankResults = await rankedStudents(sponsorId);
-    } catch (error) {
-        console.error("Failed to rank students", error);
-    }
+  let rankResults = [];
+  try {
+    rankResults = await rankedStudents(sponsorId);
+  } catch (error) {
+    console.error("Failed to rank students", error);
+  }
 
-    const serverData = {
-      sponsorId: sponsorId,
-      rankedStudents: rankResults,
-    }
-    return (
-      <>
-        <RankedStudentsListing serverData={serverData}/>
-      </>
-    );
+  const serverData = {
+    sponsorId: sponsorId,
+    rankedStudents: rankResults,
   };
-  
+  return (
+    <>
+      <RankedStudentsListing serverData={serverData} />
+    </>
+  );
+};
+
 export default RankingResultsPage;

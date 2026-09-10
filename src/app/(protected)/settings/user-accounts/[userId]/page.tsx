@@ -8,11 +8,10 @@ export const metadata: Metadata = {
   title: "Effinance - Profile",
 };
 
-
 interface UserDetailsProps {
-  params: {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 }
 
 const userAPI = new UserAPIService();
@@ -20,29 +19,33 @@ const rolesAPI = new RolesAPIService();
 
 const fetchProfile = async (userId: string) => {
   return await userAPI.profile(userId);
-}
+};
 
 const fetchRoles = async () => {
   return await rolesAPI.roles();
-}
+};
 
+const UserDetails = async ({ params }: UserDetailsProps) => {
+  const { userId } = await params;
 
-const UserDetails = async({ params } : UserDetailsProps) => {
-    const { userId } = await params;
+  const userDetails = await fetchProfile(userId);
+  const userType = userDetails?.userType ?? "";
 
-    const userDetails = await fetchProfile(userId);
-    const userType = userDetails?.userType ?? '';
+  const roles: APIUserRoles[] =
+    userType === "System Admin" ? await fetchRoles() : [];
 
-    const roles: APIUserRoles[] = userType === 'System Admin' ? await fetchRoles() : [];
-    
-    return (
-        <>
-          <Breadcrumb pageName="Profile" />
-          <div className="flex gap-6 flex-col">
-              <MainProfile userDetails={userDetails} roles={roles} allowRouterBack={true}/>
-          </div>
-        </>
-    );
+  return (
+    <>
+      <Breadcrumb pageName="Profile" />
+      <div className="flex flex-col gap-6">
+        <MainProfile
+          userDetails={userDetails}
+          roles={roles}
+          allowRouterBack={true}
+        />
+      </div>
+    </>
+  );
 };
 
 export default UserDetails;

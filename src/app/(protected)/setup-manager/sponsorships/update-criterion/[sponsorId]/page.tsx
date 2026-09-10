@@ -11,37 +11,41 @@ export const metadata: Metadata = {
 const SponsorshipAPI = new SponsorshipAPIService();
 
 const getSponsorshipDetails = async (sponsorId: string) => {
-    const response = await SponsorshipAPI.getSponsorshipDetails(sponsorId);
-    return response;
-}
+  const response = await SponsorshipAPI.getSponsorshipDetails(sponsorId);
+  return response;
+};
 
 const getCriterionCategories = async () => {
   const response = await SponsorshipAPI.getAllCriterionCategories();
   return response;
-}
+};
 
 const getDataSources = async () => {
-    const response = await SponsorshipAPI.getCriterionCategoryDataSource();
-    return response;
-}
+  const response = await SponsorshipAPI.getCriterionCategoryDataSource();
+  return response;
+};
 
-const CriteriaPage= async ({ params }: { params: { sponsorId: string } }) => {
-    const { sponsorId } = await params;
-    const sponsorshipDetails = await getSponsorshipDetails(sponsorId);
-    const criterionCategories = await getCriterionCategories();
-    const dataSources = await getDataSources();
+const CriteriaPage = async ({
+  params,
+}: {
+  params: Promise<{ sponsorId: string }>;
+}) => {
+  const { sponsorId } = await params;
+  const sponsorshipDetails = await getSponsorshipDetails(sponsorId);
+  const criterionCategories = await getCriterionCategories();
+  const dataSources = await getDataSources();
 
-    const serverData = {
-        sponsorshipDetails: sponsorshipDetails,
-        criterionCategories: criterionCategories || [],
-        dataSources: dataSources || [],
-    }
-    
-    return (
-      <>
-        <CriteriaSetup serverData={serverData}/>
-      </>
-    );
+  const serverData = {
+    sponsorshipDetails: sponsorshipDetails,
+    criterionCategories: criterionCategories || [],
+    dataSources: dataSources || [],
   };
-  
+
+  return (
+    <>
+      <CriteriaSetup serverData={serverData} />
+    </>
+  );
+};
+
 export default CriteriaPage;

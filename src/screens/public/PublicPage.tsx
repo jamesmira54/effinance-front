@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PublicBanner, { PublicBannerProps } from "./PublicBanner";
 import {
   FiAlertCircle,
   FiArrowRight,
@@ -31,6 +32,7 @@ type PanelItem = {
 };
 
 type PublicPageProps = {
+  banner?: PublicBannerProps;
   eyebrow: string;
   title: string;
   description: string;
@@ -47,6 +49,7 @@ type PublicPageProps = {
 
 export const pageContent: Record<string, PublicPageProps> = {
   home: {
+    banner: { image: "home" },
     eyebrow: "Admission & Scholarship Office",
     title: "Scholarship applications, deadlines, and scholar support in one place.",
     description:
@@ -84,6 +87,7 @@ export const pageContent: Record<string, PublicPageProps> = {
     ],
   },
   grants: {
+    banner: { image: "grants", href: "/login" },
     eyebrow: "Available Grants",
     title: "Directory of open scholarship programs.",
     description:
@@ -119,6 +123,7 @@ export const pageContent: Record<string, PublicPageProps> = {
     ],
   },
   forms: {
+    banner: { image: "forms", href: "/available-grants" },
     eyebrow: "Document Forms",
     title: "Printable clearance, certificate, and appeal forms.",
     description:
@@ -156,6 +161,7 @@ export const pageContent: Record<string, PublicPageProps> = {
     ],
   },
   announcements: {
+    banner: { image: "announcements" },
     eyebrow: "Announcements",
     title: "Admission news, qualifiers lists, and renewal dates.",
     description:
@@ -194,6 +200,7 @@ export const pageContent: Record<string, PublicPageProps> = {
     ],
   },
   help: {
+    banner: { image: "home" },
     eyebrow: "Scholarship & Grant-Aid Help",
     title: "Frequently Asked Questions",
     description:
@@ -375,6 +382,7 @@ export const pageContent: Record<string, PublicPageProps> = {
 };
 
 const PublicPage = ({
+  banner,
   eyebrow,
   title,
   description,
@@ -388,6 +396,7 @@ const PublicPage = ({
   return (
     <div>
       <section className="border-b border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
+        {banner && <PublicBanner {...banner} />}
         <div className="mx-auto grid max-w-screen-2xl gap-8 px-4 py-10 md:px-6 lg:grid-cols-[1.25fr_0.75fr] lg:py-14 2xl:px-10">
           <div>
             <span className="inline-flex rounded-sm bg-gray px-3 py-1 text-sm font-medium text-primary dark:bg-meta-4 dark:text-white">

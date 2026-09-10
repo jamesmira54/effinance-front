@@ -6,216 +6,170 @@ import { IconType } from "react-icons";
 import { GrAnnounce } from "react-icons/gr";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 
-
-export type UserRole = 'admin' | 'student' | 'sponsor' | 'coordinator';
+export type UserRole = "admin" | "student" | "sponsor" | "coordinator";
 
 export type MenuItem = {
-  id: string
-  label: string
-  route?: string 
-  icon?: IconType
-  roles?: UserRole[]
-  children?: MenuItem[]
-}
-
+  id: string;
+  label: string;
+  route?: string;
+  icon?: IconType;
+  roles?: UserRole[];
+  children?: MenuItem[];
+};
 
 export const MENU_ITEMS: MenuItem[] = [
   {
-    id: 'dashboard',
+    id: "dashboard",
     icon: RxDashboard,
     label: "Dashboard",
     route: "/dashboard",
-    roles: ['admin', 'sponsor', 'coordinator'],
+    roles: ["admin", "sponsor", "coordinator"],
   },
   {
-    id: 'announcements',
+    id: "announcements",
     icon: GrAnnounce,
     label: "Announcements",
     route: "/announcements",
-    roles: ['admin', 'student', 'coordinator'],
+    roles: ["admin", "student", "coordinator"],
   },
   {
-    id: 'finas-application',
+    id: "finas-application",
     icon: IoNewspaperOutline,
     label: "Finas Application",
     route: "",
     children: [
       {
-        id: 'pooling',
-        label: 'Pooling List',
-        route: '/finas-application/pooling',
-        roles: ['admin', 'coordinator', 'sponsor'],
+        id: "pooling",
+        label: "Pooling List",
+        route: "/finas-application/pooling",
+        roles: ["admin", "coordinator", "sponsor"],
       },
       {
-        id: 'application-list',
-        label: 'Application List',
-        route: '/finas-application/application-list',
-        roles: ['admin', 'coordinator'],
+        id: "application-list",
+        label: "Application List",
+        route: "/finas-application/application-list",
+        roles: ["admin", "coordinator"],
       },
       {
-        id: 'ranked-list',
-        label: 'Pending Rankings',
-        route: '/finas-application/ranked-list',
-        roles: ['admin', 'coordinator'],
-      },
-        {
-        id: 'ranking-results',
-        label: 'Ranking Results',
-        route: '/finas-application/ranking-results',
-        roles: ['admin', 'coordinator'],
+        id: "ranked-list",
+        label: "Pending Rankings",
+        route: "/finas-application/ranked-list",
+        roles: ["admin", "coordinator"],
       },
       {
-        id: 'finas-proper',
-        label: 'Finas Proper',
-        route: '/finas-application/finas-proper',
-        roles: ['admin', 'coordinator'],
-      }
+        id: "ranking-results",
+        label: "Ranking Results",
+        route: "/finas-application/ranking-results",
+        roles: ["admin", "coordinator"],
+      },
+      {
+        id: "finas-proper",
+        label: "Finas Proper",
+        route: "/finas-application/finas-proper",
+        roles: ["admin", "coordinator"],
+      },
     ],
-    roles: ['admin', 'coordinator', 'sponsor'],
+    roles: ["admin", "coordinator", "sponsor"],
   },
   {
-      id: 'sponsorhip-list',
-      label: 'Sponsorship List',
-      route: '',
-      icon: IoNewspaperOutline,
-      roles: ['student'],
-      children:[
-        {
-          id: 'applied-sponsorships',
-          label: 'Applied',
-          route: '/sponsorship-list/applied',
-          roles: ['student'],
-        },
-        {
-          id: 'recommended-sponsorships',
-          label: 'Recommended',
-          route: '/sponsorship-list/recommended',
-          roles: ['student'],
-        },
-      ]
-  },
-  {
-    id: 'financing',
-    icon: HiOutlineOfficeBuilding,
-    label: "Financing",
+    id: "sponsorhip-list",
+    label: "Sponsorship List",
     route: "",
-    roles: ['admin'],
+    icon: IoNewspaperOutline,
+    roles: ["student"],
     children: [
       {
-        id: 'budget-office',
-        icon: HiOutlineOfficeBuilding,
-        label: "Budget Office",
-        route: "/financing/budget-office",
-        roles: ['admin'],
+        id: "applied-sponsorships",
+        label: "Applied",
+        route: "/sponsorship-list/applied",
+        roles: ["student"],
       },
       {
-        id: 'mayors-office',
-        icon: HiOutlineOfficeBuilding,
-        label: "Mayor's Office",
-        route: "/financing/mayors-office",
-        roles: ['admin'],
+        id: "recommended-sponsorships",
+        label: "Recommended",
+        route: "/sponsorship-list/recommended",
+        roles: ["student"],
       },
-      {
-        id: 'treasurers-office',
-        icon: HiOutlineOfficeBuilding,
-        label: "Treasurer's Office",
-        route: "/financing/treasurers-office",
-        roles: ['admin'],
-      },
-      {
-        id: 'cashiering',
-        icon: HiOutlineOfficeBuilding,
-        label: "Cashiering",
-        route: "/financing/cashiering",
-        roles: ['admin'],
-      },
-      {
-        id: 'accounting',
-        icon: HiOutlineOfficeBuilding,
-        label: "Accounting",
-        route: "/financing/accounting",
-        roles: ['admin'],
-      },
-    ]
+    ],
   },
   {
-    id: 'setup-manager',
+    id: "setup-manager",
     icon: RiListSettingsLine,
     label: "Setup Manager",
     route: "",
     children: [
       {
-        id: 'academic-setup',
-        label: 'Academic Setup',
-        route: '/setup-manager/academic-setup',
-        roles: ['admin'],
+        id: "academic-setup",
+        label: "Academic Setup",
+        route: "/setup-manager/academic-setup",
+        roles: ["admin"],
       },
       {
-        id: 'sponsorships',
-        label: 'Sponsorships',
-        route: '/setup-manager/sponsorships',
-        roles: ['admin'],
+        id: "sponsorships",
+        label: "Sponsorships",
+        route: "/setup-manager/sponsorships",
+        roles: ["admin"],
       },
       {
-        id: 'schools',
-        label: 'Schools',
-        route: '/setup-manager/schools',
-        roles: ['admin'],
+        id: "schools",
+        label: "Schools",
+        route: "/setup-manager/schools",
+        roles: ["admin"],
       },
       {
-        id: 'schedules',
-        label: 'Schedule',
-        route: '/setup-manager/schedules',
-        roles: ['admin', 'coordinator'],
-      }
+        id: "schedules",
+        label: "Schedule",
+        route: "/setup-manager/schedules",
+        roles: ["admin", "coordinator"],
+      },
     ],
-    roles: ['admin', 'sponsor', 'coordinator'],
+    roles: ["admin", "sponsor", "coordinator"],
   },
   {
-    id: 'manage-report',
+    id: "manage-report",
     icon: HiOutlineOfficeBuilding,
     label: "Manage Report",
     route: "/manage-report",
-    roles: ['admin', 'coordinator',],
+    roles: ["admin", "coordinator"],
   },
   {
-    id: 'monitoring-list',
+    id: "monitoring-list",
     icon: IoNewspaperOutline,
-    label: 'Monitoring List',
-    route: '/monitoring-list',
-    roles: ['admin', 'coordinator', 'sponsor'],
+    label: "Monitoring List",
+    route: "/monitoring-list",
+    roles: ["admin", "coordinator", "sponsor"],
   },
   {
-    id: 'settings',
+    id: "settings",
     icon: CiSettings,
     label: "Settings",
     route: "",
     children: [
       {
-        id: 'profile',
-        label: 'Profile',
-        route: '/settings/profile',
-        roles: ['admin', 'student'],
+        id: "profile",
+        label: "Profile",
+        route: "/settings/profile",
+        roles: ["admin", "student"],
       },
       {
-        id: 'requirements',
-        label: 'Requirements',
-        route: '/settings/requirements',
-        roles: ['student'],
+        id: "requirements",
+        label: "Requirements",
+        route: "/settings/requirements",
+        roles: ["student"],
       },
       {
-        id: 'user-accounts',
-        label: 'User Accounts',
-        route: '/settings/user-accounts',
-        roles: ['admin'],
+        id: "user-accounts",
+        label: "User Accounts",
+        route: "/settings/user-accounts",
+        roles: ["admin"],
       },
       {
-        id: 'student-accounts',
-        label: 'Student Accounts',
-        route: '/settings/student-accounts',
-        roles: ['admin'],
-      }
+        id: "student-accounts",
+        label: "Student Accounts",
+        route: "/settings/student-accounts",
+        roles: ["admin"],
+      },
     ],
-    roles: ['admin', 'student'],
-  }
+    roles: ["admin", "student"],
+  },
 ];

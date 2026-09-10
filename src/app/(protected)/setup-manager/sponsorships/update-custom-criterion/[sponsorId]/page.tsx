@@ -11,30 +11,34 @@ export const metadata: Metadata = {
 const SponsorshipAPI = new SponsorshipAPIService();
 
 const getSponsorshipDetails = async (sponsorId: string) => {
-    const response = await SponsorshipAPI.getSponsorshipDetails(sponsorId);
-    return response;
-}
+  const response = await SponsorshipAPI.getSponsorshipDetails(sponsorId);
+  return response;
+};
 
 const getCustomCriterion = async () => {
-    const response = await SponsorshipAPI.getCustomCriterionData();
-    return response;
-}
+  const response = await SponsorshipAPI.getCustomCriterionData();
+  return response;
+};
 
-const CriteriaPage= async ({ params }: { params: { sponsorId: string } }) => {
-    const { sponsorId } = await params;
-    const sponsorshipDetails = await getSponsorshipDetails(sponsorId);
-    const customCriterionData = await getCustomCriterion();
+const CriteriaPage = async ({
+  params,
+}: {
+  params: Promise<{ sponsorId: string }>;
+}) => {
+  const { sponsorId } = await params;
+  const sponsorshipDetails = await getSponsorshipDetails(sponsorId);
+  const customCriterionData = await getCustomCriterion();
 
-    const serverData = {
-      sponsorshipDetails: sponsorshipDetails,
-      customCriterionData: customCriterionData
-    }
-    
-    return (
-      <>
-        <CriteriaCustomInput serverData={serverData}/>
-      </>
-    );
+  const serverData = {
+    sponsorshipDetails: sponsorshipDetails,
+    customCriterionData: customCriterionData,
   };
-  
+
+  return (
+    <>
+      <CriteriaCustomInput serverData={serverData} />
+    </>
+  );
+};
+
 export default CriteriaPage;

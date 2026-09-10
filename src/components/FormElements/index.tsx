@@ -1,16 +1,16 @@
 "use client";
+import CheckBox from "@/components/Checkboxes";
+import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import CheckboxFive from "@/components/Checkboxes/CheckboxFive";
-import CheckboxFour from "@/components/Checkboxes/CheckboxFour";
-import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
-import CheckboxThree from "@/components/Checkboxes/CheckboxThree";
-import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
 import DatePickerTwo from "@/components/FormElements/DatePicker/DatePickerTwo";
 import DatePickerOne from "@/components/FormElements/DatePicker/DatePickerOne";
 import MultiSelect from "@/components/FormElements/MultiSelect";
 import SelectGroupTwo from "@/components/SelectGroup/SelectGroupTwo";
 
 const FormElements = () => {
+  const [checkedStyles, setCheckedStyles] = useState<Record<string, boolean>>(
+    {},
+  );
   return (
     <>
       <Breadcrumb pageName="FormElements" />
@@ -68,9 +68,7 @@ const FormElements = () => {
                 Toggle switch input
               </h3>
             </div>
-            <div className="flex flex-col gap-5.5 p-6.5">
-            
-            </div>
+            <div className="flex flex-col gap-5.5 p-6.5"></div>
           </div>
 
           {/* <!-- Time and date --> */}
@@ -170,11 +168,29 @@ const FormElements = () => {
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
-              <CheckboxOne />
-              <CheckboxTwo />
-              <CheckboxThree />
-              <CheckboxFour />
-              <CheckboxFive />
+              {(
+                [
+                  "default",
+                  "square",
+                  "x-sign",
+                  "inner-circle",
+                  "outer-circle",
+                ] as const
+              ).map((style) => (
+                <CheckBox
+                  key={style}
+                  name={style}
+                  label={style + " checkbox"}
+                  style={style}
+                  checked={checkedStyles[style] ?? false}
+                  onChange={(checked) =>
+                    setCheckedStyles((previous) => ({
+                      ...previous,
+                      [style]: checked,
+                    }))
+                  }
+                />
+              ))}
             </div>
           </div>
 
