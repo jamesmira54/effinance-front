@@ -27,16 +27,16 @@ export type PublicBannerProps = {
 
 export default function PublicBanner({ image, href }: PublicBannerProps) {
   const banner = banners[image];
-  // Keep the complete artwork visible so its embedded text is never cropped.
+  // Fill the content width while retaining the compact banner height.
   const artwork = (
-    <div className="relative aspect-[2658/984] w-full bg-primary">
+    <div className="relative aspect-[5316/984] w-full overflow-hidden bg-primary h-[510px]">
       <Image
         src={banner.src}
         alt={banner.alt}
         fill
         priority
         sizes="100vw"
-        className="object-contain"
+        className="object-cover object-top"
       />
     </div>
   );

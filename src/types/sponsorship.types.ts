@@ -57,6 +57,7 @@ export interface APISponsorshipListResponse {
     students: studentsAPI[],
     criterion: any[];
     pairwise: any[];
+    allowancePerStudent: number;
 }
 
 export interface SponsorshipSchoolProps {

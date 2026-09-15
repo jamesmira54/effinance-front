@@ -14,6 +14,7 @@ export interface SponsorshipFormProps {
     fundAllocation: number;
     sponsorshipRequirements: SelectOption[] | null;
     sponsorshipSchool: SelectOption[] | null;
+    allowancePerStudent: number;
 }
 
 
@@ -40,4 +41,5 @@ export interface SponsorshipDetailsProps {
     students: any[],
     criterion: Criteria[];
     pairwise: InitialPairwise[];
+    allowancePerStudent: number;
 }

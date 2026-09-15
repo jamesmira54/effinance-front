@@ -50,7 +50,7 @@ const SponsorshipForm: React.FC<
       batchNumber: initialData?.batchNumber || 0,
       limit: initialData?.limit || 0,
       slot: initialData?.slot || 0,
-      fundAllocation: initialData?.fundAllocation || 0,
+      fundAllocation: initialData?.fundAllocation || 1,
       sponsorshipRequirements: initialData?.sponsorshipRequirements?.map((item) => ({
         label: selectOptionsData.requirements.find((option) => option.value === item.fileId)?.label || "",
         value: item.fileId,
@@ -59,6 +59,7 @@ const SponsorshipForm: React.FC<
         label: selectOptionsData.schools.find((option) => option.value === item.schoolId)?.label || "",
         value: item.schoolId,
       })) || [],
+      allowancePerStudent: initialData?.allowancePerStudent || 0,
     }), [initialData]);
 
   const formik = useFormik<SponsorshipFormProps>({
@@ -83,7 +84,6 @@ const SponsorshipForm: React.FC<
       batchNumber: Yup.number().required("Required Field!"),
       limit: Yup.number().required("Required Field!"),
       slot: Yup.number().required("Required Field!"),
-      fundAllocation: Yup.number().required("Required Field!"),
       sponsorshipRequirements: Yup.array()
         .min(1, "Select at least one school") // ✅ Require at least one selection
         .required("Required Field!"),
@@ -323,18 +323,32 @@ const SponsorshipForm: React.FC<
         </div>
 
         <div className="flex flex-col mb-4 gap-6 xl:flex-row">
-          <div className="w-full xl:w-1/2">
+          <div className="w-full xl:w-1/2 hidden">
             <Input  
               id="fundAllocation"
               label="Fund Allocation" 
               type="number" 
               placeholder="Fund Allocation" 
               name="fundAllocation"
-              value={formik.values.fundAllocation}
+              value={1}
               onChange={formik.handleChange}
               onBlur={() => formik.handleBlur}
               error={formik.touched.fundAllocation && formik.errors.fundAllocation ? true : false}
               errorMessage={formik.errors.fundAllocation}
+            />
+          </div>
+          <div className="w-full xl:w-1/2">
+            <Input  
+              id="allowancePerStudent"
+              label="Allowance Per Student" 
+              type="number" 
+              placeholder="Allowance Per Student" 
+              name="allowancePerStudent"
+              value={formik.values.allowancePerStudent}
+              onChange={formik.handleChange}
+              onBlur={() => formik.handleBlur}
+              error={formik.touched.allowancePerStudent && formik.errors.allowancePerStudent ? true : false}
+              errorMessage={formik.errors.allowancePerStudent}
             />
           </div>
         </div>
