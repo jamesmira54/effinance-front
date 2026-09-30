@@ -6,6 +6,8 @@ import {
     ReceiverActionFields,
     SetupItem,
     SetupKind,
+    SetupListParams,
+    SetupPayload,
     TrackCurrentUser,
     TrackListParams,
 } from "@/types/document-tracking.types";
@@ -64,8 +66,25 @@ export default class DocumentTrackingAPIService extends AxiosAPI {
         return this.post({ path: `/${trackId}/done`, body: fields });
     }
 
-    async setupList(kind: SetupKind, params: { active?: boolean; limit?: number } = {}): Promise<Paginated<SetupItem>> {
+    async setupList(kind: SetupKind, { active, search, offset, limit }: SetupListParams = {}): Promise<Paginated<SetupItem>> {
+        const params: Record<string, string | number | boolean> = {};
+        if (active !== undefined) params.active = active;
+        if (search?.trim()) params.search = search.trim();
+        if (offset !== undefined) params.offset = offset;
+        if (limit !== undefined) params.limit = limit;
         return this.get({ path: `/setup/${kind}`, params });
+    }
+
+    async setupCreate(kind: SetupKind, payload: SetupPayload): Promise<SetupItem> {
+        return this.post({ path: `/setup/${kind}`, body: payload });
+    }
+
+    async setupUpdate(kind: SetupKind, id: string, payload: SetupPayload): Promise<SetupItem> {
+        return this.put({ path: `/setup/${kind}/${id}`, body: payload });
+    }
+
+    async setupDelete(kind: SetupKind, id: string): Promise<string> {
+        return this.delete({ path: `/setup/${kind}/${id}` });
     }
 
     // The PDF is binary, so it skips the { data } envelope unwrap used everywhere else.

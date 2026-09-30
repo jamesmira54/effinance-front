@@ -85,6 +85,19 @@ export interface SetupItem {
     updatedAt: string;
 }
 
+export interface SetupPayload {
+    name?: string;
+    sortOrder?: number;
+    isActive?: boolean;
+}
+
+export interface SetupListParams {
+    active?: boolean;
+    search?: string;
+    offset?: number;
+    limit?: number;
+}
+
 export interface Paginated<T> {
     data: T[];
     total: number;

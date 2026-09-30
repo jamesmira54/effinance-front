@@ -122,6 +122,25 @@ export const MENU_ITEMS: MenuItem[] = [
         route: "/setup-manager/schedules",
         roles: ["admin", "coordinator"],
       },
+      // Labels must match the backend's seeded module names or the sidebar hides them.
+      {
+        id: "process-type",
+        label: "Process Type",
+        route: "/setup-manager/process-types",
+        roles: ["admin", "coordinator"],
+      },
+      {
+        id: "process-purpose",
+        label: "Process Purpose",
+        route: "/setup-manager/process-purposes",
+        roles: ["admin", "coordinator"],
+      },
+      {
+        id: "process-destination",
+        label: "Process Destination",
+        route: "/setup-manager/process-destinations",
+        roles: ["admin", "coordinator"],
+      },
     ],
     roles: ["admin", "sponsor", "coordinator"],
   },
