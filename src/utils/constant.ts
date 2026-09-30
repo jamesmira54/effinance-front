@@ -55,19 +55,6 @@ export const FORMULA_TYPE_OPTIONS = [
     { label: 'Average', value: 'AVG' },
 ];
 
-// Must match backend role names exactly, including the curly apostrophes.
-export const OFFICE_ROLE = {
-    BUDGET_OFFICE: "Budget Office",
-    MAYORS_OFFICE: "Mayor’s Office",
-    TREASURERS_OFFICE: "Treasurer’s Office",
-    CASHIER: "Cashier",
-    ACCOUNTING: "Accounting",
-} as const;
-
-export const TRACK_OFFICES: string[] = Object.values(OFFICE_ROLE);
-
-export const TRACK_ROUTING_OFFICES: string[] = [...TRACK_OFFICES, USER_ROLE.COORDINATOR];
-
 export const TRACK_STATUS = {
     DRAFT: "DRAFT",
     SUBMITTED: "SUBMITTED",
@@ -85,14 +72,3 @@ export const TRACK_STATUS_LABEL: Record<string, string> = {
     RETURNED: "Returned",
     DONE: "Done",
 };
-
-export const PROCESS_TYPE_OPTIONS = [
-    { label: "Scholarship Voucher", value: "SCHOLARSHIP_VOUCHER" },
-    { label: "Scholarship Disbursement", value: "SCHOLARSHIP_DISBURSEMENT" },
-];
-
-export const TRACK_PURPOSE_OPTIONS = [
-    { label: "For Processing", value: "FOR_PROCESSING" },
-    { label: "For Approval", value: "FOR_APPROVAL" },
-    { label: "For Validation", value: "FOR_VALIDATION" },
-];

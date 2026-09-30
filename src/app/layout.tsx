@@ -18,7 +18,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <LoaderProvider>
             <LoaderAutoHide />
-            <main className="dark:bg-boxdark-2 dark:text-bodydark print:!h-auto print:!overflow-visible" style={{height: '100vh', overflow: 'auto'}}>
+            <main className="dark:bg-boxdark-2 dark:text-bodydark" style={{height: '100vh', overflow: 'auto'}}>
               {children}
             </main>
           </LoaderProvider>

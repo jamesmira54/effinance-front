@@ -1,94 +1,167 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TableColumn } from "react-data-table-component";
 import { CiSquarePlus } from "react-icons/ci";
 import DataTable from "@/components/DataTable";
-import Tabs from "@/components/Tabs";
 import Badge from "@/components/Badge";
 import Alert from "@/components/Alert";
 import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
-import { DocumentTrack, TrackCurrentUser } from "@/types/document-tracking.types";
+import { DocumentTrack, TrackCurrentUser, TrackStatus } from "@/types/document-tracking.types";
 import { TRACK_STATUS } from "@/utils/constant";
-import {
-    canViewTrack,
-    formatDateTime,
-    isTrackCreator,
-    lastUpdated,
-    processTypeLabel,
-    purposeLabel,
-    statusLabel,
-    statusVariant,
-} from "./trackDisplay";
+import { formatDateTime, statusLabel, statusVariant, toTrackError } from "./trackDisplay";
 
 interface DocumentTrackingListProps {
     currentUser: TrackCurrentUser;
-    awardedSponsorshipIds: string[];
 }
+
+type TabKey = "ALL" | "INBOX" | TrackStatus;
 
 const trackingAPI = new DocumentTrackingAPIService();
 
-const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser, awardedSponsorshipIds }) => {
-    const [tracks, setTracks] = useState<DocumentTrack[]>([]);
+const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser }) => {
+    const router = useRouter();
+    const [tab, setTab] = useState<TabKey>("ALL");
+    const [searchInput, setSearchInput] = useState<string>("");
+    const [search, setSearch] = useState<string>("");
+    const [page, setPage] = useState<number>(1);
+    const [perPage, setPerPage] = useState<number>(10);
+    const [rows, setRows] = useState<DocumentTrack[]>([]);
+    const [total, setTotal] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>("");
 
+    const tabs: { key: TabKey; label: string }[] = [
+        { key: "ALL", label: "All" },
+        ...Object.values(TRACK_STATUS).map((status) => ({ key: status as TabKey, label: statusLabel(status) })),
+        ...(currentUser.officeId ? [{ key: "INBOX" as TabKey, label: "Pending on my office" }] : []),
+    ];
+
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        setErrorMessage("");
+        try {
+            const result = await trackingAPI.list({
+                offset: (page - 1) * perPage,
+                limit: perPage,
+                status: tab === "ALL" || tab === "INBOX" ? undefined : tab,
+                inbox: tab === "INBOX",
+                search,
+            });
+            setRows(result?.data ?? []);
+            setTotal(result?.total ?? 0);
+        } catch (err) {
+            const error = toTrackError(err);
+            if (error.signedOut) {
+                router.push("/login");
+                return;
+            }
+            setErrorMessage(error.message);
+            setRows([]);
+            setTotal(0);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [page, perPage, tab, search, router]);
+
     useEffect(() => {
-        trackingAPI.getTracks()
-            .then((all) => setTracks(all.filter((track) => canViewTrack(track, currentUser, awardedSponsorshipIds))))
-            .catch(() => setErrorMessage("Unable to load document tracks."))
-            .finally(() => setIsLoading(false));
-    }, [currentUser, awardedSponsorshipIds]);
+        load();
+    }, [load]);
+
+    const selectTab = (key: TabKey) => {
+        setTab(key);
+        setPage(1);
+    };
+
+    const handleSearch = (event: FormEvent) => {
+        event.preventDefault();
+        setSearch(searchInput);
+        setPage(1);
+    };
 
     const columns: TableColumn<DocumentTrack>[] = useMemo(() => [
         {
             name: "Track No.",
             cell: (row) => <Link className="text-primary hover:underline" href={`/document-tracking/${row.id}`}>{row.trackNumber}</Link>,
-            sortable: true,
-            sortFunction: (a, b) => a.trackNumber.localeCompare(b.trackNumber),
+            
         },
-        { name: "Title", selector: (row) => row.title, sortable: true, wrap: true },
-        { name: "Sponsorship", selector: (row) => row.sponsorshipName, sortable: true, wrap: true },
-        { name: "Type of Process", selector: (row) => processTypeLabel(row.processType), wrap: true },
-        { name: "Purpose", selector: (row) => purposeLabel(row.purpose) },
-        { name: "Current Office", selector: (row) => row.currentHolder, sortable: true, wrap: true },
+        { name: "Title", selector: (row) => row.title, wrap: true },
+        { name: "Particulars", selector: (row) => row.particulars, wrap: true },
+        { name: "Process Type", selector: (row) => row.processType, wrap: true },
+        { name: "Purpose", selector: (row) => row.purpose, wrap: true },
+        { name: "Sponsorship", selector: (row) => row.sponsorshipName, wrap: true },
         { name: "Status", cell: (row) => <Badge variants={statusVariant(row.status)}>{statusLabel(row.status)}</Badge> },
-        { name: "Last Updated", selector: (row) => formatDateTime(lastUpdated(row)), wrap: true },
+        { name: "Current Office", selector: (row) => row.currentHolder, wrap: true },
+        { name: "Created By", selector: (row) => row.createdBy.name, wrap: true },
+        { name: "Created At", selector: (row) => formatDateTime(row.createdAt), wrap: true },
+        { name: "Submitted At", selector: (row) => formatDateTime(row.submittedAt), wrap: true },
     ], []);
-
-    const tabs = Object.values(TRACK_STATUS).map((status) => {
-        const rows = tracks.filter((track) => track.status === status);
-        return {
-            label: `${statusLabel(status)} (${rows.length})`,
-            content: (
-                <DataTable
-                    columns={columns}
-                    data={rows}
-                    pagination
-                    noDataComponent={<p className="py-6">No {statusLabel(status).toLowerCase()} tracks.</p>}
-                />
-            ),
-        };
-    });
 
     return (
         <div className="rounded-sm border border-stroke bg-white px-5 pb-5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
-            {isTrackCreator(currentUser.userType) && (
-                <div className="mb-4 flex justify-end">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <form onSubmit={handleSearch} className="flex gap-2" role="search">
+                    <label htmlFor="track-search" className="sr-only">Search track number or title</label>
+                    <input
+                        id="track-search"
+                        type="search"
+                        placeholder="Search track no. or title"
+                        value={searchInput}
+                        onChange={(event) => setSearchInput(event.target.value)}
+                        className="rounded border border-stroke bg-transparent px-4 py-2 outline-none focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                    />
+                    <button type="submit" className="rounded bg-primary px-4 py-2 font-medium text-white hover:bg-opacity-90">Search</button>
+                </form>
+                {currentUser.canCreate && (
                     <Link
                         href="/document-tracking/create"
                         className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-white hover:bg-opacity-90"
                     >
                         <CiSquarePlus size={22} /> Create Track
                     </Link>
-                </div>
-            )}
+                )}
+            </div>
+
+            <div className="mb-4 flex flex-wrap border-b" role="tablist">
+                {tabs.map((item) => (
+                    <button
+                        key={item.key}
+                        type="button"
+                        role="tab"
+                        aria-selected={tab === item.key}
+                        onClick={() => selectTab(item.key)}
+                        className={`px-4 py-2 text-sm font-medium transition-colors ${
+                            tab === item.key ? "border-b-2 border-primary text-primary" : "text-gray-500 hover:text-primary"
+                        }`}
+                    >
+                        {item.label}
+                    </button>
+                ))}
+            </div>
 
             {errorMessage && <Alert variant="error" title="Error" message={errorMessage} />}
 
-            {isLoading ? <Throbber /> : <Tabs tabs={tabs} />}
+            <DataTable
+                key={`${tab}-${search}-${perPage}`}
+                columns={columns}
+                data={rows}
+                progressPending={isLoading}
+                progressComponent={<div className="py-6"><Throbber /></div>}
+                noDataComponent={<p className="py-6">No tracks.</p>}
+                pagination
+                paginationServer
+                paginationTotalRows={total}
+                paginationDefaultPage={page}
+                paginationPerPage={perPage}
+                onChangePage={setPage}
+                onChangeRowsPerPage={(newPerPage) => {
+                    setPerPage(newPerPage);
+                    setPage(1);
+                }}
+            />
         </div>
     );
 };

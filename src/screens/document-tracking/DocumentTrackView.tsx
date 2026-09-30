@@ -1,43 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Badge from "@/components/Badge";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
+import Modal from "@/components/Modal";
 import Throbber from "@/components/common/Throbber";
-import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import { DocumentTrackingAPIService } from "@/api";
-import { DocumentTrack, TrackCurrentUser, TrackHistoryEntry } from "@/types/document-tracking.types";
+import { DocumentTrack, TrackCurrentUser } from "@/types/document-tracking.types";
 import { TRACK_STATUS } from "@/utils/constant";
-import DocumentTrackForm from "./DocumentTrackForm";
+import DocumentTrackForm, { TrackFormOptionsProps } from "./DocumentTrackForm";
 import DocumentTrackActions from "./DocumentTrackActions";
 import {
-    canViewTrack,
     formatDateTime,
-    processTypeLabel,
-    purposeLabel,
+    HISTORY_LABEL,
+    historyFrom,
+    readBlobError,
     statusLabel,
     statusVariant,
+    toTrackError,
 } from "./trackDisplay";
 
 interface DocumentTrackViewProps {
     trackId: string;
     currentUser: TrackCurrentUser;
-    awardedSponsorshipIds: string[];
-    sponsorshipOptions: SelectOption[];
+    options: TrackFormOptionsProps;
 }
 
 const trackingAPI = new DocumentTrackingAPIService();
-
-const HISTORY_LABEL: Record<TrackHistoryEntry["action"], string> = {
-    CREATED: "Created",
-    SUBMITTED: "Submitted",
-    ACCEPTED: "In-Processed",
-    FORWARDED: "Forwarded",
-    RETURNED: "Returned",
-    DONE: "Done",
-};
 
 const Detail: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
     <div>
@@ -46,24 +38,46 @@ const Detail: React.FC<{ label: string; value: React.ReactNode }> = ({ label, va
     </div>
 );
 
-const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentUser, awardedSponsorshipIds, sponsorshipOptions }) => {
+const card = "rounded-sm border border-stroke bg-white px-5 pb-5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5";
+
+const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentUser, options }) => {
+    const router = useRouter();
     const [track, setTrack] = useState<DocumentTrack | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [notFound, setNotFound] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [discardOpen, setDiscardOpen] = useState<boolean>(false);
+    const [isBusy, setIsBusy] = useState<boolean>(false);
+
+    const handleError = useCallback((err: unknown) => {
+        const error = toTrackError(err);
+        if (error.signedOut) router.push("/login");
+        return error;
+    }, [router]);
+
+    const load = useCallback(async () => {
+        try {
+            setTrack(await trackingAPI.getTrack(trackId));
+            setNotFound(false);
+        } catch (err) {
+            const error = handleError(err);
+            if (error.message === "Something went wrong.") {
+                setErrorMessage(error.message);
+            } else {
+                setNotFound(true);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [trackId, handleError]);
 
     useEffect(() => {
-        trackingAPI.getTrack(trackId)
-            .then((found) => setTrack(found && canViewTrack(found, currentUser, awardedSponsorshipIds) ? found : null))
-            .catch(() => setErrorMessage("Unable to load the track."))
-            .finally(() => setIsLoading(false));
-    }, [trackId, currentUser, awardedSponsorshipIds]);
-
-    const card = "rounded-sm border border-stroke bg-white px-5 pb-5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 print:border-0 print:shadow-none";
+        load();
+    }, [load]);
 
     if (isLoading) return <Throbber />;
-    if (errorMessage) return <Alert variant="error" title="Error" message={errorMessage} />;
-    if (!track) {
+    if (notFound || (!track && !errorMessage)) {
         return (
             <div className={card}>
                 <p className="mb-4">Track not found.</p>
@@ -71,14 +85,50 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
             </div>
         );
     }
+    if (!track) return <Alert variant="error" title="Error" message={errorMessage} />;
 
+    const canEdit = track.allowedActions.includes("EDIT");
     const isDraft = track.status === TRACK_STATUS.DRAFT;
-    const canEditDraft = isDraft && track.createdBy.userId === currentUser.userId;
 
-    const handleSaved = (updated: DocumentTrack) => {
+    const updateTrack = (updated: DocumentTrack) => {
+        setErrorMessage("");
         setTrack(updated);
         setIsEditing(false);
     };
+
+    const discard = async () => {
+        setDiscardOpen(false);
+        setIsBusy(true);
+        try {
+            await trackingAPI.discard(track.id);
+            router.push("/document-tracking");
+        } catch (err) {
+            const error = handleError(err);
+            setErrorMessage(error.message);
+            if (error.reload) load();
+            setIsBusy(false);
+        }
+    };
+
+    const downloadPdf = async () => {
+        setIsBusy(true);
+        setErrorMessage("");
+        try {
+            const blob = await trackingAPI.pdf(track.id);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${track.trackNumber}.pdf`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            setErrorMessage(handleError(await readBlobError(err)).message);
+        } finally {
+            setIsBusy(false);
+        }
+    };
+
+    const buttonSize = "py-2 lg:px-5 xl:px-5";
 
     return (
         <div className="flex flex-col gap-6">
@@ -88,31 +138,45 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                         <h3 className="text-xl font-semibold text-black dark:text-white">{track.trackNumber}</h3>
                         <Badge variants={statusVariant(track.status)}>{statusLabel(track.status)}</Badge>
                     </div>
-                    <div className="flex gap-3 print:hidden">
-                        {canEditDraft && !isEditing && (
-                            <Button variants="outlined" className="py-2 lg:px-5 xl:px-5" onClick={() => setIsEditing(true)}>Edit Draft</Button>
+                    <div className="flex flex-wrap gap-3">
+                        {isBusy && <Throbber />}
+                        {canEdit && !isEditing && (
+                            <Button variants="outlined" className={buttonSize} onClick={() => setIsEditing(true)}>Edit</Button>
+                        )}
+                        {isDraft && canEdit && !isEditing && (
+                            <Button variants="outlined" className={buttonSize} onClick={() => setDiscardOpen(true)}>Discard Draft</Button>
                         )}
                         {!isDraft && (
-                            <Button className="bg-primary py-2 lg:px-5 xl:px-5" onClick={() => window.print()}>Print Track</Button>
+                            <Button className={`bg-primary ${buttonSize}`} onClick={downloadPdf} disabled={isBusy}>Print Track as PDF</Button>
                         )}
                     </div>
+                </div>
+
+                {errorMessage && <div className="mb-4"><Alert variant="error" title="Error" message={errorMessage} /></div>}
+
+                <div className="mb-6 rounded border border-primary/30 bg-primary/5 px-4 py-3">
+                    <span className="text-sm text-body dark:text-bodydark">Currently with</span>
+                    <p className="text-lg font-semibold text-black dark:text-white">{track.currentHolder}</p>
                 </div>
 
                 {isEditing ? (
                     <DocumentTrackForm
                         currentUser={currentUser}
-                        sponsorshipOptions={sponsorshipOptions}
+                        options={options}
                         initialTrack={track}
-                        onSaved={handleSaved}
+                        onSaved={updateTrack}
+                        onCancel={() => setIsEditing(false)}
                     />
                 ) : (
                     <dl className="grid grid-cols-1 gap-5 md:grid-cols-2">
                         <Detail label="Title of the Document" value={track.title} />
                         <Detail label="Sponsorship" value={track.sponsorshipName} />
-                        <Detail label="Type of Process" value={processTypeLabel(track.processType)} />
-                        <Detail label="Purpose" value={purposeLabel(track.purpose)} />
-                        <Detail label={isDraft ? "Created By" : "Current Office"} value={isDraft ? track.createdBy.name : track.currentHolder} />
-                        <Detail label="Date Submitted" value={track.submittedAt ? formatDateTime(track.submittedAt) : "Not submitted"} />
+                        <Detail label="Type of Process" value={track.processType} />
+                        <Detail label="Purpose" value={track.purpose} />
+                        <Detail label="Created By" value={`${track.createdBy.name} · ${formatDateTime(track.createdAt)}`} />
+                        {isDraft && <Detail label="Intended Destination" value={track.intendedDestination ?? "-"} />}
+                        <Detail label="Submitted At" value={formatDateTime(track.submittedAt)} />
+                        <Detail label="Completed At" value={formatDateTime(track.completedAt)} />
                         <div className="md:col-span-2">
                             <Detail label="Particulars" value={track.particulars} />
                         </div>
@@ -120,9 +184,15 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                 )}
             </div>
 
-            {!isEditing && (
-                <div className={`${card} print:hidden empty:hidden`}>
-                    <DocumentTrackActions track={track} currentUser={currentUser} onUpdated={setTrack} />
+            {!isEditing && track.allowedActions.some((action) => action !== "EDIT") && (
+                <div className={card}>
+                    <DocumentTrackActions
+                        track={track}
+                        currentUser={currentUser}
+                        offices={options.offices}
+                        onUpdated={updateTrack}
+                        onReload={load}
+                    />
                 </div>
             )}
 
@@ -141,20 +211,28 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                             </tr>
                         </thead>
                         <tbody>
-                            {track.history.map((item, index) => (
-                                <tr key={`${item.at}-${index}`} className="border-b border-stroke dark:border-strokedark">
-                                    <td className="px-3 py-2">{formatDateTime(item.at)}</td>
-                                    <td className="px-3 py-2">{HISTORY_LABEL[item.action]}</td>
-                                    <td className="px-3 py-2">{item.fromOffice}</td>
-                                    <td className="px-3 py-2">{item.toOffice ?? "-"}</td>
-                                    <td className="px-3 py-2">{item.actor.name}</td>
-                                    <td className="whitespace-pre-wrap px-3 py-2">{item.remarks ?? "-"}</td>
+                            {(track.history ?? []).map((entry) => (
+                                <tr key={entry.sequence} className="border-b border-stroke dark:border-strokedark">
+                                    <td className="px-3 py-2">{formatDateTime(entry.at)}</td>
+                                    <td className="px-3 py-2">{HISTORY_LABEL[entry.action]}</td>
+                                    <td className="px-3 py-2">{historyFrom(entry)}</td>
+                                    <td className="px-3 py-2">{entry.toOffice ?? "-"}</td>
+                                    <td className="px-3 py-2">{entry.actor.office ? `${entry.actor.name} (${entry.actor.office})` : entry.actor.name}</td>
+                                    <td className="whitespace-pre-wrap px-3 py-2">{entry.remarks ?? "-"}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <Modal isOpen={discardOpen} onClose={() => setDiscardOpen(false)} title="Discard draft?" className="max-w-lg">
+                <p className="mb-6">This draft will be deleted. This can&apos;t be undone.</p>
+                <div className="flex justify-end gap-3">
+                    <Button type="button" variants="outlined" onClick={() => setDiscardOpen(false)}>Cancel</Button>
+                    <Button type="button" className="bg-danger" onClick={discard}>Discard</Button>
+                </div>
+            </Modal>
         </div>
     );
 };

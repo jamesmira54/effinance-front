@@ -144,7 +144,7 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: IoNewspaperOutline,
     label: "Document Tracking",
     route: "/document-tracking",
-    roles: ["admin", "coordinator", "student"],
+    roles: ["admin", "coordinator"],
   },
   {
     id: "settings",

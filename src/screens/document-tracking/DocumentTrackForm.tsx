@@ -9,103 +9,139 @@ import Select from "@/components/Inputs/Select/Select";
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
+import Modal from "@/components/Modal";
 import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
-import { DocumentTrack, DocumentTrackPayload, ProcessType, TrackCurrentUser, TrackPurpose } from "@/types/document-tracking.types";
-import { PROCESS_TYPE_OPTIONS, TRACK_OFFICES, TRACK_PURPOSE_OPTIONS } from "@/utils/constant";
+import { DocumentTrack, DocumentTrackPayload, TrackCurrentUser } from "@/types/document-tracking.types";
+import { toTrackError } from "./trackDisplay";
+
+export interface TrackFormOptionsProps {
+    processTypes: SelectOption[];
+    purposes: SelectOption[];
+    offices: SelectOption[];
+    sponsorships: SelectOption[];
+}
 
 interface DocumentTrackFormProps {
     currentUser: TrackCurrentUser;
-    sponsorshipOptions: SelectOption[];
+    options: TrackFormOptionsProps;
     initialTrack?: DocumentTrack;
     onSaved?: (track: DocumentTrack) => void;
+    onCancel?: () => void;
 }
 
 interface FormValues {
     title: string;
     particulars: string;
-    processType: string;
-    purpose: string;
+    processTypeId: string;
+    purposeId: string;
     sponsorshipId: string;
-    destination: string;
+    destinationId: string;
 }
 
 const trackingAPI = new DocumentTrackingAPIService();
-const destinationOptions: SelectOption[] = TRACK_OFFICES.map((office) => ({ label: office, value: office }));
 
 const validationSchema = Yup.object({
-    title: Yup.string().trim().required("Title of the document is required"),
+    title: Yup.string().trim().max(255, "Title must be at most 255 characters").required("Title of the document is required"),
     particulars: Yup.string().trim().required("Particulars are required"),
-    processType: Yup.string().required("Type of process is required"),
-    purpose: Yup.string().required("Purpose is required"),
+    processTypeId: Yup.string().required("Type of process is required"),
+    purposeId: Yup.string().required("Purpose is required"),
     sponsorshipId: Yup.string().required("Sponsorship is required"),
-    destination: Yup.string().required("Destination is required"),
+    destinationId: Yup.string(),
 });
 
 const findOption = (options: SelectOption[], value: string) => options.find((option) => option.value === value) ?? null;
 
-const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, sponsorshipOptions, initialTrack, onSaved }) => {
+const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, options, initialTrack, onSaved, onCancel }) => {
     const router = useRouter();
+    const isEdit = Boolean(initialTrack);
     // A ref, not state: the button click and form submit happen in the same event.
     const submitMode = useRef<"draft" | "submit">("draft");
     const [errorMessage, setErrorMessage] = useState<string>("");
-    const isEdit = Boolean(initialTrack);
+    const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+
+    const destinationOptions = options.offices.filter((office) => office.value !== currentUser.officeId);
+
+    const save = async (values: FormValues, submit: boolean) => {
+        setErrorMessage("");
+        const payload: DocumentTrackPayload = {
+            title: values.title.trim(),
+            particulars: values.particulars.trim(),
+            processTypeId: values.processTypeId,
+            purposeId: values.purposeId,
+            sponsorshipId: values.sponsorshipId,
+            destinationId: values.destinationId || null,
+        };
+
+        try {
+            const track = initialTrack
+                ? await trackingAPI.update(initialTrack.id, payload)
+                : await trackingAPI.create({ ...payload, submit });
+            if (onSaved) {
+                onSaved(track);
+            } else {
+                router.push(`/document-tracking/${track.id}`);
+            }
+        } catch (err) {
+            const error = toTrackError(err);
+            if (error.signedOut) {
+                router.push("/login");
+                return;
+            }
+            if (error.fieldErrors) formik.setErrors(error.fieldErrors);
+            setErrorMessage(error.message);
+        }
+    };
 
     const formik = useFormik<FormValues>({
         initialValues: {
             title: initialTrack?.title ?? "",
             particulars: initialTrack?.particulars ?? "",
-            processType: initialTrack?.processType ?? "",
-            purpose: initialTrack?.purpose ?? "",
+            processTypeId: initialTrack?.processTypeId ?? "",
+            purposeId: initialTrack?.purposeId ?? "",
             sponsorshipId: initialTrack?.sponsorshipId ?? "",
-            destination: initialTrack?.history[0]?.toOffice ?? "",
+            destinationId: initialTrack?.intendedDestinationId ?? "",
         },
         validationSchema,
-        onSubmit: async (values) => {
-            setErrorMessage("");
-            const payload: DocumentTrackPayload = {
-                title: values.title.trim(),
-                particulars: values.particulars.trim(),
-                processType: values.processType as ProcessType,
-                purpose: values.purpose as TrackPurpose,
-                sponsorshipId: values.sponsorshipId,
-                sponsorshipName: findOption(sponsorshipOptions, values.sponsorshipId)?.label ?? "",
-                destination: values.destination,
-            };
-            const actor = { userId: currentUser.userId, name: currentUser.name, office: currentUser.userType };
-            const asDraft = submitMode.current === "draft";
-
-            try {
-                const track = initialTrack
-                    ? await trackingAPI.updateDraft(initialTrack.id, payload, actor, !asDraft)
-                    : await trackingAPI.createTrack(payload, actor, asDraft);
-                if (onSaved) {
-                    onSaved(track);
-                } else {
-                    router.push(`/document-tracking/${track.id}`);
+        onSubmit: async (values, { setFieldError, setFieldTouched }) => {
+            if (!isEdit && submitMode.current === "submit") {
+                if (!values.destinationId) {
+                    setFieldTouched("destinationId", true, false);
+                    setFieldError("destinationId", "Destination is required to submit");
+                    return;
                 }
-            } catch (error) {
-                setErrorMessage(error instanceof Error ? error.message : "Unable to save the track.");
+                setConfirmOpen(true);
+                return;
             }
+            await save(values, false);
         },
     });
 
-    const fieldError = (field: keyof FormValues) => (formik.touched[field] && formik.errors[field]) || "";
+    const confirmSubmit = async () => {
+        setConfirmOpen(false);
+        formik.setSubmitting(true);
+        await save(formik.values, true);
+        formik.setSubmitting(false);
+    };
 
-    const selectField = (field: keyof FormValues, label: string, options: SelectOption[]) => (
+    const fieldError = (field: keyof FormValues) => (formik.touched[field] || formik.submitCount > 0 ? formik.errors[field] : "") || "";
+
+    const selectField = (field: keyof FormValues, label: string, fieldOptions: SelectOption[]) => (
         <Select
-            id={field}
             name={field}
             label={label}
             placeholder={`Select ${label.toLowerCase()}`}
-            options={options}
-            value={findOption(options, formik.values[field])}
+            options={fieldOptions}
+            value={findOption(fieldOptions, formik.values[field])}
             onChange={(option) => formik.setFieldValue(field, (option as SelectOption | null)?.value ?? "")}
             onBlur={() => formik.setFieldTouched(field, true)}
             error={Boolean(fieldError(field))}
             errorMessage={fieldError(field)}
+            noOptionsMessage={`No ${label.toLowerCase()} available`}
         />
     );
+
+    const destinationName = findOption(destinationOptions, formik.values.destinationId)?.label ?? "";
 
     return (
         <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-5">
@@ -144,26 +180,39 @@ const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, spon
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {selectField("processType", "Type of Process", PROCESS_TYPE_OPTIONS)}
-                {selectField("purpose", "Purpose", TRACK_PURPOSE_OPTIONS)}
-                {selectField("sponsorshipId", "Sponsorship", sponsorshipOptions)}
-                {selectField("destination", "Destination", destinationOptions)}
+                {selectField("processTypeId", "Type of Process", options.processTypes)}
+                {selectField("purposeId", "Purpose", options.purposes)}
+                {selectField("sponsorshipId", "Sponsorship", options.sponsorships)}
+                {selectField("destinationId", "Destination", destinationOptions)}
             </div>
 
             <div className="flex flex-wrap justify-end gap-3">
                 {formik.isSubmitting ? (
                     <Throbber />
+                ) : isEdit ? (
+                    <>
+                        {onCancel && <Button type="button" variants="outlined" onClick={onCancel}>Cancel</Button>}
+                        <Button type="submit" className="bg-primary">Save Changes</Button>
+                    </>
                 ) : (
                     <>
                         <Button type="submit" variants="outlined" onClick={() => { submitMode.current = "draft"; }}>
-                            {isEdit ? "Save Draft" : "Create as Draft"}
+                            Save as Draft
                         </Button>
                         <Button type="submit" className="bg-primary" onClick={() => { submitMode.current = "submit"; }}>
-                            {isEdit ? "Save and Submit" : "Create and Submit"}
+                            Create &amp; Submit
                         </Button>
                     </>
                 )}
             </div>
+
+            <Modal isOpen={confirmOpen} onClose={() => setConfirmOpen(false)} title="Submit track?" className="max-w-lg">
+                <p className="mb-6">This document will be sent to <strong>{destinationName}</strong>.</p>
+                <div className="flex justify-end gap-3">
+                    <Button type="button" variants="outlined" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+                    <Button type="button" className="bg-primary" onClick={confirmSubmit}>Submit</Button>
+                </div>
+            </Modal>
         </form>
     );
 };

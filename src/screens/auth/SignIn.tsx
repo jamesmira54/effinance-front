@@ -11,6 +11,7 @@ import { useState } from "react";
 import Throbber from "@/components/common/Throbber";
 import { AuthAPIService } from "@/api";
 import { useLoader } from "@/context/LoaderContext";
+import { USER_ROLE } from "@/utils/constant";
 
 
 const SignIn: React.FC = () => {
@@ -27,10 +28,14 @@ const SignIn: React.FC = () => {
     try {
       setSubmitting(true);
       const response = await authAPI.login(values);
-      if(response.studentId === null) {
+      // Only these roles may load the dashboard; others (e.g. DTS Officer) work from Document Tracking.
+      const dashboardRoles: string[] = [USER_ROLE.ADMIN, USER_ROLE.COORDINATOR, USER_ROLE.SPONSOR];
+      if(response.studentId !== null) {
+        router.push("/announcements");
+      } else if(dashboardRoles.includes(response.permissions?.[0]?.roleName ?? USER_ROLE.ADMIN)) {
         router.push("/dashboard");
       } else {
-        router.push("/announcements");
+        router.push("/document-tracking");
       }
 
     } catch (err: any) {
