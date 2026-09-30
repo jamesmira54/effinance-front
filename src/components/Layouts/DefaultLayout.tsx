@@ -21,11 +21,13 @@ export default function DefaultLayout({
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex">
         {/* <!-- ===== Sidebar Start ===== --> */}
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} permissions={permissions}/>
+        <div className="print:hidden">
+          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} permissions={permissions}/>
+        </div>
         {/* <!-- ===== Sidebar End ===== --> */}
 
         {/* <!-- ===== Content Area Start ===== --> */}
-        <div className="relative flex flex-1 flex-col lg:ml-72.5">
+        <div className="relative flex flex-1 flex-col lg:ml-72.5 print:ml-0">
           {/* <!-- ===== Header Start ===== --> */}
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} />
           {/* <!-- ===== Header End ===== --> */}

@@ -14,3 +14,4 @@ export { default as ScheduleAPIService } from './schedules-api';
 export { default as MonitoringAPIService } from './monitoring-api';
 export { default as PublicSponsorshipAPIService } from './public-sponsorships-api';
 export { default as PublicAnnouncementsAPIService } from './public-announcements-api';
+export { default as DocumentTrackingAPIService } from './document-tracking-api';

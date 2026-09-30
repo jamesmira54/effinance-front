@@ -140,6 +140,13 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: ["admin", "coordinator", "sponsor"],
   },
   {
+    id: "document-tracking",
+    icon: IoNewspaperOutline,
+    label: "Document Tracking",
+    route: "/document-tracking",
+    roles: ["admin", "coordinator", "student"],
+  },
+  {
     id: "settings",
     icon: CiSettings,
     label: "Settings",

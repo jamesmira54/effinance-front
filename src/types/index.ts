@@ -5,3 +5,4 @@ export * from './academics.types';
 export * from './application.types';
 export * from './annoucements.types';
 export * from './sponsorship.types';
+export * from './document-tracking.types';
