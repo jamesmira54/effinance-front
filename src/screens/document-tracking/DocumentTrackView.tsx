@@ -7,8 +7,8 @@ import Badge from "@/components/Badge";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
 import Modal from "@/components/Modal";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { DocumentTrack, TrackCurrentUser } from "@/types/document-tracking.types";
 import { TRACK_STATUS } from "@/utils/constant";
 import DocumentTrackForm, { TrackFormOptionsProps } from "./DocumentTrackForm";
@@ -42,6 +42,7 @@ const card = "rounded-sm border border-stroke bg-white px-5 pb-5 pt-6 shadow-def
 
 const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentUser, options }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [track, setTrack] = useState<DocumentTrack | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
@@ -57,6 +58,7 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
     }, [router]);
 
     const load = useCallback(async () => {
+        showLoader();
         try {
             setTrack(await trackingAPI.getTrack(trackId));
             setNotFound(false);
@@ -69,19 +71,20 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
             }
         } finally {
             setIsLoading(false);
+            hideLoader();
         }
-    }, [trackId, handleError]);
+    }, [trackId, handleError, showLoader, hideLoader]);
 
     useEffect(() => {
         load();
     }, [load]);
 
-    if (isLoading) return <Throbber />;
+    if (isLoading) return null;
     if (notFound || (!track && !errorMessage)) {
         return (
             <div className={card}>
                 <p className="mb-4">Track not found.</p>
-                <Link className="text-primary hover:underline" href="/document-tracking">Back to Document Tracking</Link>
+                <Link className="text-primary hover:underline" href="/document-tracking">Back to Finas Tracking</Link>
             </div>
         );
     }
@@ -99,6 +102,7 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
     const discard = async () => {
         setDiscardOpen(false);
         setIsBusy(true);
+        showLoader();
         try {
             await trackingAPI.discard(track.id);
             router.push("/document-tracking");
@@ -107,12 +111,15 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
             setErrorMessage(error.message);
             if (error.reload) load();
             setIsBusy(false);
+        } finally {
+            hideLoader();
         }
     };
 
     const downloadPdf = async () => {
         setIsBusy(true);
         setErrorMessage("");
+        showLoader();
         try {
             const blob = await trackingAPI.pdf(track.id);
             const url = URL.createObjectURL(blob);
@@ -125,6 +132,7 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
             setErrorMessage(handleError(await readBlobError(err)).message);
         } finally {
             setIsBusy(false);
+            hideLoader();
         }
     };
 
@@ -139,7 +147,6 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                         <Badge variants={statusVariant(track.status)}>{statusLabel(track.status)}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                        {isBusy && <Throbber />}
                         {canEdit && !isEditing && (
                             <Button variants="outlined" className={buttonSize} onClick={() => setIsEditing(true)}>Edit</Button>
                         )}
@@ -173,7 +180,7 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                         <Detail label="Sponsorship" value={track.sponsorshipName} />
                         <Detail label="Type of Process" value={track.processType} />
                         <Detail label="Purpose" value={track.purpose} />
-                        <Detail label="Created By" value={`${track.createdBy.name} · ${formatDateTime(track.createdAt)}`} />
+                        <Detail label="Created By" value={track.createdBy ? `${track.createdBy.name} · ${formatDateTime(track.createdAt)}` : formatDateTime(track.createdAt)} />
                         {isDraft && <Detail label="Intended Destination" value={track.intendedDestination ?? "-"} />}
                         <Detail label="Submitted At" value={formatDateTime(track.submittedAt)} />
                         <Detail label="Completed At" value={formatDateTime(track.completedAt)} />
@@ -217,7 +224,7 @@ const DocumentTrackView: React.FC<DocumentTrackViewProps> = ({ trackId, currentU
                                     <td className="px-3 py-2">{HISTORY_LABEL[entry.action]}</td>
                                     <td className="px-3 py-2">{historyFrom(entry)}</td>
                                     <td className="px-3 py-2">{entry.toOffice ?? "-"}</td>
-                                    <td className="px-3 py-2">{entry.actor.office ? `${entry.actor.name} (${entry.actor.office})` : entry.actor.name}</td>
+                                    <td className="px-3 py-2">{!entry.actor ? "—" : entry.actor.office ? `${entry.actor.name} (${entry.actor.office})` : entry.actor.name}</td>
                                     <td className="whitespace-pre-wrap px-3 py-2">{entry.remarks ?? "-"}</td>
                                 </tr>
                             ))}

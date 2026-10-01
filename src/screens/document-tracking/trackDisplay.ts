@@ -27,7 +27,7 @@ export const HISTORY_LABEL: Record<TrackHistoryEntry["action"], string> = {
     DONE: "Done",
 };
 
-export const historyFrom = (entry: TrackHistoryEntry) => entry.fromOffice || entry.actor.name;
+export const historyFrom = (entry: TrackHistoryEntry) => entry.fromOffice || entry.actor?.name || "—";
 
 export interface TrackError {
     message: string;

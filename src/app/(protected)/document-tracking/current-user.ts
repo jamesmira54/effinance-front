@@ -12,4 +12,4 @@ export const getTrackSession = async (): Promise<TrackCurrentUser | null> => {
 };
 
 export const hasTrackAccess = (user: TrackCurrentUser | null): user is TrackCurrentUser =>
-    Boolean(user && (user.officeId || user.canCreate));
+    Boolean(user && (user.officeId || user.canCreate || user.isGrantee));

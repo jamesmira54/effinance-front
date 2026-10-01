@@ -35,7 +35,7 @@ const ApplicationForm: React.FC<
         enableReinitialize: true,
         validationSchema: Yup.object({
             appStatus: Yup.string().required("Application status is required"),
-            remarks: Yup.string().required("Remarks are required"),
+            remarks: Yup.string(),
         }),
         onSubmit: async (values, {setSubmitting}) => {
             submitHandler(values, setSubmitting);

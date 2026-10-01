@@ -18,6 +18,7 @@ import { APISponsorshipListResponse } from "@/types/sponsorship.types";
 import { CiSquarePlus } from "react-icons/ci";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CiEdit } from "react-icons/ci";
+import { FormattedDate } from "@/utils/helpers";
 
 
 const StyledModal = styled(Modal)`
@@ -60,6 +61,12 @@ const AnnouncementsList: React.FC<{serverData: serverDataProps}> = ({
         { name: "Title", selector: (row:AnnouncementsListProps) => row.title, sortable: true },
         { name: "Caption", selector: (row:AnnouncementsListProps) => row.caption },
         { name: "Sponsorship", selector: (row:AnnouncementsListProps) => row.sponsorshipName || "N/A" },
+        {
+            name: "Date Posted",
+            selector: (row:AnnouncementsListProps) => row.date_posted || "",
+            format: (row:AnnouncementsListProps) => row.date_posted ? FormattedDate(row.date_posted) : "N/A",
+            sortable: true,
+        },
         { name: <div className="flex justify-center w-full">Status</div>, cell: () => ( 
             <div className="flex justify-center w-full">
                 <Badge variants="warning">Unread</Badge> 

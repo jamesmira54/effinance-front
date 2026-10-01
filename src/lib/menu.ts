@@ -14,6 +14,8 @@ export type MenuItem = {
   route?: string;
   icon?: IconType;
   roles?: UserRole[];
+  // Shown only to students who are an official grantee of a sponsorship.
+  granteeOnly?: boolean;
   children?: MenuItem[];
 };
 
@@ -86,11 +88,19 @@ export const MENU_ITEMS: MenuItem[] = [
       },
       {
         id: "recommended-sponsorships",
-        label: "Recommended",
+        label: "Available Grants",
         route: "/sponsorship-list/recommended",
         roles: ["student"],
       },
     ],
+  },
+  {
+    id: "finas-tracking-student",
+    icon: IoNewspaperOutline,
+    label: "Finas Tracking",
+    route: "/document-tracking",
+    roles: ["student"],
+    granteeOnly: true,
   },
   {
     id: "setup-manager",
@@ -161,7 +171,7 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: "document-tracking",
     icon: IoNewspaperOutline,
-    label: "Document Tracking",
+    label: "Finas Tracking",
     route: "/document-tracking",
     roles: ["admin", "coordinator"],
   },

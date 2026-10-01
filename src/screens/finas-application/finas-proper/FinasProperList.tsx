@@ -12,7 +12,6 @@ import StudentAPIService from "@/api/student-api";
 import { IoEyeOutline } from "react-icons/io5";
 import Badge from "@/components/Badge/Badge";
 import { APIStudentFilesRes } from "@/types";
-import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import Link from "next/link";
 import { TableColumn } from "react-data-table-component";
 import { useLoader } from "@/context/LoaderContext";
@@ -34,12 +33,22 @@ const FinasProperList: React.FC<{serverData: serverDataProps}> = ({
     
     const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
-    const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
+
+    const [search, setSearch] = useState<string>("");
 
     useEffect(() => {
         setData(serverData.applications || []);
     }, [serverData.applications]);
+
+    const filteredData = useMemo(() => {
+        const term = search.trim().toLowerCase();
+        if (!term) return data;
+
+        return data.filter((item) =>
+            [item.appNumber, item.applicantName, item.finAssname].some((value) => value?.toLowerCase().includes(term))
+        );
+    }, [data, search]);
 
     const columns: TableColumn<SponsorshipApplicationResponse>[] = useMemo(() => [
         { name: "Application #", selector: (row:SponsorshipApplicationResponse) => row.appNumber, sortable: true },
@@ -73,7 +82,7 @@ const FinasProperList: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: <div className="flex justify-center w-full">Remarks</div>, cell: (row:any) => (
             <div className="flex justify-center w-full">
-                <Button onClick={() => getRemarks(row.sponsorshipId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
+                <Button onClick={() => showRemarks(row.remarks)} disabled={!row.remarks?.trim()} variants="text" className="disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-black dark:disabled:hover:text-white" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
     ], []);
@@ -95,15 +104,11 @@ const FinasProperList: React.FC<{serverData: serverDataProps}> = ({
         hideLoader();
     };
 
-    const getRemarks = async(sponsorshipId: string) => {
-        showLoader();
-        const remarksData = await SponsorshipStudentAPI.getSpecificSponsorship(sponsorshipId);
-        if(remarksData) {
-            setRemarks(remarksData.sponsorshipRemarks || "No remarks available.");
-            setOpenRemarksModal(true);
-        }
-        hideLoader();
-    }
+    // Remarks come with the row; the button is disabled when there are none.
+    const showRemarks = (value?: string | null) => {
+        setRemarks(value ?? "");
+        setOpenRemarksModal(true);
+    };
 
     const openFile = (filename: string) => {
         window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${filename}`, "_blank", "noopener,noreferrer");
@@ -112,9 +117,18 @@ const FinasProperList: React.FC<{serverData: serverDataProps}> = ({
     return (
         <Fragment>
             <div className="max-w-full overflow-x-auto">
-              <DataTable 
-                  columns={columns} 
-                  data={data} 
+              <div className="mb-4 max-w-md">
+                  <label className="mb-2 block text-sm font-medium">Search</label>
+                  <input
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Application #, applicant name, or Finas applied"
+                      className="w-full rounded border border-stroke bg-transparent px-4 py-2 outline-none focus:border-primary dark:border-strokedark"
+                  />
+              </div>
+              <DataTable
+                  columns={columns}
+                  data={filteredData}
                   pagination 
                   highlightOnHover 
                   striped

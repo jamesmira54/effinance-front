@@ -108,7 +108,8 @@ const SponsorshipListing: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: <div className="flex justify-center w-full">Custom</div>,cell: (row:APISponsorshipListResponse) => (
             <div className="flex justify-center w-full">
-                {row.studentCount > 0 && (
+                {/* Shown once a saved criterion uses the Custom Input data source. */}
+                {row.criterion?.some((criterion) => criterion.dataSource === "CUSTOM_INPUT") && (
                     <Button onClick={() => updateCustomCriterion(row.id)} variants="text" startIcon={<MdDashboardCustomize className='text-primary hover:text-success' title="Update Custom Criterion" size={20}/>}/>
                 )}
             </div>

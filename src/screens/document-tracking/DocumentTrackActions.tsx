@@ -8,8 +8,8 @@ import Select from "@/components/Inputs/Select/Select";
 import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { DocumentTrack, ReceiverAction, ReceiverActionFields, TrackCurrentUser } from "@/types/document-tracking.types";
 import { TRACK_STATUS } from "@/utils/constant";
 import { toTrackError } from "./trackDisplay";
@@ -47,6 +47,7 @@ const runAction = (action: ReceiverAction, trackId: string, fields: ReceiverActi
 
 const DocumentTrackActions: React.FC<DocumentTrackActionsProps> = ({ track, currentUser, offices, onUpdated, onReload }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [errorMessage, setErrorMessage] = useState<string>("");
     const actions = track.allowedActions.filter((action): action is ReceiverAction => action !== "EDIT");
 
@@ -83,6 +84,7 @@ const DocumentTrackActions: React.FC<DocumentTrackActionsProps> = ({ track, curr
             if (NEEDS_DESTINATION.includes(action)) fields.destinationId = values.destinationId;
             if (values.remarks.trim()) fields.remarks = values.remarks.trim();
 
+            showLoader();
             try {
                 onUpdated(await runAction(action, track.id, fields));
             } catch (err) {
@@ -94,6 +96,8 @@ const DocumentTrackActions: React.FC<DocumentTrackActionsProps> = ({ track, curr
                 if (error.fieldErrors) formik.setErrors(error.fieldErrors);
                 setErrorMessage(error.message);
                 if (error.reload) onReload();
+            } finally {
+                hideLoader();
             }
         },
     });
@@ -162,11 +166,7 @@ const DocumentTrackActions: React.FC<DocumentTrackActionsProps> = ({ track, curr
             </div>
 
             <div className="flex justify-end">
-                {formik.isSubmitting ? (
-                    <Throbber />
-                ) : (
-                    <Button type="submit" className="bg-primary">{actionLabel(action) ?? "Submit"}</Button>
-                )}
+                <Button type="submit" className="bg-primary" disabled={formik.isSubmitting}>{actionLabel(action) ?? "Submit"}</Button>
             </div>
         </form>
     );

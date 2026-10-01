@@ -8,11 +8,13 @@ import { APIModuleProps, APIUserProfileResponse } from "@/types";
 export default function DefaultLayout({
   children,
   userDetails,
-  permissions
+  permissions,
+  isGrantee = false,
 }: {
   children: React.ReactNode;
   userDetails: APIUserProfileResponse;
   permissions: APIModuleProps[];
+  isGrantee?: boolean;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   
@@ -21,7 +23,7 @@ export default function DefaultLayout({
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex">
         {/* <!-- ===== Sidebar Start ===== --> */}
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} permissions={permissions}/>
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userDetails={userDetails} permissions={permissions} isGrantee={isGrantee}/>
         {/* <!-- ===== Sidebar End ===== --> */}
 
         {/* <!-- ===== Content Area Start ===== --> */}

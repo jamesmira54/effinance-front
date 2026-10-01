@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { TableColumn } from "react-data-table-component";
 import { FaFileExcel, FaFilePdf, FaRegEye, FaSearch } from "react-icons/fa";
+import { MdUpdate } from "react-icons/md";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import DataTable from "@/components/DataTable";
@@ -12,6 +13,7 @@ import Select from "@/components/Inputs/Select/Select";
 import { MonitoringAPIService } from "@/api";
 import { APIAcademicYearProps } from "@/types/academics.types";
 import { GranteeListResponse, GranteeRow, MonitoringFilter } from "@/types/monitoring.types";
+import GranteeStatusForm from "./GranteeStatusForm";
 
 const PAGE_SIZE = 50;
 const emptyValue = "—";
@@ -20,10 +22,12 @@ const statusFilters: { value: MonitoringFilter; label: string; description: stri
   { value: "active", label: "Active", description: "Currently enrolled and receiving stipends" },
   { value: "delisted", label: "Delisted", description: "Removed from the grant" },
   { value: "graduated", label: "Graduated", description: "Completed their program under the grant" },
+  { value: "loa", label: "Leave of Absence", description: "Grant suspended during an approved LOA" },
 ];
 
 const displayValue = (value: string | number | null | undefined) => value === null || value === undefined || value === "" ? emptyValue : value;
-const statusClass = (status: GranteeRow["status"]) => status === "ACTIVE" ? "bg-success/10 text-success" : status === "DELISTED" ? "bg-danger/10 text-danger" : "bg-primary/10 text-primary";
+const statusClass = (status: GranteeRow["status"]) => status === "ACTIVE" ? "bg-success/10 text-success" : status === "DELISTED" ? "bg-danger/10 text-danger" : status === "LOA" ? "bg-warning/10 text-warning" : "bg-primary/10 text-primary";
+const statusText = (status: GranteeRow["status"]) => status === "LOA" ? "LOA" : status.charAt(0) + status.slice(1).toLowerCase();
 const academicYearLabel = (year: APIAcademicYearProps) => `${year.academicYearStart}–${year.academicYearEnd} / Semester ${year.schoolTerm}`;
 
 const downloadBlob = (content: BlobPart, type: string, filename: string) => {
@@ -36,9 +40,9 @@ const downloadBlob = (content: BlobPart, type: string, filename: string) => {
 };
 
 const exportColumns: [string, keyof GranteeRow][] = [
-  ["Seq", "seq"], ["Award Number", "awardNumber"], ["Grant", "grantName"], ["Academic Year", "academicYear"], ["Batch", "batch"],
-  ["Semester", "semester"], ["Complete Name", "completeName"], ["Gender", "gender"],
-  ["Year Level", "yearLevel"], ["Course", "course"], ["School", "school"], ["GWA", "gwa"], ["Status", "status"],
+  ["Seq.", "seq"], ["Award Number", "awardNumber"], ["Student Number", "studentNumber"], ["Full Name", "completeName"],
+  ["Sex", "gender"], ["Year Level", "yearLevel"], ["Course", "course"], ["Sponsor", "sponsor"], ["Grant", "grantName"],
+  ["Academic Year", "academicYear"], ["Status", "status"],
 ];
 
 const escapeHtml = (value: unknown) => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -46,10 +50,10 @@ const escapeHtml = (value: unknown) => String(value ?? "").replace(/&/g, "&amp;"
 const createPdf = (rows: GranteeRow[]) => {
   const pageRows = 32;
   const pages: string[][] = [];
-  const header = "SEQ | AWARD NUMBER | SCHOLARSHIP | ACADEMIC YEAR | STUDENT | GENDER | YEAR | GWA | STATUS";
+  const header = "SEQ | AWARD NUMBER | STUDENT NUMBER | FULL NAME | SEX | YEAR | COURSE | SPONSOR | STATUS";
   for (let index = 0; index < Math.max(rows.length, 1); index += pageRows) {
     pages.push(rows.slice(index, index + pageRows).map((row) =>
-      `${row.seq} | ${row.awardNumber || "-"} | ${row.grantName} | ${row.academicYear || "-"} | ${row.completeName} | ${row.gender || "-"} | ${row.yearLevel ?? "-"} | ${row.gwa ?? "-"} | ${row.status}`
+      `${row.seq} | ${row.awardNumber || "-"} | ${row.studentNumber || "-"} | ${row.completeName} | ${row.gender || "-"} | ${row.yearLevel ?? "-"} | ${row.course || "-"} | ${row.sponsor || "-"} | ${row.status}`
     ));
   }
   const ascii = (value: string) => value.normalize("NFKD").replace(/[^\x20-\x7E]/g, "?").replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
@@ -75,7 +79,7 @@ const createPdf = (rows: GranteeRow[]) => {
   return pdf;
 };
 
-const MonitoringList = ({ initialData, academicYears }: { initialData: GranteeListResponse; academicYears: APIAcademicYearProps[] }) => {
+const MonitoringList = ({ initialData, academicYears, canUpdate }: { initialData: GranteeListResponse; academicYears: APIAcademicYearProps[]; canUpdate: boolean }) => {
   const api = new MonitoringAPIService();
   const [data, setData] = useState(initialData.grantees || []);
   const [totalRows, setTotalRows] = useState(initialData.totalCount || 0);
@@ -85,6 +89,7 @@ const MonitoringList = ({ initialData, academicYears }: { initialData: GranteeLi
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<GranteeRow | null>(null);
+  const [updating, setUpdating] = useState<GranteeRow | null>(null);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
@@ -129,35 +134,45 @@ const MonitoringList = ({ initialData, academicYears }: { initialData: GranteeLi
   };
 
   const columns: TableColumn<GranteeRow>[] = useMemo(() => [
-    { name: "Name of Scholarship", selector: (row) => row.grantName, sortable: true},
-    { name: "Award Number", cell: (row) => row.studentId && row.awardNumber ? <Link className="font-medium text-primary hover:underline" href={`/settings/student-accounts/view/${row.studentId}`}>{row.awardNumber}</Link> : displayValue(row.awardNumber) },
-    { name: "Complete Name of Student", selector: (row) => row.completeName, sortable: true},
-    { name: "Gender", selector: (row) => String(displayValue(row.gender)), sortable: true },
+    { name: "Seq.", width: "70px", selector: (row) => row.seq },
+    // Blank when the grantee has no award number yet.
+    { name: "Award Number", cell: (row) => row.studentId && row.awardNumber ? <Link className="font-medium text-primary hover:underline" href={`/settings/student-accounts/view/${row.studentId}`}>{row.awardNumber}</Link> : "" },
+    { name: "Student Number", selector: (row) => row.studentNumber || "", sortable: true },
+    { name: "Full Name", selector: (row) => row.completeName, sortable: true, wrap: true },
+    { name: "Sex", selector: (row) => String(displayValue(row.gender)), sortable: true },
     { name: "Year Level", selector: (row) => String(displayValue(row.yearLevel)), sortable: true },
-    { name: "GWA", selector: (row) => String(displayValue(row.gwa)), sortable: true },
-    { name: "Status", cell: (row) => <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(row.status)}`}>{row.status.charAt(0) + row.status.slice(1).toLowerCase()}</span>, sortable: true, selector: (row) => row.status },
+    { name: "Course", selector: (row) => String(displayValue(row.course)), sortable: true, wrap: true },
+    { name: "Sponsor", selector: (row) => String(displayValue(row.sponsor)), sortable: true, wrap: true },
+    { name: "Status", cell: (row) => <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass(row.status)}`}>{statusText(row.status)}</span>, sortable: true, selector: (row) => row.status },
     { name: "View", width: "80px", cell: (row) => <Button variants="text" onClick={() => setSelected(row)} startIcon={<FaRegEye size={20} />} /> },
-  ], []);
+    ...(canUpdate ? [{
+      name: "Action",
+      width: "150px",
+      cell: (row: GranteeRow) => row.status === "ACTIVE" || row.status === "LOA"
+        ? <Button variants="text" onClick={() => setUpdating(row)} startIcon={<MdUpdate className="text-success" size={18} />}>Update Status</Button>
+        : "",
+    }] : []),
+  ], [canUpdate]);
 
   const detailRows = selected ? [
-    ["Name of Scholarship", selected.grantName], 
-    ["Academic Year", selected.academicYear], 
-    ["Seq", selected.seq],
-    ["Award Number", selected.awardNumber], 
-    ["Grant (TDP/TES)", selected.grantName], 
-    ["Batch", selected.batch], 
-    ["Semester", selected.semester],
-    ["Complete Name of Student", selected.completeName], 
-    ["Gender", selected.gender], 
+    ["Seq.", selected.seq],
+    ["Award Number", selected.awardNumber],
+    ["Student Number", selected.studentNumber],
+    ["Full Name", selected.completeName],
+    ["Sex", selected.gender],
     ["Year Level", selected.yearLevel],
-    ["Course", selected.course], 
-    ["School", selected.school], 
-    ["GWA", selected.gwa], 
-    ["Status", selected.status.charAt(0) + selected.status.slice(1).toLowerCase()],
+    ["Course", selected.course],
+    ["Sponsor", selected.sponsor],
+    ["Name of Scholarship", selected.grantName],
+    ["Academic Year", selected.academicYear],
+    ["Batch", selected.batch],
+    ["Semester", selected.semester],
+    ["School", selected.school],
+    ["Status", statusText(selected.status)],
   ] : [];
 
   return <>
-    <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-5">
       {statusFilters.map((item) => <button key={item.value} onClick={() => changeFilter(item.value)} className={`rounded-lg border p-4 text-left transition ${filter === item.value ? "border-primary bg-primary text-white" : "border-stroke bg-white hover:border-primary dark:border-strokedark dark:bg-boxdark"}`}>
         <span className="block font-semibold">{item.label}</span><span className={`mt-1 block text-xs ${filter === item.value ? "text-white/80" : "text-gray-500"}`}>{item.description}</span>
       </button>)}
@@ -193,6 +208,9 @@ const MonitoringList = ({ initialData, academicYears }: { initialData: GranteeLi
       <dl className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
         {detailRows.map(([label, value]) => <div key={String(label)} className="border-b border-stroke pb-3 dark:border-strokedark"><dt className="text-sm text-gray-500 dark:text-gray-400">{label}</dt><dd className="mt-1 font-medium text-black dark:text-white">{displayValue(value)}</dd></div>)}
       </dl>
+    </Modal>
+    <Modal title="Update Grantee Status" className="w-full max-w-xl" isOpen={!!updating} onClose={() => setUpdating(null)}>
+      {updating && <GranteeStatusForm grantee={updating} onSuccess={async () => { setUpdating(null); await loadData(); }} />}
     </Modal>
   </>;
 };

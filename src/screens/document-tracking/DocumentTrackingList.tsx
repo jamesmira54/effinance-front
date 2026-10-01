@@ -8,8 +8,8 @@ import { CiSquarePlus } from "react-icons/ci";
 import DataTable from "@/components/DataTable";
 import Badge from "@/components/Badge";
 import Alert from "@/components/Alert";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { DocumentTrack, TrackCurrentUser, TrackStatus } from "@/types/document-tracking.types";
 import { TRACK_STATUS } from "@/utils/constant";
 import { formatDateTime, statusLabel, statusVariant, toTrackError } from "./trackDisplay";
@@ -24,6 +24,7 @@ const trackingAPI = new DocumentTrackingAPIService();
 
 const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [tab, setTab] = useState<TabKey>("ALL");
     const [searchInput, setSearchInput] = useState<string>("");
     const [search, setSearch] = useState<string>("");
@@ -42,6 +43,7 @@ const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser
 
     const load = useCallback(async () => {
         setIsLoading(true);
+        showLoader();
         setErrorMessage("");
         try {
             const result = await trackingAPI.list({
@@ -64,8 +66,9 @@ const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser
             setTotal(0);
         } finally {
             setIsLoading(false);
+            hideLoader();
         }
-    }, [page, perPage, tab, search, router]);
+    }, [page, perPage, tab, search, router, showLoader, hideLoader]);
 
     useEffect(() => {
         load();
@@ -95,7 +98,7 @@ const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser
         { name: "Sponsorship", selector: (row) => row.sponsorshipName, wrap: true },
         { name: "Status", cell: (row) => <Badge variants={statusVariant(row.status)}>{statusLabel(row.status)}</Badge> },
         { name: "Current Office", selector: (row) => row.currentHolder, wrap: true },
-        { name: "Created By", selector: (row) => row.createdBy.name, wrap: true },
+        { name: "Created By", selector: (row) => row.createdBy?.name ?? "", wrap: true },
         { name: "Created At", selector: (row) => formatDateTime(row.createdAt), wrap: true },
         { name: "Submitted At", selector: (row) => formatDateTime(row.submittedAt), wrap: true },
     ], []);
@@ -149,7 +152,7 @@ const DocumentTrackingList: React.FC<DocumentTrackingListProps> = ({ currentUser
                 columns={columns}
                 data={rows}
                 progressPending={isLoading}
-                progressComponent={<div className="py-6"><Throbber /></div>}
+                progressComponent={<div className="py-6" />}
                 noDataComponent={<p className="py-6">No tracks.</p>}
                 pagination
                 paginationServer

@@ -22,7 +22,8 @@ export interface TrackHistoryEntry {
     toOffice: string | null;
     toOfficeId: string | null;
     remarks: string | null;
-    actor: TrackActor;
+    // null in a student grantee's view; staff identities are hidden.
+    actor: TrackActor | null;
     at: string;
 }
 
@@ -44,7 +45,8 @@ export interface DocumentTrack {
     originOffice: string | null;
     intendedDestinationId: string | null;
     intendedDestination: string | null;
-    createdBy: { userId: string; name: string };
+    // null in a student grantee's view.
+    createdBy: { userId: string; name: string } | null;
     createdAt: string;
     submittedAt: string | null;
     completedAt: string | null;
@@ -74,6 +76,7 @@ export interface TrackCurrentUser {
     officeId: string | null;
     officeName: string | null;
     canCreate: boolean;
+    isGrantee?: boolean;
 }
 
 export interface SetupItem {

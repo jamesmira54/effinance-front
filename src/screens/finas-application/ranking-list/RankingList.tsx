@@ -15,7 +15,6 @@ import { MdUpdate } from "react-icons/md";
 import RankingListForm from "./RankingListForm";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse, APIStudentFilesRes } from "@/types";
-import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import { SponsorshipAPIService } from "@/api";
 import { TableColumn } from "react-data-table-component";
 import { useLoader } from "@/context/LoaderContext";
@@ -39,7 +38,6 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
     const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
-    const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
 
     useEffect(() => {
@@ -89,7 +87,7 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: <div className="flex justify-center w-full">Remarks</div>, cell: (row:any) => (
             <div className="flex justify-center w-full">
-                <Button onClick={() => getRemarks(row.sponsorshipId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
+                <Button onClick={() => showRemarks(row.remarks)} disabled={!row.remarks?.trim()} variants="text" className="disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-black dark:disabled:hover:text-white" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
     ], []);
@@ -116,13 +114,11 @@ const RankingList: React.FC<{serverData: serverDataProps}> = ({
         }
     };
 
-    const getRemarks = async(sponsorshipId: string) => {
-        const remarksData = await SponsorshipStudentAPI.getSpecificSponsorship(sponsorshipId);
-        if(remarksData) {
-            setRemarks(remarksData.sponsorshipRemarks || "No remarks available.");
-            setOpenRemarksModal(true);
-        }
-    }
+    // Remarks come with the row; the button is disabled when there are none.
+    const showRemarks = (value?: string | null) => {
+        setRemarks(value ?? "");
+        setOpenRemarksModal(true);
+    };
 
     const openFile = (filename: string) => {
         window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${filename}`, "_blank", "noopener,noreferrer");

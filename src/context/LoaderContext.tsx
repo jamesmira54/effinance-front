@@ -1,7 +1,7 @@
 "use client";
 
 import Loader from "@/components/Loader";
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 
 type LoaderContextType = {
@@ -14,11 +14,13 @@ const LoaderContext = createContext<LoaderContextType | null>(null);
 export function LoaderProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
-  const showLoader = () => setLoading(true);
-  const hideLoader = () => setLoading(false);
+  // Stable references, so screens can list them as hook dependencies.
+  const showLoader = useCallback(() => setLoading(true), []);
+  const hideLoader = useCallback(() => setLoading(false), []);
+  const value = useMemo(() => ({ showLoader, hideLoader }), [showLoader, hideLoader]);
 
   return (
-    <LoaderContext.Provider value={{ showLoader, hideLoader }}>
+    <LoaderContext.Provider value={value}>
       <Loader show={loading} />
       {children}
     </LoaderContext.Provider>

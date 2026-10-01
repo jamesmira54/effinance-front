@@ -22,6 +22,7 @@ export interface AnnouncementsListProps {
     caption: string;
     sponsorshipId: string;
     sponsorshipName?: string;
+    date_posted?: string | null;
 }
 
 

@@ -7,8 +7,8 @@ import * as Yup from "yup";
 import Input from "@/components/Inputs/Input";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { SetupItem, SetupKind, SetupPayload } from "@/types/document-tracking.types";
 import { toTrackError } from "@/screens/document-tracking/trackDisplay";
 
@@ -32,6 +32,7 @@ const validationSchema = Yup.object({
 
 const OfficeTrackSetupForm: React.FC<OfficeTrackSetupFormProps> = ({ kind, item, onSaved, onCancel }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const formik = useFormik({
@@ -48,6 +49,7 @@ const OfficeTrackSetupForm: React.FC<OfficeTrackSetupFormProps> = ({ kind, item,
             const sortOrder = String(values.sortOrder ?? "").trim();
             if (sortOrder !== "") payload.sortOrder = Number(sortOrder);
 
+            showLoader();
             try {
                 const saved = item
                     ? await trackingAPI.setupUpdate(kind, item.id, payload)
@@ -61,6 +63,8 @@ const OfficeTrackSetupForm: React.FC<OfficeTrackSetupFormProps> = ({ kind, item,
                 }
                 if (error.fieldErrors) formik.setErrors(error.fieldErrors);
                 setErrorMessage(error.message);
+            } finally {
+                hideLoader();
             }
         },
     });
@@ -108,14 +112,8 @@ const OfficeTrackSetupForm: React.FC<OfficeTrackSetupFormProps> = ({ kind, item,
             </label>
 
             <div className="flex justify-end gap-3">
-                {formik.isSubmitting ? (
-                    <Throbber />
-                ) : (
-                    <>
-                        <Button type="button" variants="outlined" onClick={onCancel}>Cancel</Button>
-                        <Button type="submit" className="bg-primary">{item ? "Save Changes" : "Add"}</Button>
-                    </>
-                )}
+                <Button type="button" variants="outlined" onClick={onCancel} disabled={formik.isSubmitting}>Cancel</Button>
+                <Button type="submit" className="bg-primary" disabled={formik.isSubmitting}>{item ? "Save Changes" : "Add"}</Button>
             </div>
         </form>
     );

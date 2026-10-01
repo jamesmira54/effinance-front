@@ -50,6 +50,17 @@ export const filterMenuByRole = (menu: MenuItem[], role: UserRole): MenuItem[] =
 }
 
 
+// COMPLETE is the pooling "accept" decision; the client calls it Accepted.
+export const applicationStatusLabel = (status: string) => {
+  if (!status) return '';
+  if (status === 'COMPLETE') return 'Accepted';
+  return status
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+
 export const capitalized = (str: string) => {
   if (!str) return '';
   return str.split(' ')

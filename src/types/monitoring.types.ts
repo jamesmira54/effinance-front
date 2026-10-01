@@ -1,9 +1,13 @@
-export type MonitoringFilter = "all" | "active" | "delisted" | "graduated";
-export type GranteeStatus = "ACTIVE" | "DELISTED" | "GRADUATED";
+export type MonitoringFilter = "all" | "active" | "delisted" | "graduated" | "loa";
+export type GranteeStatus = "ACTIVE" | "DELISTED" | "GRADUATED" | "LOA";
 
 export interface GranteeRow {
   seq: number;
+  applicationId: string;
   awardNumber: string | null;
+  // The application number, shown as the student number.
+  studentNumber: string | null;
+  sponsor: string | null;
   grantName: string;
   academicYear: string | null;
   batch: number | null;
@@ -31,7 +35,10 @@ export interface MonitoringListParams {
   limit?: number;
 }
 
+// AWARDED reinstates an LOA grantee to Active.
+export type GranteeStatusTarget = "DELISTED" | "GRADUATED" | "LOA" | "AWARDED";
+
 export interface GranteeStatusChangeRequest {
-  status: "DELISTED" | "GRADUATED";
+  status: GranteeStatusTarget;
   remarks?: string;
 }

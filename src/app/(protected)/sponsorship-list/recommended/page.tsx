@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import RecommendedListing from "@/screens/sponsorship-list/recommended/RecommendedListing";
 
 export const metadata: Metadata = {
-  title: "Effinance - Recommended Sponsorships",
+  title: "Effinance - Available Grants",
 };
 
 const authAPI = new AuthAPIService();
@@ -37,7 +37,7 @@ const RecommendedSponsorships = async () => {
 
   return (
     <>
-      <Breadcrumb pageName="Recommended Sponsorships" />
+      <Breadcrumb pageName="Available Grants" />
       <RecommendedListing serverData={serverData} />
     </>
   );

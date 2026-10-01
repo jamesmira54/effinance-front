@@ -10,8 +10,8 @@ import Badge from "@/components/Badge";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
 import Modal from "@/components/Modal";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { SetupItem, SetupKind } from "@/types/document-tracking.types";
 import { formatDateTime, toTrackError } from "@/screens/document-tracking/trackDisplay";
 import OfficeTrackSetupForm from "./OfficeTrackSetupForm";
@@ -26,6 +26,7 @@ const trackingAPI = new DocumentTrackingAPIService();
 
 const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind, title, canManage }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [rows, setRows] = useState<SetupItem[]>([]);
     const [total, setTotal] = useState<number>(0);
     const [page, setPage] = useState<number>(1);
@@ -50,6 +51,7 @@ const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind,
 
     const load = useCallback(async () => {
         setIsLoading(true);
+        showLoader();
         try {
             const result = await trackingAPI.setupList(kind, { search, offset: (page - 1) * perPage, limit: perPage });
             setRows(result?.data ?? []);
@@ -60,8 +62,9 @@ const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind,
             setTotal(0);
         } finally {
             setIsLoading(false);
+            hideLoader();
         }
-    }, [kind, search, page, perPage, showError]);
+    }, [kind, search, page, perPage, showError, showLoader, hideLoader]);
 
     useEffect(() => {
         load();
@@ -89,6 +92,7 @@ const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind,
         setErrorMessage("");
         setTogglingId(item.id);
         setRows((current) => current.map((row) => (row.id === item.id ? { ...row, isActive: !item.isActive } : row)));
+        showLoader();
         try {
             const saved = await trackingAPI.setupUpdate(kind, item.id, { isActive: !item.isActive });
             setRows((current) => current.map((row) => (row.id === item.id ? saved : row)));
@@ -97,19 +101,23 @@ const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind,
             showError(err);
         } finally {
             setTogglingId(null);
+            hideLoader();
         }
-    }, [kind, showError]);
+    }, [kind, showError, showLoader, hideLoader]);
 
     const confirmDelete = async () => {
         if (!pendingDelete) return;
         const item = pendingDelete;
         setPendingDelete(null);
         setErrorMessage("");
+        showLoader();
         try {
             await trackingAPI.setupDelete(kind, item.id);
             load();
         } catch (err) {
             showError(err);
+        } finally {
+            hideLoader();
         }
     };
 
@@ -161,7 +169,7 @@ const OfficeTrackSetupListing: React.FC<OfficeTrackSetupListingProps> = ({ kind,
                 columns={columns}
                 data={rows}
                 progressPending={isLoading}
-                progressComponent={<div className="py-6"><Throbber /></div>}
+                progressComponent={<div className="py-6" />}
                 noDataComponent={<p className="py-6">No values yet.</p>}
                 pagination
                 paginationServer

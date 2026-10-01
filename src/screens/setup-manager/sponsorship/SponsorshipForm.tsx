@@ -37,12 +37,15 @@ const SponsorshipForm: React.FC<
 
   const initialValues = useMemo<SponsorshipFormProps>(() => ({
       name: initialData?.name || "",
+      // Fall back to the names on the row when the current sponsor or academic
+      // year is not in the dropdown options (e.g. an inactive sponsor account).
       sponsorId: initialData?.sponsorId ? {
-        label: selectOptionsData.coordinators.find((item) => item.value === initialData.sponsorId)?.label || "",
+        label: selectOptionsData.coordinators.find((item) => item.value === initialData.sponsorId)?.label || initialData.sponsorName || "",
         value: initialData.sponsorId,
       } : null,
       academicYearId: initialData?.academicYearId ? {
-        label: selectOptionsData.academicYears.find((item) => item.value === initialData.academicYearId)?.label || "",
+        label: selectOptionsData.academicYears.find((item) => item.value === initialData.academicYearId)?.label
+          || (initialData.academicYearStart ? `${initialData.academicYearStart}-${initialData.academicYearEnd}` : ""),
         value: initialData.academicYearId,
       } : null,
       durationFrom: initialData?.durationFrom ? initialData.durationFrom.split('T')[0] : "",
@@ -67,18 +70,10 @@ const SponsorshipForm: React.FC<
     enableReinitialize: true,
     validationSchema: Yup.object({
       name: Yup.string().required("Required Field!"),
-      sponsorId: Yup.object()
-        .shape({
-          value: Yup.string().required(),
-          label: Yup.string().required(),
-        })
-        .required("Required Field!"),
-      academicYearId: Yup.object()
-        .shape({
-          value: Yup.string().required(),
-          label: Yup.string().required(),
-        })
-        .required("Required Field!"),
+      // A single test (not a nested object shape) so the error is always a
+      // string; a nested error object would crash the Select's error message.
+      sponsorId: Yup.mixed().test("required", "Required Field!", (option: any) => Boolean(option?.value)),
+      academicYearId: Yup.mixed().test("required", "Required Field!", (option: any) => Boolean(option?.value)),
       durationFrom: Yup.string().required("Required Field!"),
       durationTo: Yup.string().required("Required Field!"),
       batchNumber: Yup.number().required("Required Field!"),

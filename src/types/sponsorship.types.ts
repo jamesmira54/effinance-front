@@ -89,6 +89,7 @@ export interface SponsorshipApplicationResponse {
     municipality: string; 
     finAssname: string;
     dateOfApp: string;
+    remarks?: string | null;
 }
 
 export interface AppliedSponsorshipDetailResponse {

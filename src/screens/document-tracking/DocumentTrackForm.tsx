@@ -10,8 +10,8 @@ import { SelectOption } from "@/components/Inputs/Select/Select.types";
 import Button from "@/components/Button";
 import Alert from "@/components/Alert";
 import Modal from "@/components/Modal";
-import Throbber from "@/components/common/Throbber";
 import { DocumentTrackingAPIService } from "@/api";
+import { useLoader } from "@/context/LoaderContext";
 import { DocumentTrack, DocumentTrackPayload, TrackCurrentUser } from "@/types/document-tracking.types";
 import { toTrackError } from "./trackDisplay";
 
@@ -54,6 +54,7 @@ const findOption = (options: SelectOption[], value: string) => options.find((opt
 
 const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, options, initialTrack, onSaved, onCancel }) => {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const isEdit = Boolean(initialTrack);
     // A ref, not state: the button click and form submit happen in the same event.
     const submitMode = useRef<"draft" | "submit">("draft");
@@ -73,6 +74,7 @@ const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, opti
             destinationId: values.destinationId || null,
         };
 
+        showLoader();
         try {
             const track = initialTrack
                 ? await trackingAPI.update(initialTrack.id, payload)
@@ -90,6 +92,8 @@ const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, opti
             }
             if (error.fieldErrors) formik.setErrors(error.fieldErrors);
             setErrorMessage(error.message);
+        } finally {
+            hideLoader();
         }
     };
 
@@ -187,19 +191,17 @@ const DocumentTrackForm: React.FC<DocumentTrackFormProps> = ({ currentUser, opti
             </div>
 
             <div className="flex flex-wrap justify-end gap-3">
-                {formik.isSubmitting ? (
-                    <Throbber />
-                ) : isEdit ? (
+                {isEdit ? (
                     <>
-                        {onCancel && <Button type="button" variants="outlined" onClick={onCancel}>Cancel</Button>}
-                        <Button type="submit" className="bg-primary">Save Changes</Button>
+                        {onCancel && <Button type="button" variants="outlined" onClick={onCancel} disabled={formik.isSubmitting}>Cancel</Button>}
+                        <Button type="submit" className="bg-primary" disabled={formik.isSubmitting}>Save Changes</Button>
                     </>
                 ) : (
                     <>
-                        <Button type="submit" variants="outlined" onClick={() => { submitMode.current = "draft"; }}>
+                        <Button type="submit" variants="outlined" disabled={formik.isSubmitting} onClick={() => { submitMode.current = "draft"; }}>
                             Save as Draft
                         </Button>
-                        <Button type="submit" className="bg-primary" onClick={() => { submitMode.current = "submit"; }}>
+                        <Button type="submit" className="bg-primary" disabled={formik.isSubmitting} onClick={() => { submitMode.current = "submit"; }}>
                             Create &amp; Submit
                         </Button>
                     </>

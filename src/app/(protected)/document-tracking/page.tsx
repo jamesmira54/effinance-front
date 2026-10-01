@@ -5,7 +5,7 @@ import NoTrackAccess from "@/screens/document-tracking/NoTrackAccess";
 import { getTrackSession, hasTrackAccess } from "./current-user";
 
 export const metadata: Metadata = {
-  title: "Effinance - Document Tracking",
+  title: "Effinance - Finas Tracking",
 };
 
 const DocumentTrackingPage = async () => {
@@ -13,7 +13,7 @@ const DocumentTrackingPage = async () => {
 
   return (
     <>
-      <Breadcrumb pageName="Document Tracking" />
+      <Breadcrumb pageName="Finas Tracking" />
       {hasTrackAccess(currentUser) ? <DocumentTrackingList currentUser={currentUser} /> : <NoTrackAccess />}
     </>
   );

@@ -19,10 +19,11 @@ interface SidebarProps {
   setSidebarOpen: (arg: boolean) => void;
   userDetails: APIUserProfileResponse;
   permissions: APIModuleProps[];
+  isGrantee?: boolean;
 }
 
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails, permissions }: SidebarProps) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails, permissions, isGrantee = false }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
   
   let role:UserRole = 'admin';
@@ -36,7 +37,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, userDetails, permissions }: Side
     }
   }
 
-  const menuItems = filterMenuByRole(MENU_ITEMS, role);
+  const menuItems = filterMenuByRole(MENU_ITEMS, role).filter((item) => isGrantee || !item.granteeOnly);
 
 
   const permissionMap = (permissions: APIModuleProps[]) => {

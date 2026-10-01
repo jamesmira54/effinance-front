@@ -215,8 +215,11 @@ export default function CriteriaSetup({ serverData }: CriteriaSetupProps) {
       }
   }, [showAlert]);
 
+  // Reload the list (not router.back()) so newly saved criteria, such as a
+  // Custom Input one, show up there right away.
   const handleBack = () => {
-    router.back();
+    router.push('/setup-manager/sponsorships');
+    router.refresh();
   };
 
   const confirmNotif = () => {

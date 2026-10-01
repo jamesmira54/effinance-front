@@ -7,6 +7,7 @@ import Select from "@/components/Inputs/Select/Select";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import Throbber from "@/components/common/Throbber";
 import { ApplicationAPIService } from "@/api";
+import { applicationStatusLabel } from "@/utils/helpers";
 
 const PoolingForm: React.FC<
 {
@@ -60,10 +61,7 @@ const PoolingForm: React.FC<
         return Object.values(APPLICATION_STATUS)
             .filter((status) => allowedStatuses.includes(status as typeof allowedStatuses[number]))
             .map((status) => ({
-                label: status
-                        .toLowerCase()
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char: string) => char.toUpperCase()),
+                label: applicationStatusLabel(status),
                 value: status,
             }));
     }, []);

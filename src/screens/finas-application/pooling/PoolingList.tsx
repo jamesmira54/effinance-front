@@ -6,7 +6,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { styled } from "styled-components";
 import { SponsorshipApplicationResponse } from "@/types/sponsorship.types";
-import { FormattedDate } from "@/utils/helpers";
+import { applicationStatusLabel, FormattedDate } from "@/utils/helpers";
 import { FaRegEye } from "react-icons/fa6";
 import StudentAPIService from "@/api/student-api";
 import { IoEyeOutline } from "react-icons/io5";
@@ -15,7 +15,6 @@ import { MdUpdate } from "react-icons/md";
 import PoolingForm from "./PoolingForm";
 import { APPLICATION_STAGE, APPLICATION_STATUS } from "@/utils/constant";
 import { APIApplicationResponse, APIStudentFilesRes } from "@/types";
-import SponsorshipStudentAPIService from "@/api/sponsorship-student-api";
 import Link from "next/link";
 import { SponsorshipAPIService } from "@/api";
 import { TableColumn } from "react-data-table-component";
@@ -39,7 +38,6 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
     const { showLoader, hideLoader } = useLoader();
     const StudentAPI = new StudentAPIService();
     const SponsorshipAPI = new SponsorshipAPIService();
-    const SponsorshipStudentAPI = new SponsorshipStudentAPIService();
 
     const [statusFilter, setStatusFilter] = useState<string>("ALL");
     const [data, setData] = useState<SponsorshipApplicationResponse[]>(serverData.applications || []);
@@ -81,11 +79,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
                     row.appStatus === APPLICATION_STATUS.COMPLETE ? "success" : 
                     row.appStatus === APPLICATION_STATUS.REJECTED ? "error" : 
                     "default"}>
-                        {row.appStatus
-                            .toLowerCase()
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char: string) => char.toUpperCase())
-                        }
+                        {applicationStatusLabel(row.appStatus)}
                 </Badge> 
             </div>
         )},
@@ -98,7 +92,7 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
         )},
         { name: <div className="flex justify-center w-full">Remarks</div>, cell: (row:any) => (
             <div className="flex justify-center w-full">
-                <Button onClick={() => getRemarks(row.sponsorshipId) } variants="text" startIcon={<FaRegEye size={20}/>}/>
+                <Button onClick={() => showRemarks(row.remarks)} disabled={!row.remarks?.trim()} variants="text" className="disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-black dark:disabled:hover:text-white" startIcon={<FaRegEye size={20}/>}/>
             </div>
         )},
     ], []);
@@ -122,13 +116,11 @@ const PoolingList: React.FC<{serverData: serverDataProps}> = ({
         hideLoader();
     };
 
-    const getRemarks = async(sponsorshipId: string) => {
-        const remarksData = await SponsorshipStudentAPI.getSpecificSponsorship(sponsorshipId);
-        if(remarksData) {
-            setRemarks(remarksData.sponsorshipRemarks || "No remarks available.");
-            setOpenRemarksModal(true);
-        }
-    }
+    // Remarks come with the row; the button is disabled when there are none.
+    const showRemarks = (value?: string | null) => {
+        setRemarks(value ?? "");
+        setOpenRemarksModal(true);
+    };
 
     const openFile = (filename: string) => {
         window.open(`${process.env.NEXT_PUBLIC_API_URL}/uploads/docs/${filename}`, "_blank", "noopener,noreferrer");

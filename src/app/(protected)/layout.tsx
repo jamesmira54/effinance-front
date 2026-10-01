@@ -5,6 +5,8 @@ import "@/css/style.css";
 import React, { Fragment} from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { AuthAPIService, UserAPIService } from "@/api";
+import { USER_ROLE } from "@/utils/constant";
+import { getTrackSession } from "./document-tracking/current-user";
 
 
 const authAPI = new AuthAPIService();
@@ -32,10 +34,14 @@ export default async function AdminLayout({
   
   const userDetails = await fetchProfile(userId);
   const permissions = getUserSession?.permissions || [];
+  // Only student grantees get the read-only Finas Tracking menu.
+  const isGrantee = userDetails?.userType === USER_ROLE.STUDENT
+    ? Boolean((await getTrackSession())?.isGrantee)
+    : false;
 
   return (
     <Fragment>
-      <DefaultLayout userDetails={userDetails} permissions={permissions}>
+      <DefaultLayout userDetails={userDetails} permissions={permissions} isGrantee={isGrantee}>
         {children}
       </DefaultLayout>
     </Fragment>
